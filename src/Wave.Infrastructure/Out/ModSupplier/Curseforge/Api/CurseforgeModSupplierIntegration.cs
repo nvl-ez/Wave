@@ -11,10 +11,16 @@ namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
 
 public class CurseforgeModSupplier : IModSupplierIntegration
 {
-    private static readonly HttpClient client = new()
+    private readonly HttpClient client;
+
+    public CurseforgeModSupplier()
     {
-        BaseAddress = new Uri("https://api.curseforge.com")
-    };
+        client = new HttpClient()
+        {
+            BaseAddress = new Uri("https://api.curseforge.com")
+        };
+        client.DefaultRequestHeaders.Add("x-api-key", "$2a$10$BGG5jB6kIf.QgqGtFOKEWuscWzRGs.YsZ3YXp1YJ7.0PW9i4CzmAe");
+    }
     public async Task<Mod> SearchModAsync(Mod mod, CancellationToken ct)
     {
         throw new NotImplementedException();
@@ -50,6 +56,7 @@ public class CurseforgeModSupplier : IModSupplierIntegration
 
         queryParameters.Add("index", modSupplierQuery.Offset.ToString());
         queryParameters.Add("pageSize", modSupplierQuery.PageSize.ToString());
+        queryParameters.Add("gameId", $"{432}");
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
