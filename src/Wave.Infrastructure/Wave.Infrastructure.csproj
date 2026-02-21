@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wave.Application\Wave.Application.csproj" />
+    <ProjectReference Include="..\Wave.Domain\Wave.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="In\" />
+    <Folder Include="Out\ModSupplier\Curseforge\Api\Mappers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0-preview.1.26104.118" />
+    <PackageReference Include="System.Net.Http.Json" Version="11.0.0-preview.1.26104.118" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

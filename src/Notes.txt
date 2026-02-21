@@ -1,0 +1,8 @@
+Modloader Version APIs were obtained from: https://github.com/Zmito26dev/minecraft-versions-api/blob/main/main.py#L123
+Minecraft Version API was obtained from: https://launchermeta.mojang.com/mc/game/version_manifest.json?versions
+
+Forge Launch Flags were obtained from: https://minecraft.fandom.com/wiki/Tutorials/Setting_up_a_Minecraft_Forge_server
+Fabric Launch Flags were obtained from: https://wiki.fabricmc.net/install
+
+Modrinth API: https://docs.modrinth.com/api/operations/getproject/
+Curseforge API: https://docs.curseforge.com/rest-api/#get-mod
