@@ -9,11 +9,11 @@ using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Mappers;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
 
-public class CurseforgeModSupplier : IModSupplierIntegration
+public class CurseforgeModSupplierIntegration : IModSupplierIntegration
 {
     private readonly HttpClient client;
 
-    public CurseforgeModSupplier()
+    public CurseforgeModSupplierIntegration()
     {
         client = new HttpClient()
         {
@@ -76,7 +76,7 @@ public class CurseforgeModSupplier : IModSupplierIntegration
         }
         catch (HttpRequestException)
         {
-            Console.WriteLine("Error when contacting ");
+            Console.WriteLine("Error when contacting Curseforge");
         }
         return mods;
     }

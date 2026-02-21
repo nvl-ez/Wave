@@ -33,7 +33,7 @@ public static class MauiProgram
 		var mcsvc = new MinecraftVersionCatalogService(new MinecraftVersionCatalog());
 		var fgsvc = new ModloaderVersionCatalogService(new ForgeVersionCatalog());
 		var fasvc = new ModloaderVersionCatalogService(new FabricVersionCatalog());
-		var cfsvc = new ModSupplierService(new CurseforgeModSupplier());
+		var cfsvc = new ModSupplierService(new CurseforgeModSupplierIntegration());
 		var versions = Task.Run(async () =>
 		{
 			MinecraftVersion mc = new()
