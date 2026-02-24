@@ -16,4 +16,5 @@ public class Mod
     public required ModloaderType ModloaderType { get; set; }
     public string? ExternalId { get; set; }
     public required Uri DownloadUrl;
+    public List<int>? DependencyExternalCodes = null;
 }

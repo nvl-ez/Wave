@@ -24,7 +24,7 @@ public static class ModDtoMapper
 
     public static Mod ToDomain(ModFileDto dto, ModInfoResult modInfoResult)
     {
-        return new Mod()
+        Mod mod = new Mod()
         {
             ExternalId = dto.ModId.ToString(),
             MinecraftVersion = modInfoResult.MinecraftVersion,
@@ -35,5 +35,15 @@ public static class ModDtoMapper
             DownloadUrl = new Uri(dto.DownloadUrl),
             Version = ""
         };
+
+        if (dto.Dependencies is not null && dto.Dependencies.Count > 0)
+        {
+            mod.DependencyExternalCodes = new List<int>();
+            foreach (ModDependencyDto dependencyDto in dto.Dependencies)
+            {
+                mod.DependencyExternalCodes.Add(dependencyDto.ModId);
+            }
+        }
+        return mod;
     }
 }
