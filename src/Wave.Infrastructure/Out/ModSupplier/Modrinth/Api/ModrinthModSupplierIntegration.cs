@@ -17,17 +17,17 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
     {
         client = new HttpClient()
         {
-            BaseAddress = new Uri("https://staging-api.modrinth.com")
+            BaseAddress = new Uri("https://api.modrinth.com")
         };
         client.DefaultRequestHeaders.Add("User-Agent", "nvl-ez/Wave (nahuelvazquezlevrino@gmail.com)");
     }
 
-    public async Task<Mod> SearchModAsync(Mod mod, CancellationToken ct)
+    public async Task<IEnumerable<Mod>> GetModFilesAsync(ModInfoResult mod, CancellationToken ct)
     {
-        throw new NotImplementedException();
+
     }
 
-    public async Task<IEnumerable<Mod>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct)
+    public async Task<IEnumerable<ModInfoResult>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct)
     {
         //Build Query Arguments
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
@@ -56,7 +56,7 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
-        List<Mod> mods = new List<Mod>();
+        List<ModInfoResult> mods = new List<ModInfoResult>();
         try
         {
             string jsonResponse = await client.GetStringAsync($"/v2/search?{queryString}", ct);

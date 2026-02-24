@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Dtos;
 
-public record class SearchModsResponseDto
+public class SearchModFileDto
 {
-    [JsonPropertyName("data")]
-    public List<ModInfoDto> Mods { get; set; } = new List<ModInfoDto>();
-    [JsonPropertyName("pagination")]
+    [JsonPropertyName("id")]
+    public List<ModFileDto> Data { get; set; } = new List<ModFileDto>();
+    [JsonPropertyName("id")]
     public PaginationDto Pagination { get; set; } = new PaginationDto()
     {
         Index = -1,

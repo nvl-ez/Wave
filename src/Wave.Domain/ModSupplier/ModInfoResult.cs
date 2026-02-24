@@ -1,19 +1,16 @@
 using System;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Modloaders;
-using Wave.Domain.ModSupplier;
 
-namespace Wave.Domain.Mods;
+namespace Wave.Domain.ModSupplier;
 
-public class Mod
+public record class ModInfoResult
 {
     public required ModSupplierType ModSupplierType { get; set; }
     public required string Name { get; set; }
-    public string? Description { get; set; }
     public Uri? IconUrl { get; set; }
-    public required string Version { get; set; }
     public required MinecraftVersion MinecraftVersion { get; set; }
     public required ModloaderType ModloaderType { get; set; }
-    public string? ExternalId { get; set; }
-    public required Uri DownloadUrl;
+    public required string ExternalId { get; set; }
+    public required string Slug { get; set; }
 }

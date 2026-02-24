@@ -6,7 +6,6 @@ namespace Wave.Application.Out.ModSupplier;
 
 public interface IModSupplierIntegration
 {
-    public Task<IEnumerable<Mod>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct);
-    public Task<Mod> SearchModAsync(Mod mod, CancellationToken ct);
-
+    public Task<IEnumerable<ModInfoResult>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct);
+    public Task<IEnumerable<Mod>> GetModFilesAsync(ModInfoResult mod, CancellationToken ct);
 }

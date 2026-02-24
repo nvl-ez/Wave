@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Dtos;
 
-public record class ModDto
+public record class ModInfoDto
 {
     [JsonPropertyName("id")]
     public required int Id { get; set; }

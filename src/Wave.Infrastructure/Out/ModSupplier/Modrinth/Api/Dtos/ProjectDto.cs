@@ -11,7 +11,7 @@ public record class ProjectDto
     public string Slug { get; set; } = "";
     [JsonPropertyName("icon_url")]
     public string? IconUrl { get; set; }
-    [JsonPropertyName(" project_id ")]
+    [JsonPropertyName("project_id")]
     public required string ProjectId { get; set; }
     [JsonPropertyName("author")]
     public required string Author { get; set; }

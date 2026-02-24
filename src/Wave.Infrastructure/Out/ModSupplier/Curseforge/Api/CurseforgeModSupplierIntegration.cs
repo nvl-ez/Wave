@@ -21,12 +21,40 @@ public class CurseforgeModSupplierIntegration : IModSupplierIntegration
         };
         client.DefaultRequestHeaders.Add("x-api-key", "$2a$10$BGG5jB6kIf.QgqGtFOKEWuscWzRGs.YsZ3YXp1YJ7.0PW9i4CzmAe");
     }
-    public async Task<Mod> SearchModAsync(Mod mod, CancellationToken ct)
+
+    public async Task<IEnumerable<Mod>> GetModFilesAsync(ModInfoResult mod, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        Dictionary<string, string> queryParameters = new Dictionary<string, string>();
+        queryParameters.Add("gameVersion", mod.MinecraftVersion.Version);
+        ModloaderType loader = mod.ModloaderType;
+        if (loader == ModloaderType.Vanilla) throw new NotSupportedException("Mods cannot be searched for Vanilla Minecraft.");
+        queryParameters.Add("modLoaderType",
+            loader == ModloaderType.Forge ? "1" :
+                (loader == ModloaderType.Fabric ? "4" : throw new NotImplementedException("Missing implementation for modloader"))
+            );
+        string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
+
+        List<Mod> mods = new List<Mod>();
+        try
+        {
+            string jsonResponse = await client.GetStringAsync($"/v1/mods/{mod.ExternalId}/files?{queryString}", ct);
+            JsonDocument doc = JsonDocument.Parse(jsonResponse);
+            JsonElement rootElement = doc.RootElement;
+
+            SearchModFileDto dto = JsonSerializer.Deserialize<SearchModFileDto>(rootElement) ?? new SearchModFileDto();
+            foreach (ModFileDto modDto in dto.Data)
+            {
+                mods.Add(ModDtoMapper.ToDomain(modDto, mod));
+            }
+        }
+        catch (HttpRequestException)
+        {
+            Console.WriteLine("Error when contacting Curseforge");
+        }
+        return mods;
     }
 
-    public async Task<IEnumerable<Mod>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct)
+    public async Task<IEnumerable<ModInfoResult>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct)
     {
         //Build Query Arguments
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
@@ -50,8 +78,8 @@ public class CurseforgeModSupplierIntegration : IModSupplierIntegration
         ModloaderType loader = modSupplierQuery.ModloaderType;
         if (loader == ModloaderType.Vanilla) throw new NotSupportedException("Mods cannot be searched for Vanilla Minecraft.");
         queryParameters.Add("modLoaderType",
-            loader == ModloaderType.Forge ? "Forge" :
-                (loader == ModloaderType.Fabric ? "Fabric" : throw new NotImplementedException("Missing implementation for modloader"))
+            loader == ModloaderType.Forge ? "1" :
+                (loader == ModloaderType.Fabric ? "4" : throw new NotImplementedException("Missing implementation for modloader"))
             );
 
         queryParameters.Add("index", modSupplierQuery.Offset.ToString());
@@ -61,7 +89,7 @@ public class CurseforgeModSupplierIntegration : IModSupplierIntegration
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
         //HTTP Request
-        List<Mod> mods = new List<Mod>();
+        List<ModInfoResult> mods = new List<ModInfoResult>();
         try
         {
             string jsonResponse = await client.GetStringAsync($"/v1/mods/search?{queryString}", ct);
@@ -69,7 +97,7 @@ public class CurseforgeModSupplierIntegration : IModSupplierIntegration
             JsonElement rootElement = doc.RootElement;
 
             SearchModsResponseDto dto = JsonSerializer.Deserialize<SearchModsResponseDto>(rootElement) ?? new SearchModsResponseDto();
-            foreach (ModDto modDto in dto.Mods)
+            foreach (ModInfoDto modDto in dto.Mods)
             {
                 mods.Add(ModDtoMapper.ToDomain(modDto, modSupplierQuery));
             }

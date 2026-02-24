@@ -8,6 +8,7 @@ using Wave.Infrastructure.Out.Minecraft.Api;
 using Wave.Infrastructure.Out.Modloader.Fabric.Api;
 using Wave.Infrastructure.Out.Modloader.Forge.Api;
 using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
+using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api;
 
 namespace Wave.Ui;
 
@@ -34,6 +35,7 @@ public static class MauiProgram
 		var fgsvc = new ModloaderVersionCatalogService(new ForgeVersionCatalog());
 		var fasvc = new ModloaderVersionCatalogService(new FabricVersionCatalog());
 		var cfsvc = new ModSupplierService(new CurseforgeModSupplierIntegration());
+		var mrsvc = new ModSupplierService(new ModrinthModSupplierIntegration());
 		var versions = Task.Run(async () =>
 		{
 			MinecraftVersion mc = new()
@@ -49,9 +51,9 @@ public static class MauiProgram
 			};
 			await mcsvc.GetMinecraftVersionsAsync(false, CancellationToken.None);
 			await fgsvc.GetModloaderVersionsAsync(mc, CancellationToken.None);
-			await fasvc.GetModloaderVersionsAsync(mc, CancellationToken.None);
-			await cfsvc.SearchModsAsync(query, CancellationToken.None);
-
+			//await fasvc.GetModloaderVersionsAsync(mc, CancellationToken.None);
+			//await cfsvc.SearchModsAsync(query, CancellationToken.None);
+			await mrsvc.SearchModsAsync(query, CancellationToken.None);
 		});
 
 		return builder.Build();
