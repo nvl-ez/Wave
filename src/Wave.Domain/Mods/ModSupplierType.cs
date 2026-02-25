@@ -1,4 +1,4 @@
-namespace Wave.Domain.ModSupplier;
+namespace Wave.Domain.Mods;
 
 public enum ModSupplierType
 {

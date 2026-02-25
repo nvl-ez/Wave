@@ -18,7 +18,7 @@ public class MinecraftVersionCatalogService : IMinecraftVersionCatalogService
     {
 
         List<MinecraftVersion> versions = (await minecraftVersionCatalog.GetMinecraftVersionsAsync(ct))
-        .Where(x => includeSnapshots || x.VersionType == MinecraftVersion.VersionTypeEnum.Release)
+        .Where(x => includeSnapshots || x.VersionType == MinecraftVersion.VersionType.Release)
         .ToList();
 
         return versions;

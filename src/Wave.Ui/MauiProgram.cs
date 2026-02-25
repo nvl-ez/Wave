@@ -41,7 +41,7 @@ public static class MauiProgram
 			MinecraftVersion mc = new()
 			{
 				Version = "1.14",
-				VersionType = MinecraftVersion.VersionTypeEnum.Release,
+				VersionType = MinecraftVersion.VersionType.Release,
 				ReleaseDate = DateTime.Now
 			};
 			ModSupplierQuery query = new ModSupplierQuery()

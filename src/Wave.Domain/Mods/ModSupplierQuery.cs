@@ -2,7 +2,7 @@ using System;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Modloaders;
 
-namespace Wave.Domain.ModSupplier;
+namespace Wave.Domain.Mods;
 
 public record class ModSupplierQuery
 {

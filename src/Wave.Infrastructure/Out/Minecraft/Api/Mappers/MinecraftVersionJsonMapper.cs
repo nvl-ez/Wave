@@ -11,8 +11,8 @@ public static class MinecraftVersionJsonMapper
         return new MinecraftVersion()
         {
             Version = dto.Id,
-            VersionType = dto.Type == "release" ? MinecraftVersion.VersionTypeEnum.Release :
-                (dto.Type == "snapshot" ? MinecraftVersion.VersionTypeEnum.Snapshot : MinecraftVersion.VersionTypeEnum.Other),
+            VersionType = dto.Type == "release" ? MinecraftVersion.VersionType.Release :
+                (dto.Type == "snapshot" ? MinecraftVersion.VersionType.Snapshot : MinecraftVersion.VersionType.Other),
             DetailsUrl = new Uri(dto.Url),
             ReleaseDate = dto.ReleaseTime
         };

@@ -20,4 +20,18 @@ public static class ProjectDtoMapper
             Slug = dto.Slug
         };
     }
+
+    public static Mod ToDomain(ProjectVersionDto versionDto, FileDto fileDto, ModInfoResult modInfoResult)
+    {
+        Mod mod = new Mod()
+        {
+            Name = versionDto.Name,
+            ExternalId = dto.ProjectId,
+            MinecraftVersion = query.MinecraftVersion,
+            ModSupplierType = ModSupplierType.Modrinth,
+            ModloaderType = query.ModloaderType,
+            IconUrl = dto.IconUrl == null ? null : new Uri(dto.IconUrl),
+            Slug = dto.Slug
+        };
+    }
 }

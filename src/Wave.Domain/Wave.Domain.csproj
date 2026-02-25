@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Modloaders\" />
-    <Folder Include="Mods\" />
     <Folder Include="ServerManager\" />
   </ItemGroup>
 

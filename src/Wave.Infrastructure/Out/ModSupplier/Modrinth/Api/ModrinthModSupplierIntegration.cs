@@ -3,7 +3,6 @@ using System.Text.Json;
 using Wave.Application.Out.ModSupplier;
 using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
-using Wave.Domain.ModSupplier;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Dtos;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Mappers;
 
@@ -24,7 +23,35 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
 
     public async Task<IEnumerable<Mod>> GetModFilesAsync(ModInfoResult mod, CancellationToken ct)
     {
+        Dictionary<string, string> queryParameters = new Dictionary<string, string>();
+        ModloaderType loader = mod.ModloaderType;
+        string loaderString = loader == ModloaderType.Forge ? "forge" :
+                (loader == ModloaderType.Fabric ? "fabric" : throw new NotImplementedException("Missing implementation for modloader"));
+        string facets = $"[[\"loaders:{loaderString}\"],[\"game_versions:{mod.MinecraftVersion.Version}\"]]";
+        queryParameters.Add("facets", facets);
 
+        string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
+
+        List<Mod> mods = new List<Mod>();
+        try
+        {
+            string jsonResponse = await client.GetStringAsync($"/v2/project/{mod.ExternalId}/version?{queryString}", ct);
+            JsonDocument doc = JsonDocument.Parse(jsonResponse);
+            JsonElement rootElement = doc.RootElement;
+
+            List<ProjectVersionDto> dto = JsonSerializer.Deserialize<List<ProjectVersionDto>>(rootElement) ?? new List<ProjectVersionDto>();
+            foreach (ProjectVersionDto versionDto in dto)
+            {
+                foreach (FileDto fileDto in versionDto.Files)
+                {
+
+                }
+            }
+        }
+        catch (HttpRequestException)
+        {
+            Console.WriteLine("Error when contacting Modrinth");
+        }
     }
 
     public async Task<IEnumerable<ModInfoResult>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct)
