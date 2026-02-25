@@ -1,6 +1,6 @@
 namespace Wave.Domain.Minecraft;
 
-public enum VersionType
+public enum MinecraftVersionType
 {
     Release,
     Snapshot,

@@ -21,7 +21,7 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
         client.DefaultRequestHeaders.Add("User-Agent", "nvl-ez/Wave (nahuelvazquezlevrino@gmail.com)");
     }
 
-    public async Task<IEnumerable<Mod>> GetModFilesAsync(ModInfoResult mod, CancellationToken ct)
+    public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo mod, CancellationToken ct)
     {
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
         ModloaderType loader = mod.ModloaderType;
@@ -32,13 +32,14 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
-        List<Mod> mods = new List<Mod>();
+        List<ModVersion> mods = new List<ModVersion>();
         try
         {
-            string jsonResponse = await client.GetStringAsync($"/v2/project/{mod.ExternalId}/version?{queryString}", ct);
+            string jsonResponse = await client.GetStringAsync($"/v2/project/{mod.ModId}/version?{queryString}", ct);
             JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement rootElement = doc.RootElement;
 
+            //TODO: acabar integracion de version
             List<ProjectVersionDto> dto = JsonSerializer.Deserialize<List<ProjectVersionDto>>(rootElement) ?? new List<ProjectVersionDto>();
             foreach (ProjectVersionDto versionDto in dto)
             {
@@ -52,9 +53,10 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
         {
             Console.WriteLine("Error when contacting Modrinth");
         }
+        return mods;
     }
 
-    public async Task<IEnumerable<ModInfoResult>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct)
+    public async Task<IEnumerable<ModInfo>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct)
     {
         //Build Query Arguments
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
@@ -83,7 +85,7 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
-        List<ModInfoResult> mods = new List<ModInfoResult>();
+        List<ModInfo> mods = new List<ModInfo>();
         try
         {
             string jsonResponse = await client.GetStringAsync($"/v2/search?{queryString}", ct);
@@ -93,7 +95,7 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
             SearchModsResponseDto dto = JsonSerializer.Deserialize<SearchModsResponseDto>(rootElement) ?? new SearchModsResponseDto();
             foreach (ProjectDto modDto in dto.Projects)
             {
-                mods.Add(ProjectDtoMapper.ToDomain(modDto, modSupplierQuery));
+                mods.Add(Mapper.ToDomain(modDto, modSupplierQuery));
             }
         }
         catch (HttpRequestException)

@@ -1,15 +1,14 @@
 using System;
 using Wave.Domain.Mods;
-using Wave.Domain.ModSupplier;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Mappers;
 
-public static class ProjectDtoMapper
+public static class Mapper
 {
-    public static ModInfoResult ToDomain(ProjectDto dto, ModSupplierQuery query)
+    public static ModInfo ToDomain(ProjectDto dto, ModSupplierQuery query)
     {
-        return new ModInfoResult()
+        return new ModInfo()
         {
             Name = dto.Title,
             ExternalId = dto.ProjectId,
@@ -21,9 +20,9 @@ public static class ProjectDtoMapper
         };
     }
 
-    public static Mod ToDomain(ProjectVersionDto versionDto, FileDto fileDto, ModInfoResult modInfoResult)
+    public static ModVersion ToDomain(ProjectVersionDto versionDto, FileDto fileDto, ModInfo modInfoResult)
     {
-        Mod mod = new Mod()
+        ModVersion mod = new ModVersion()
         {
             Name = versionDto.Name,
             ExternalId = dto.ProjectId,

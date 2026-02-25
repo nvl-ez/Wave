@@ -13,4 +13,6 @@ public record class ModInfoDto
     public required string Slug { get; set; }
     [JsonPropertyName("logo")]
     public required ModAssetDto Logo { get; set; }
+    [JsonPropertyName("summary")]
+    public required string Summary { get; set; }
 }

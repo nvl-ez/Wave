@@ -12,5 +12,5 @@ public class ServerDefinition
     public required MinecraftVersion MinecraftVersion { get; set; }
     public required ModloaderType ModloaderType { get; set; }
     public ModloaderVersion? ModloaderVersion { get; set; } = null;
-    public List<Mod>? Mods { get; set; } = null;
+    public List<ModVersion>? Mods { get; set; } = null;
 }
