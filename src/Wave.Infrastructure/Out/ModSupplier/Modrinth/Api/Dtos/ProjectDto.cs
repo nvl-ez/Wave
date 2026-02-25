@@ -15,4 +15,6 @@ public record class ProjectDto
     public required string ProjectId { get; set; }
     [JsonPropertyName("author")]
     public required string Author { get; set; }
+    [JsonPropertyName("description")]
+    public required string Description { get; set; }
 }

@@ -12,7 +12,7 @@ public static class FabricVersionJsonMapper
         {
             Version = dto.Loader.Version,
             MinecraftVersion = minecraftVersion,
-            DowloadUrl = new Uri($"https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.1.1/fabric-installer-1.1.1.jar")
+            DowloadUrl = $"https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.1.1/fabric-installer-1.1.1.jar"
         };
     }
 }

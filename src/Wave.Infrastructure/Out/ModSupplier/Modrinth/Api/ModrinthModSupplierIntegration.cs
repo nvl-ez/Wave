@@ -21,13 +21,11 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
         client.DefaultRequestHeaders.Add("User-Agent", "nvl-ez/Wave (nahuelvazquezlevrino@gmail.com)");
     }
 
-    public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo mod, CancellationToken ct)
+    public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo modInfo, CancellationToken ct)
     {
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
-        ModloaderType loader = mod.ModloaderType;
-        string loaderString = loader == ModloaderType.Forge ? "forge" :
-                (loader == ModloaderType.Fabric ? "fabric" : throw new NotImplementedException("Missing implementation for modloader"));
-        string facets = $"[[\"loaders:{loaderString}\"],[\"game_versions:{mod.MinecraftVersion.Version}\"]]";
+        string loaderString = Mapper.ToDtoModloaderType(modInfo.ModloaderType);
+        string facets = $"[[\"loaders:{loaderString}\"],[\"game_versions:{modInfo.MinecraftVersion.Version}\"]]";
         queryParameters.Add("facets", facets);
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
@@ -35,18 +33,14 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
         List<ModVersion> mods = new List<ModVersion>();
         try
         {
-            string jsonResponse = await client.GetStringAsync($"/v2/project/{mod.ModId}/version?{queryString}", ct);
+            string jsonResponse = await client.GetStringAsync($"/v2/project/{modInfo.ModId}/version?{queryString}", ct);
             JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement rootElement = doc.RootElement;
 
-            //TODO: acabar integracion de version
             List<ProjectVersionDto> dto = JsonSerializer.Deserialize<List<ProjectVersionDto>>(rootElement) ?? new List<ProjectVersionDto>();
             foreach (ProjectVersionDto versionDto in dto)
             {
-                foreach (FileDto fileDto in versionDto.Files)
-                {
-
-                }
+                mods.Add(Mapper.ToDomain(versionDto, modInfo));
             }
         }
         catch (HttpRequestException)

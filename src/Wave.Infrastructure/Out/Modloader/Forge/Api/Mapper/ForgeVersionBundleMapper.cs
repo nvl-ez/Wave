@@ -15,7 +15,7 @@ public static class ForgeVersionBundleMapper
         {
             Version = version,
             MinecraftVersion = minecraftVersion,
-            DowloadUrl = new Uri($"https://maven.minecraftforge.net/net/minecraftforge/forge/{dto}/forge-{dto}-installer.jar")
+            DowloadUrl = $"https://maven.minecraftforge.net/net/minecraftforge/forge/{dto}/forge-{dto}-installer.jar"
         };
     }
 }

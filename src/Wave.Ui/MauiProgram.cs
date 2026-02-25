@@ -3,7 +3,6 @@ using Wave.Application.Services;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
-using Wave.Domain.ModSupplier;
 using Wave.Infrastructure.Out.Minecraft.Api;
 using Wave.Infrastructure.Out.Modloader.Fabric.Api;
 using Wave.Infrastructure.Out.Modloader.Forge.Api;
@@ -41,7 +40,7 @@ public static class MauiProgram
 			MinecraftVersion mc = new()
 			{
 				Version = "1.14",
-				VersionType = MinecraftVersion.VersionType.Release,
+				MinecraftVersionType = MinecraftVersionType.Release,
 				ReleaseDate = DateTime.Now
 			};
 			ModSupplierQuery query = new ModSupplierQuery()

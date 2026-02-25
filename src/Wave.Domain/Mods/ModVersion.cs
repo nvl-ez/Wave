@@ -14,7 +14,7 @@ public record class ModVersion
     public List<ModDependency>? Dependencies { get; set; }
     public string? Changelog { get; set; }
     public required MinecraftVersion MinecraftVersion { get; set; }
-    public required ModVersionType VersionType { get; set; }
+    public required ModVersionType ModVersionType { get; set; }
     public required ModSupplierType ModSupplierType { get; set; }
     public required ModloaderType ModloaderType { get; set; }
     public bool Featured { get; set; } = false;

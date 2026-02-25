@@ -56,13 +56,13 @@ public static class Mapper
             MinecraftVersion = modInfoResult.MinecraftVersion,
             ModloaderType = modInfoResult.ModloaderType,
             ModSupplierType = ModSupplierType.Curseforge,
-            VersionType = ToDomainVersionType(dto.ReleaseType),
+            ModVersionType = ToDomainModVersionType(dto.ReleaseType),
             Version = ""
         };
         return mod;
     }
 
-    public static ModVersionType ToDomainVersionType(int versionType)
+    public static ModVersionType ToDomainModVersionType(int versionType)
     {
         switch (versionType)
         {
