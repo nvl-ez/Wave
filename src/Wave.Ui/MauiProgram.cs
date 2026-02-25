@@ -33,8 +33,8 @@ public static class MauiProgram
 		var mcsvc = new MinecraftVersionCatalogService(new MinecraftVersionCatalog());
 		var fgsvc = new ModloaderVersionCatalogService(new ForgeVersionCatalog());
 		var fasvc = new ModloaderVersionCatalogService(new FabricVersionCatalog());
-		var cfsvc = new ModSupplierService(new CurseforgeModSupplierIntegration());
-		var mrsvc = new ModSupplierService(new ModrinthModSupplierIntegration());
+		var cfsvc = new CurseforgeModSupplierIntegration();
+		var mrsvc = new ModrinthModSupplierIntegration();
 		var versions = Task.Run(async () =>
 		{
 			MinecraftVersion mc = new()
@@ -48,11 +48,13 @@ public static class MauiProgram
 				MinecraftVersion = mc,
 				ModloaderType = ModloaderType.Forge,
 			};
-			await mcsvc.GetMinecraftVersionsAsync(false, CancellationToken.None);
-			await fgsvc.GetModloaderVersionsAsync(mc, CancellationToken.None);
+			//await mcsvc.GetMinecraftVersionsAsync(false, CancellationToken.None);
+			//await fgsvc.GetModloaderVersionsAsync(mc, CancellationToken.None);
 			//await fasvc.GetModloaderVersionsAsync(mc, CancellationToken.None);
-			//await cfsvc.SearchModsAsync(query, CancellationToken.None);
-			await mrsvc.SearchModsAsync(query, CancellationToken.None);
+			//var result = await cfsvc.SearchModsAsync(query, CancellationToken.None);
+			//await cfsvc.GetModVersionsAsync(result.First(), CancellationToken.None);
+			var result = await mrsvc.SearchModsAsync(query, CancellationToken.None);
+			await mrsvc.GetModVersionsAsync(result.First(), CancellationToken.None);
 		});
 
 		return builder.Build();

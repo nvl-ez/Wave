@@ -4,6 +4,10 @@
     <ProjectReference Include="..\Wave.Domain\Wave.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Out\Java\" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

@@ -25,8 +25,8 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
     {
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
         string loaderString = Mapper.ToDtoModloaderType(modInfo.ModloaderType);
-        string facets = $"[[\"loaders:{loaderString}\"],[\"game_versions:{modInfo.MinecraftVersion.Version}\"]]";
-        queryParameters.Add("facets", facets);
+        queryParameters.Add("loaders", $"[\"{loaderString}\"]");
+        queryParameters.Add("game_versions", $"[\"{modInfo.MinecraftVersion.Version}\"]");
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
@@ -71,9 +71,7 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
         queryParameters.Add("offset", modSupplierQuery.Offset.ToString());
         queryParameters.Add("limit", modSupplierQuery.PageSize.ToString());
 
-        ModloaderType loader = modSupplierQuery.ModloaderType;
-        string loaderString = loader == ModloaderType.Forge ? "forge" :
-                (loader == ModloaderType.Fabric ? "fabric" : throw new NotImplementedException("Missing implementation for modloader"));
+        string loaderString = Mapper.ToDtoModloaderType(modSupplierQuery.ModloaderType);
         string facets = $"[[\"categories:{loaderString}\"],[\"versions:{modSupplierQuery.MinecraftVersion.Version}\"],[\"project_type:mod\"]]";
         queryParameters.Add("facets", facets);
 

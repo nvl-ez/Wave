@@ -5,9 +5,9 @@ namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Dtos;
 
 public class SearchModFileDto
 {
-    [JsonPropertyName("id")]
+    [JsonPropertyName("data")]
     public List<ModFileDto> Data { get; set; } = new List<ModFileDto>();
-    [JsonPropertyName("id")]
+    [JsonPropertyName("pagination")]
     public PaginationDto Pagination { get; set; } = new PaginationDto()
     {
         Index = -1,
