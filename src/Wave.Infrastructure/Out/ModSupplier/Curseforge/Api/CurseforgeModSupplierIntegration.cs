@@ -12,7 +12,7 @@ public class CurseforgeModSupplierIntegration : IModSupplierIntegration
 {
     private readonly HttpClient client;
     private const int MinecraftGameId = 432;
-    private const int ModCategoryId = 6;
+    private const int ModClassId = 6;
 
     public CurseforgeModSupplierIntegration()
     {
@@ -78,7 +78,7 @@ public class CurseforgeModSupplierIntegration : IModSupplierIntegration
         queryParameters.Add("index", modSupplierQuery.Offset.ToString());
         queryParameters.Add("pageSize", modSupplierQuery.PageSize.ToString());
         queryParameters.Add("gameId", $"{MinecraftGameId}");
-        queryParameters.Add("classId", $"{ModCategoryId}");
+        queryParameters.Add("classId", $"{ModClassId}");
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 

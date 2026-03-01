@@ -6,3 +6,7 @@ Fabric Launch Flags were obtained from: https://wiki.fabricmc.net/install
 
 Modrinth API: https://docs.modrinth.com/api/operations/getproject/
 Curseforge API: https://docs.curseforge.com/rest-api/#get-mod
+
+Java OpenJDKs for Minecraft: https://minecraft.wiki/w/Tutorial:Update_Java
+Vanity URLs for Microsoft: https://learn.microsoft.com/en-us/java/openjdk/download-major-urls (API has been requested but postponed by Microsoft)
+Adoptium API Documentation: https://api.adoptium.net/q/swagger-ui/#/Assets/getReleaseInfo

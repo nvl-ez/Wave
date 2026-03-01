@@ -3,6 +3,7 @@ using Wave.Application.Services;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
+using Wave.Infrastructure.Out.Java;
 using Wave.Infrastructure.Out.Minecraft.Api;
 using Wave.Infrastructure.Out.Modloader.Fabric.Api;
 using Wave.Infrastructure.Out.Modloader.Forge.Api;
@@ -35,6 +36,7 @@ public static class MauiProgram
 		var fasvc = new ModloaderVersionCatalogService(new FabricVersionCatalog());
 		var cfsvc = new CurseforgeModSupplierIntegration();
 		var mrsvc = new ModrinthModSupplierIntegration();
+		var javaChecker = new WindowsJavaVerifier();
 		var versions = Task.Run(async () =>
 		{
 			MinecraftVersion mc = new()
@@ -53,8 +55,9 @@ public static class MauiProgram
 			//await fasvc.GetModloaderVersionsAsync(mc, CancellationToken.None);
 			//var result = await cfsvc.SearchModsAsync(query, CancellationToken.None);
 			//await cfsvc.GetModVersionsAsync(result.First(), CancellationToken.None);
-			var result = await mrsvc.SearchModsAsync(query, CancellationToken.None);
-			await mrsvc.GetModVersionsAsync(result.First(), CancellationToken.None);
+			//var result = await mrsvc.SearchModsAsync(query, CancellationToken.None);
+			//await mrsvc.GetModVersionsAsync(result.First(), CancellationToken.None);
+			javaChecker.GetJavaInstallations();
 		});
 
 		return builder.Build();

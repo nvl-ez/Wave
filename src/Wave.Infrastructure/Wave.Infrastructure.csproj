@@ -7,6 +7,9 @@
 
   <ItemGroup>
     <Folder Include="In\" />
+    <Folder Include="Out\Java\Adoptium\Dtos\" />
+    <Folder Include="Out\Java\Adoptium\Mappers\" />
+    <Folder Include="Out\Java\Microsoft\" />
     <Folder Include="Out\ModSupplier\Modrinth\Api\Dtos\" />
   </ItemGroup>
 
