@@ -12,7 +12,7 @@ public record class BinaryDto
     [JsonPropertyName("image_type")]
     public required string ImageType { get; set; }
     [JsonPropertyName("c_lib")]
-    public required string CLib { get; set; }
+    public string? CLib { get; set; }
     [JsonPropertyName("jvm_impl")]
     public required string JvmImplementation { get; set; }
     [JsonPropertyName("package")]

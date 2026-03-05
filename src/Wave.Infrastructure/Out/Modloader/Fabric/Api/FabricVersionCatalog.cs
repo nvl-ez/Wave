@@ -26,7 +26,7 @@ public class FabricVersionCatalog : IModloaderVersionCatalog
             List<FabricVersionJson> dtoVersions = JsonSerializer.Deserialize<List<FabricVersionJson>>(versionsElement) ?? new List<FabricVersionJson>();
             foreach (FabricVersionJson dtoVersion in dtoVersions)
             {
-                fabricVersions.Add(FabricVersionJsonMapper.ToDomain(dtoVersion, minecraftVersion.Version));
+                fabricVersions.Add(Mapper.ToDomain(dtoVersion, minecraftVersion.Version));
             }
         }
         catch (HttpRequestException)

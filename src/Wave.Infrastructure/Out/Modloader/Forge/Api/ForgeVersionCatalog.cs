@@ -5,7 +5,7 @@ using Wave.Application.Out.Modloader.Api;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Modloaders;
 using Wave.Infrastructure.Out.Modloader.Forge.Api.Dtos;
-using Wave.Infrastructure.Out.Modloader.Forge.Api.Mapper;
+using Wave.Infrastructure.Out.Modloader.Forge.Api.Mappers;
 
 namespace Wave.Infrastructure.Out.Modloader.Forge.Api;
 
@@ -34,12 +34,10 @@ public class ForgeVersionCatalog : IModloaderVersionCatalog
 
             foreach (string versionBundle in versionBundles)
             {
-                ForgeVersion forgeVersion = ForgeVersionBundleMapper.ToDomain(versionBundle);
-                if (forgeVersion.MinecraftVersion == minecraftVersion.Version)
-                {
-                    forgeVersions.Add(forgeVersion);
-                }
+                forgeVersions.Add(Mapper.ToDomain(versionBundle));
             }
+
+            forgeVersions = forgeVersions.Where(f => minecraftVersion.Version == f.Version).ToList();
         }
         catch (HttpRequestException)
         {

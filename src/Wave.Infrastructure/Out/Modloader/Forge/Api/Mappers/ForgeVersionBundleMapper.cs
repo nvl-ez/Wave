@@ -1,9 +1,9 @@
 using System;
 using Wave.Domain.Modloaders;
 
-namespace Wave.Infrastructure.Out.Modloader.Forge.Api.Mapper;
+namespace Wave.Infrastructure.Out.Modloader.Forge.Api.Mappers;
 
-public static class ForgeVersionBundleMapper
+public static class Mapper
 {
     public static ForgeVersion ToDomain(string dto)
     {

@@ -10,13 +10,13 @@ public record class VersionDto
     [JsonPropertyName("minor")]
     public required int Minor { get; set; }
     [JsonPropertyName("security")]
-    public required int Security { get; set; }
+    public int? Security { get; set; }
     [JsonPropertyName("patch")]
-    public required int Patch { get; set; }
+    public int? Patch { get; set; }
     [JsonPropertyName("pre")]
-    public required string Pre { get; set; }
+    public string? Pre { get; set; }
     [JsonPropertyName("adopt_build_number")]
-    public required int AdoptBuildNumber { get; set; }
+    public int? AdoptBuildNumber { get; set; }
     [JsonPropertyName("semver")]
     public required string Semver { get; set; }
     [JsonPropertyName("openjdk_version")]
@@ -24,5 +24,5 @@ public record class VersionDto
     [JsonPropertyName("build")]
     public required int Build { get; set; }
     [JsonPropertyName("optional")]
-    public required string Optional { get; set; }
+    public string? Optional { get; set; }
 }

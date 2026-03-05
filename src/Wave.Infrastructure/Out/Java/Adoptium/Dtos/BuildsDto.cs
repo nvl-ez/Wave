@@ -3,14 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace Wave.Infrastructure.Out.Java.Adoptium.Dtos;
 
-public record class LatestAssetDto
+public record class BuildsDto
 {
-    [JsonPropertyName("binary")]
-    public required BinaryDto Binary { get; set; }
+    [JsonPropertyName("binaries")]
+    public required List<BinaryDto> Binaries { get; set; }
     [JsonPropertyName("release_name")]
     public required string ReleaseName { get; set; }
     [JsonPropertyName("release_link")]
     public required string ReleaseLink { get; set; }
-    [JsonPropertyName("version")]
+    [JsonPropertyName("version_data")]
     public required VersionDto Version { get; set; }
 }

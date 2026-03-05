@@ -4,7 +4,7 @@ using Wave.Infrastructure.Out.Modloader.Fabric.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.Modloader.Fabric.Api.Mappers;
 
-public static class FabricVersionJsonMapper
+public static class Mapper
 {
     public static FabricVersion ToDomain(FabricVersionJson dto, string minecraftVersion)
     {

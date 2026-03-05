@@ -7,39 +7,40 @@ namespace Wave.Infrastructure.Out.Java.Adoptium.Mappers;
 
 public static class Mapper
 {
-    public static JavaVersion ToDomain(LatestAssetDto dto)
+    public static JavaVersion ToDomain(BuildsDto build, BinaryDto binary)
     {
-        if (dto.Binary.Installer is null && dto.Binary.Package is null)
+        if (binary.Installer is null && binary.Package is null)
             throw new NullReferenceException("Installer and Package cannot be null at the same time.");
 
         List<JavaArtifact> artifacts = new List<JavaArtifact>();
 
-        if (dto.Binary.Installer is not null)
+        if (binary.Installer is not null)
         {
             artifacts.Add(new()
             {
-                FileType = FileType.Installer,
-                DownloadUrl = dto.Binary.Installer.DownloadUrl
+                Type = JavaArtifactType.Installer,
+                DownloadUrl = binary.Installer.DownloadUrl
             });
         }
 
-        if (dto.Binary.Package is not null)
+        if (binary.Package is not null)
         {
             artifacts.Add(new()
             {
-                FileType = FileType.Compressed,
-                DownloadUrl = dto.Binary.Package.DownloadUrl
+                Type = JavaArtifactType.Compressed,
+                DownloadUrl = binary.Package.DownloadUrl
             });
         }
 
 
         return new JavaVersion()
         {
-            Version = dto.Version.Major,
-            ArchitectureBitType = ToDomainArchitectureBitType(dto.Binary.Architecture),
-            ArchitectureType = ToDomainArchitectureType(dto.Binary.Architecture),
-            OsType = ToDomainOsType(dto.Binary.Os),
-            JavaArtifacts = artifacts
+            Version = build.Version.Major,
+            ArchitectureBitType = ToDomainArchitectureBitType(binary.Architecture),
+            ArchitectureType = ToDomainArchitectureType(binary.Architecture),
+            OsType = ToDomainOsType(binary.Os),
+            JavaArtifacts = artifacts,
+            Name = build.ReleaseName
         };
     }
 

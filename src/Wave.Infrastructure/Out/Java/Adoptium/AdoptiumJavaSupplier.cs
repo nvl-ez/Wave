@@ -20,10 +20,10 @@ public class AdoptiumJavaSupplier : IJavaSupplier
         };
     }
 
-    public async Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery? query, CancellationToken ct)
+    public async Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery query, CancellationToken ct)
     {
         List<int> versionsToCheck = new List<int>();
-        if (query is null || query.Version is null)
+        if (query.Version is null)
         {
             FeatureVersionsDto? versions = await GetFeatureVersions(ct);
             if (versions is not null)
@@ -36,10 +36,8 @@ public class AdoptiumJavaSupplier : IJavaSupplier
 
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
         queryParameters.Add("image_type", "jre");
-        if (query is not null && query.ArchitectureType is not null)
-            queryParameters.Add("architecture", Mapper.ToDtoArchitectureType((ArchitectureType)query.ArchitectureType));
-        if (query is not null && query.OsType is not null)
-            queryParameters.Add("os", Mapper.ToDtoOsType((OsType)query.OsType));
+        queryParameters.Add("architecture", Mapper.ToDtoArchitectureType(query.ArchitectureType));
+        queryParameters.Add("os", Mapper.ToDtoOsType(query.OsType));
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
@@ -48,15 +46,16 @@ public class AdoptiumJavaSupplier : IJavaSupplier
         {
             try
             {
-                string jsonResponse = await client.GetStringAsync($"/v3/assets/latest/{version}/hotspot?{queryString}", ct);
+                string jsonResponse = await client.GetStringAsync($"/v3/assets/feature_releases/{version}/ga?{queryString}", ct);
                 JsonDocument doc = JsonDocument.Parse(jsonResponse);
                 JsonElement rootElement = doc.RootElement;
 
-                List<LatestAssetDto> dto = JsonSerializer.Deserialize<List<LatestAssetDto>>(rootElement) ?? new List<LatestAssetDto>();
-                foreach (LatestAssetDto asset in dto)
+                List<BuildsDto> dto = JsonSerializer.Deserialize<List<BuildsDto>>(rootElement) ?? new List<BuildsDto>();
+                foreach (BuildsDto build in dto)
                 {
-                    if (asset.Binary.Installer is not null || asset.Binary.Package is not null)
-                        retrievedVersions.Add(Mapper.ToDomain(asset));
+                    BinaryDto binary = build.Binaries.First();
+                    if (binary.Installer is not null || binary.Package is not null)
+                        retrievedVersions.Add(Mapper.ToDomain(build, binary));
                 }
             }
             catch (HttpRequestException)
