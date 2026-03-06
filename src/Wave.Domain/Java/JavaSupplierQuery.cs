@@ -7,6 +7,6 @@ public record class JavaSupplierQuery
 {
     public int? Version { get; set; } = null;
     public required OsType OsType { get; set; }
-    public ArchitectureType ArchitectureType { get; set; }
-    public int ArchitectureBitType { get; set; }
+    public required ArchitectureType ArchitectureType { get; set; }
+    public required int ArchitectureBitType { get; set; }
 }

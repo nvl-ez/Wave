@@ -40,7 +40,8 @@ public static class Mapper
             ArchitectureType = ToDomainArchitectureType(binary.Architecture),
             OsType = ToDomainOsType(binary.Os),
             JavaArtifacts = artifacts,
-            Name = build.ReleaseName
+            Name = build.ReleaseName,
+            JavaSupplierType = JavaSupplierType.Adoptium
         };
     }
 

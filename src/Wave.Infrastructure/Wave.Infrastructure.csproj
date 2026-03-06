@@ -8,7 +8,6 @@
   <ItemGroup>
     <Folder Include="In\" />
     <Folder Include="Out\Java\Adoptium\Mappers\" />
-    <Folder Include="Out\Java\Installer\" />
     <Folder Include="Out\Java\Mojang\" />
     <Folder Include="Out\Java\Mojang\Dtos\" />
     <Folder Include="Out\Java\Mojang\Mappers\" />

@@ -11,4 +11,5 @@ public record class JavaVersion
     public required OsType OsType { get; set; }
     public required List<JavaArtifact> JavaArtifacts { get; set; }
     public required string Name { get; set; }
+    public required JavaSupplierType JavaSupplierType { get; set; }
 }

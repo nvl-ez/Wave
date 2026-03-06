@@ -6,7 +6,7 @@ namespace Wave.Infrastructure.Out.Java.Installer;
 
 public class ExecutableInstaller : IJavaInstaller
 {
-    public Task<JavaInstallation> Install(JavaVersion javaVersion, string destinationDirectory, CancellationToken ct)
+    public Task<JavaInstallation?> Install(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct)
     {
         throw new NotImplementedException();
     }

@@ -35,7 +35,8 @@ public static class Mapper
                     Type = JavaArtifactType.Manifest,
                     DownloadUrl = dto.Manifest.Url
                 }
-            ]
+            ],
+            JavaSupplierType = JavaSupplierType.Mojang
         };
     }
 

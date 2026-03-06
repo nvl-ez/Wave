@@ -6,6 +6,7 @@ using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
 using Wave.Infrastructure.Out.Java;
 using Wave.Infrastructure.Out.Java.Adoptium;
+using Wave.Infrastructure.Out.Java.Installer;
 using Wave.Infrastructure.Out.Java.Mojang;
 using Wave.Infrastructure.Out.Minecraft.Api;
 using Wave.Infrastructure.Out.Modloader.Fabric.Api;
@@ -41,6 +42,7 @@ public static class MauiProgram
 		var mrsvc = new ModrinthModSupplierIntegration();
 		var adsvc = new AdoptiumJavaSupplier();
 		var mjsvc = new MojangJavaSupplier();
+		var misvc = new ManifestInstaller("C:\\Users\\nahu\\Documents\\JavaTest");
 		var versions = Task.Run(async () =>
 		{
 			MinecraftVersion mc = new()
@@ -56,7 +58,24 @@ public static class MauiProgram
 			};
 			JavaSupplierQuery jQuery = new JavaSupplierQuery()
 			{
-				OsType = Domain.Os.OsType.Windows
+				OsType = Domain.Os.OsType.Windows,
+				ArchitectureBitType = 64,
+				ArchitectureType = Domain.Os.ArchitectureType.X86
+			};
+			JavaVersion javaVersion = new JavaVersion()
+			{
+				ArchitectureBitType = 64,
+				ArchitectureType = Domain.Os.ArchitectureType.X86,
+				JavaArtifacts = [
+					new JavaArtifact(){
+						DownloadUrl = "https://piston-meta.mojang.com/v1/packages/b374544c680d965fb5535977d7cb04c6befe1930/manifest.json",
+						Type = JavaArtifactType.Manifest
+					}
+				],
+				JavaSupplierType = JavaSupplierType.Mojang,
+				Name = "java-runtime-epsilon",
+				OsType = Domain.Os.OsType.Windows,
+				Version = 25,
 			};
 			//await mcsvc.GetMinecraftVersionsAsync(false, CancellationToken.None);
 			//await fgsvc.GetModloaderVersionsAsync(mc, CancellationToken.None);
@@ -66,7 +85,9 @@ public static class MauiProgram
 			//var result = await mrsvc.SearchModsAsync(query, CancellationToken.None);
 			//await mrsvc.GetModVersionsAsync(result.First(), CancellationToken.None);
 			//await adsvc.GetJavaVersionsAsync(jQuery, CancellationToken.None);
-			await mjsvc.GetJavaVersionsAsync(jQuery, CancellationToken.None);
+			//await mjsvc.GetJavaVersionsAsync(jQuery, CancellationToken.None);
+			//JavaInstallation? ji = await misvc.Install(javaVersion, javaVersion.JavaArtifacts.First(), CancellationToken.None);
+			//await misvc.Uninstall(ji!, CancellationToken.None);
 		});
 
 		return builder.Build();
