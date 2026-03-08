@@ -1,9 +1,7 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using Wave.Application.Out;
-using Wave.Infrastructure.Out;
 
 namespace Wave.Ui.ViewModels;
 

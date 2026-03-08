@@ -21,35 +21,41 @@ public class ManifestInstaller : IJavaInstaller
 
     public async Task<JavaInstallation?> Install(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct)
     {
+        if (javaArtifact.Type != JavaArtifactType.Manifest) throw new NotSupportedException("Can only install Manifest artifacts.");
         ManifestDto manifest = await GetManifestDto(javaArtifact, ct);
         if (manifest is null || manifest.Files is null)
             return null;
 
-        string basePath = Path.Combine(javaDirectory, $"{javaVersion.JavaSupplierType}-{javaVersion.Version}");
-        await DownloadFiles(javaVersion, manifest, basePath, ct);
+        string basePath = Path.Combine(javaDirectory, $"{javaVersion.JavaSupplierType}-{javaVersion.Name}-{javaVersion.Version}"); //Se deberia de abstraer
 
-        return GetJavaInstallation(javaVersion, manifest, basePath);
+        if (Directory.Exists(basePath))
+            Directory.Delete(basePath, true);
+        Directory.CreateDirectory(basePath);
+
+        await DownloadFiles(manifest, basePath, ct);
+
+        return BuildJavaInstallation(javaVersion, manifest, basePath);
     }
 
     public async Task<bool> Uninstall(JavaInstallation javaInstallation, CancellationToken ct)
     {
+        if (javaInstallation.JavaArtifactType != JavaArtifactType.Manifest) throw new NotSupportedException("Can only uninstall Manifest artifacts.");
         try
         {
             Directory.Delete(javaInstallation.UninstallerPath, true);
+            return true;
         }
         catch
         {
             return false;
         }
-        return true;
     }
 
     private async Task<ManifestDto> GetManifestDto(JavaArtifact javaArtifact, CancellationToken ct)
     {
-        client.BaseAddress = new Uri(javaArtifact.DownloadUrl);
         try
         {
-            string jsonResponse = await client.GetStringAsync("", ct);
+            string jsonResponse = await client.GetStringAsync(client.BaseAddress, ct);
 
             JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement rootElement = doc.RootElement;
@@ -64,7 +70,7 @@ public class ManifestInstaller : IJavaInstaller
         return new ManifestDto();
     }
 
-    private async Task DownloadFiles(JavaVersion javaVersion, ManifestDto manifest, string basePath, CancellationToken ct)
+    private async Task DownloadFiles(ManifestDto manifest, string basePath, CancellationToken ct)
     {
         if (manifest.Files is null) throw new NullReferenceException("Manifest contains no files.");
         var directories = manifest.Files.Where(kv => kv.Value.Type == "directory");
@@ -93,7 +99,7 @@ public class ManifestInstaller : IJavaInstaller
         }
     }
 
-    private JavaInstallation GetJavaInstallation(JavaVersion javaVersion, ManifestDto manifest, string basePath)
+    private JavaInstallation BuildJavaInstallation(JavaVersion javaVersion, ManifestDto manifest, string basePath)
     {
         if (manifest.Files is null) throw new NullReferenceException("Manifest contains no files.");
         var files = manifest.Files.Where(kv => kv.Value.Type == "file");
@@ -104,15 +110,18 @@ public class ManifestInstaller : IJavaInstaller
         foreach (var file in files)
         {
             string fullPath = Path.Combine(basePath, file.Key);
-            string fileName = Path.GetFileNameWithoutExtension(fullPath);
-
-            if (fileName == "java")
+            var fileName = Path.GetFileNameWithoutExtension(fullPath);
+            var fileExtension = Path.GetExtension(fullPath);
+            if (fileExtension == "" || string.Equals(fileExtension, ".exe", StringComparison.OrdinalIgnoreCase))
             {
-                javaPath = fullPath;
-            }
-            else if (fileName == "javaw")
-            {
-                javawPath = fullPath;
+                if (string.Equals(fileName, "java", StringComparison.OrdinalIgnoreCase))
+                {
+                    javaPath = fullPath;
+                }
+                else if (string.Equals(fileName, "javaw", StringComparison.OrdinalIgnoreCase))
+                {
+                    javawPath = fullPath;
+                }
             }
         }
 
