@@ -8,6 +8,7 @@ using Wave.Infrastructure.Out.Java;
 using Wave.Infrastructure.Out.Java.Adoptium;
 using Wave.Infrastructure.Out.Java.Installer;
 using Wave.Infrastructure.Out.Java.Mojang;
+using Wave.Infrastructure.Out.Java.Repository;
 using Wave.Infrastructure.Out.Minecraft.Api;
 using Wave.Infrastructure.Out.Modloader.Fabric.Api;
 using Wave.Infrastructure.Out.Modloader.Forge.Api;
@@ -45,6 +46,7 @@ public static class MauiProgram
 		var misvc = new ManifestInstaller("C:\\Users\\nahu\\Documents\\JavaTest");
 		var cisvc = new CompressedInstaller("C:\\Users\\nahu\\Documents\\JavaTest");
 		var eisvc = new ExecutableInstaller("C:\\Users\\nahu\\Documents\\JavaTest");
+		var jrsvc = new JavaJsonRepository("C:\\Users\\nahu\\Documents\\JavaTest");
 		var versions = Task.Run(async () =>
 		{
 			MinecraftVersion mc = new()
@@ -71,10 +73,10 @@ public static class MauiProgram
 				JavaArtifacts = [
 					new JavaArtifact(){
 						//DownloadUrl = "https://piston-meta.mojang.com/v1/packages/b374544c680d965fb5535977d7cb04c6befe1930/manifest.json", //Windows Manifest
-						//DownloadUrl = "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u482-b08/OpenJDK8U-jre_x64_windows_hotspot_8u482b08.zip", //Windows zip
+						DownloadUrl = "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u482-b08/OpenJDK8U-jre_x64_windows_hotspot_8u482b08.zip", //Windows zip
 						//DownloadUrl = "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u482-b08/OpenJDK8U-jre_x64_linux_hotspot_8u482b08.tar.gz", //Linux gz
-						DownloadUrl = "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u472-b08/OpenJDK8U-jre_x64_windows_hotspot_8u472b08.msi", //Windows msi
-						Type = JavaArtifactType.Installer
+						//DownloadUrl = "https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u472-b08/OpenJDK8U-jre_x64_windows_hotspot_8u472b08.msi", //Windows msi
+						Type = JavaArtifactType.Compressed
 					}
 				],
 				JavaSupplierType = JavaSupplierType.Adoptium,
@@ -93,10 +95,12 @@ public static class MauiProgram
 			//await mjsvc.GetJavaVersionsAsync(jQuery, CancellationToken.None);
 			//JavaInstallation? ji = await misvc.Install(javaVersion, javaVersion.JavaArtifacts.First(), CancellationToken.None);
 			//await misvc.Uninstall(ji!, CancellationToken.None);
-			//JavaInstallation? ji = await cisvc.Install(javaVersion, javaVersion.JavaArtifacts.First(), CancellationToken.None);
-			//await cisvc.Uninstall(ji!, CancellationToken.None);
-			JavaInstallation? ji = await eisvc.Install(javaVersion, javaVersion.JavaArtifacts.First(), CancellationToken.None);
-			await eisvc.Uninstall(ji!, CancellationToken.None);
+			JavaInstallation? ji = await cisvc.Install(javaVersion, javaVersion.JavaArtifacts.First(), CancellationToken.None);
+			await jrsvc.AddAsync(ji!, CancellationToken.None);
+			await cisvc.Uninstall(ji!, CancellationToken.None);
+			await jrsvc.RemoveAsync(ji!, CancellationToken.None);
+			//JavaInstallation? ji = await eisvc.Install(javaVersion, javaVersion.JavaArtifacts.First(), CancellationToken.None);
+			//await eisvc.Uninstall(ji!, CancellationToken.None);
 		});
 
 		return builder.Build();

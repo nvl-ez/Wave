@@ -5,7 +5,7 @@ namespace Wave.Application.Out.Java;
 
 public interface IJavaInstallRepository
 {
-    public Task<IEnumerable<JavaInstallation>> GetInstalledAsync();
-    public Task AddAsync(JavaInstallation javaInstallation);
-    public Task RemoveAsync(JavaInstallation javaInstallation);
+    public Task<IEnumerable<JavaInstallation>> GetInstalledAsync(CancellationToken ct);
+    public Task AddAsync(JavaInstallation javaInstallation, CancellationToken ct);
+    public Task RemoveAsync(JavaInstallation javaInstallation, CancellationToken ct);
 }
