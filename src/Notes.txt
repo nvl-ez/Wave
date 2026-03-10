@@ -1,5 +1,6 @@
 Modloader Version APIs were obtained from: https://github.com/Zmito26dev/minecraft-versions-api/blob/main/main.py#L123
 Minecraft Version API was obtained from: https://launchermeta.mojang.com/mc/game/version_manifest.json?versions
+Minecraft Launcher API Documentation: https://ryanccn.dev/posts/inside-a-minecraft-launcher/
 
 Forge Launch Flags were obtained from: https://minecraft.fandom.com/wiki/Tutorials/Setting_up_a_Minecraft_Forge_server
 Fabric Launch Flags were obtained from: https://wiki.fabricmc.net/install
@@ -13,3 +14,10 @@ Java OpenJDKs for Minecraft: https://minecraft.wiki/w/Tutorial:Update_Java
 Mojang Java Versions: https://piston-meta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json
 Vanity URLs for Microsoft: https://learn.microsoft.com/en-us/java/openjdk/download-major-urls (API has been requested but postponed by Microsoft)
 Adoptium API Documentation: https://api.adoptium.net/q/swagger-ui/#/Assets/getReleaseInfo
+
+How to download files using httpclient, any file extension: 
+* https://dev.to/1001binary/download-file-using-httpclient-wrapper-asynchronously-1p6
+* https://stackoverflow.com/questions/4096929/get-filename-while-downloading-it
+How to decompress: https://learn.microsoft.com/en-us/dotnet/standard/io/how-to-compress-and-extract-files
+How to install .msi: https://jonathancrozier.com/blog/how-to-install-msi-packages-using-msiexec-and-c-sharp
+Adoptium .msi launch args: https://adoptium.net/installation/windows/

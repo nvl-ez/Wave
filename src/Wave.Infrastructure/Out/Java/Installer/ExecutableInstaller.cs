@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using Wave.Application.Out.Java;
 using Wave.Domain.Java;
 
@@ -6,13 +8,182 @@ namespace Wave.Infrastructure.Out.Java.Installer;
 
 public class ExecutableInstaller : IJavaInstaller
 {
-    public Task<JavaInstallation?> Install(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct)
+    private string javaDirectory;
+    private readonly HttpClient client;
+
+    public ExecutableInstaller(string javaDirectory)
     {
-        throw new NotImplementedException();
+        this.javaDirectory = javaDirectory;
+        client = new HttpClient();
     }
 
-    public Task<bool> Uninstall(JavaInstallation javaInstallation, CancellationToken ct)
+    public async Task<JavaInstallation?> Install(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("Installer is still on the works.");
+        if (javaArtifact.Type != JavaArtifactType.Installer) throw new NotSupportedException("Can only install Installer artifacts.");
+        if (javaVersion.JavaSupplierType != JavaSupplierType.Adoptium) throw new NotImplementedException("Can only install Adoptium installations.");
+
+        string basePath = Path.Combine(javaDirectory, $"{javaVersion.JavaSupplierType}-{javaVersion.Name}-{javaVersion.Version}"); //Se deberia de abstraer
+        if (Path.Exists(basePath))
+            Directory.Delete(basePath, true);
+
+        Directory.CreateDirectory(basePath);
+
+        string tmpPath = await DownloadFile(javaArtifact, ct);
+        string destinationInstaller = (await InstallFiles(basePath, tmpPath, ct))!;
+
+        return BuildJavaInstallation(javaVersion, basePath, destinationInstaller);
+    }
+
+    public async Task<bool> Uninstall(JavaInstallation javaInstallation, CancellationToken ct)
+    {
+        throw new NotImplementedException("Installer is still on the works.");
+        if (javaInstallation.JavaArtifactType != JavaArtifactType.Installer) throw new NotSupportedException("Can only uninstall Installer artifacts.");
+        if (javaInstallation.JavaSupplierType != JavaSupplierType.Adoptium) throw new NotImplementedException("Can only uninstall Adoptium installations.");
+
+        string filePath = javaInstallation.UninstallerPath;
+
+        string fileExtension = Path.GetExtension(filePath);
+        string fileNameWithExtension = Path.GetFileName(filePath);
+
+        if (fileExtension == ".exe")
+        {
+
+        }
+        else if (fileExtension == ".msi")
+        {
+            string arguments = $"/x /quiet";
+            using (Process process = new Process())
+            {
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.StartInfo = new ProcessStartInfo
+                {
+                    FileName = "msiexec",
+                    Arguments = arguments,
+                    UseShellExecute = true,
+                    Verb = "runas",
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+
+                process.Start();
+                await process.WaitForExitAsync();
+
+                if (process.ExitCode != 0) throw new Win32Exception($"Error {process.ExitCode}.");
+            }
+
+            Directory.Delete(Path.GetDirectoryName(filePath)!, true);
+            return true;
+        }
+        else
+        {
+            throw new NotImplementedException($"Missing implementation for installation of type '{fileExtension}'.");
+        }
+        return false;
+    }
+
+    private async Task<string> DownloadFile(JavaArtifact javaArtifact, CancellationToken ct)
+    {
+        string filePath;
+        using (var response = await client.GetAsync(javaArtifact.DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
+        {
+            response.EnsureSuccessStatusCode();
+            string tmpPath = Path.Combine(javaDirectory, "tmp");
+            Directory.CreateDirectory(tmpPath);
+            filePath = Path.Combine(tmpPath, response.Content.Headers.ContentDisposition!.FileName!);
+            using (var fileStream = File.Create(filePath))
+            {
+                using (var httpStream = await response.Content.ReadAsStreamAsync())
+                {
+                    await httpStream.CopyToAsync(fileStream);
+                }
+            }
+        }
+
+        return filePath;
+    }
+
+    private async Task<string?> InstallFiles(string basePath, string filePath, CancellationToken ct)
+    {
+        string fileExtension = Path.GetExtension(filePath);
+        string fileNameWithExtension = Path.GetFileName(filePath);
+
+        if (fileExtension.Equals(".msi", StringComparison.OrdinalIgnoreCase))
+        {
+            string logPath = Path.Combine(basePath, "msi-install.log");
+            string arguments =
+                $"/i \"{filePath}\" ADDLOCAL=FeatureMain INSTALLDIR=\"{basePath}\" /quiet /norestart /L*v \"{logPath}\"";
+
+            using Process process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "msiexec.exe",
+                    Arguments = arguments,
+
+                    // Needed if you want to use the shell/UAC elevation path
+                    UseShellExecute = true,
+                    Verb = "runas",
+
+                    WindowStyle = ProcessWindowStyle.Hidden
+                }
+            };
+
+            process.Start();
+            await process.WaitForExitAsync(ct);
+
+            if (process.ExitCode != 0)
+            {
+                throw new InvalidOperationException(
+                    $"MSI installation failed with exit code {process.ExitCode}. Log: {logPath}");
+            }
+
+            string destinationInstaller = Path.Combine(basePath, fileNameWithExtension);
+            File.Move(filePath, destinationInstaller, true);
+            return destinationInstaller;
+        }
+
+        if (fileExtension.Equals(".exe", StringComparison.OrdinalIgnoreCase))
+        {
+            // TODO
+            return null;
+        }
+
+        throw new NotImplementedException(
+            $"Missing implementation for installation of type '{fileExtension}'.");
+    }
+
+    private JavaInstallation BuildJavaInstallation(JavaVersion javaVersion, string basePath, string filePath)
+    {
+        string? javaPath = null;
+        string? javawPath = null;
+
+        foreach (var file in Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories))
+        {
+            var fileName = Path.GetFileNameWithoutExtension(file);
+            var fileExtension = Path.GetExtension(file);
+            if (fileExtension == "" || string.Equals(fileExtension, ".exe", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.Equals(fileName, "java", StringComparison.OrdinalIgnoreCase))
+                {
+                    javaPath = file;
+                }
+                else if (string.Equals(fileName, "javaw", StringComparison.OrdinalIgnoreCase))
+                {
+                    javawPath = file;
+                }
+            }
+        }
+
+        if (javaPath is null && javawPath is null) throw new FileNotFoundException("Java executable was not found in the installed files.");
+
+        return new JavaInstallation()
+        {
+            ExecutablePath = javawPath != null ? javawPath : javaPath!,
+            JavaArtifactType = JavaArtifactType.Installer,
+            JavaSupplierType = javaVersion.JavaSupplierType,
+            Name = javaVersion.Name,
+            UninstallerPath = filePath,
+            Version = javaVersion.Version
+        };
     }
 }
