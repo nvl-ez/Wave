@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Folder Include="Out\Java\" />
+    <Folder Include="Out\ServerManager\" />
   </ItemGroup>
 
   <PropertyGroup>

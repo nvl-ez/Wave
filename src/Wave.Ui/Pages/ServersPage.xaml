@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:Wave.Ui.ViewModels"
+             xmlns:views="clr-namespace:Wave.Ui.Views"
+             x:Class="Wave.Ui.Pages.ServersPage"
+             Title="Servers Page"
+             x:Name="Root"
+             x:DataType="viewModels:ServersViewModel">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <CollectionView x:Name="serversCollection"
+                        ItemsSource="{Binding AllServers}"
+                        Grid.Row="0"
+                        Margin="20"
+                        SelectionMode="None">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical"
+                                   ItemSpacing="10"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:ServerViewModel">
+                    <views:HorizontalServerCardView
+                        StartServerCommand="{Binding StartCommand}"
+                        EditServerCommand="{Binding Source={x:Reference Root}, Path=BindingContext.EditServerCommand}"
+                        DeleteServerCommand="{Binding Source={x:Reference Root}, Path=BindingContext.DeleteServerCommand}"
+                        ServerCommandParameter="{Binding .}"/>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button
+            Text="New Server"
+            Grid.Row="1"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            Command="{Binding NewServerCommand}"/>
+    </Grid>
+</ContentPage>

@@ -5,9 +5,8 @@ using Wave.Domain.Mods;
 
 namespace Wave.Domain.ServerManager;
 
-public class ServerDefinition
+public class ServerRequest
 {
-    public required Guid Id { get; set; } = Guid.NewGuid();
     public required DateTime CreationDate { get; set; } = DateTime.Now;
     public required MinecraftVersion MinecraftVersion { get; set; }
     public required ModloaderType ModloaderType { get; set; }

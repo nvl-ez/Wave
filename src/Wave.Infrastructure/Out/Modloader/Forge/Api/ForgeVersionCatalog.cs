@@ -5,7 +5,6 @@ using Wave.Application.Out.Modloader.Api;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Modloaders;
 using Wave.Infrastructure.Out.Modloader.Forge.Api.Dtos;
-using Wave.Infrastructure.Out.Modloader.Forge.Api.Mappers;
 
 namespace Wave.Infrastructure.Out.Modloader.Forge.Api;
 

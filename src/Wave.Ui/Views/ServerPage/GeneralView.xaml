@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:Wave.Ui.ViewModels"
+             xmlns:views="clr-namespace:Wave.Ui.Views.ServerPage"
+             x:Class="Wave.Ui.Views.ServerPage.GeneralView"
+             x:DataType="viewModels:ServerViewModel">
+    <VerticalStackLayout>
+        <!-- Icon, Name and MOTD !-->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <BoxView Grid.Column="0"
+                     Grid.RowSpan="2"
+                     Grid.Row="0"
+                     WidthRequest="100"
+                     HeightRequest="100"/>
+
+            <Label Grid.Column="1"
+                   Grid.Row="0"
+                   Text="Server name: "/>
+            <Label Grid.Column="1"
+                   Grid.Row="1"
+                   Text="Motd: "/>
+
+            <Entry Grid.Column="2"
+                   Grid.Row="0"
+                   Text="{Binding Name}"/>
+            <Entry Grid.Column="2"
+                   Grid.Row="1"
+                   Text="{Binding Motd}"/>
+        </Grid>
+
+        <!-- General Properties !-->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0"
+                   Grid.Row="0"
+                   Text="Versions:"/>
+            <HorizontalStackLayout Grid.Row="0"
+                                   Grid.Column="1">
+                <VerticalStackLayout
+                    toolkit:StateContainer.CurrentState="{Binding MinecraftVersionsStatus}">
+                    <toolkit:StateContainer.StateViews>
+                        <Picker toolkit:StateView.StateKey="Done"
+                                ItemsSource="{Binding MinecraftVersions}"
+                                ItemDisplayBinding="{Binding Version}"
+                                SelectedIndex="0"
+                                SelectedItem="{Binding SelectedMinecraftVersion}"/>
+                        <BoxView toolkit:StateView.StateKey="Error"
+                                 WidthRequest="200"
+                                 HeightRequest="50"
+                                 Color="Red"/>
+                        <BoxView toolkit:StateView.StateKey="Loading"
+                                 WidthRequest="200"
+                                 HeightRequest="50"/>
+                    </toolkit:StateContainer.StateViews>
+
+                    <BoxView WidthRequest="200"
+                             HeightRequest="50"/>
+                </VerticalStackLayout>
+                <Label Text="Include Snapshots:"/>
+                <CheckBox IsChecked="{Binding IncludeSnapshots}"
+                          Command="{Binding RequestMinecraftVersionsCommand}"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+    </VerticalStackLayout>
+</ContentView>

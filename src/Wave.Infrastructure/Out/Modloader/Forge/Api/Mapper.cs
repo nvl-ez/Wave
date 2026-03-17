@@ -1,7 +1,7 @@
 using System;
 using Wave.Domain.Modloaders;
 
-namespace Wave.Infrastructure.Out.Modloader.Forge.Api.Mappers;
+namespace Wave.Infrastructure.Out.Modloader.Forge.Api;
 
 public static class Mapper
 {

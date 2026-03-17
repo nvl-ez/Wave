@@ -4,7 +4,6 @@ using System.Text.Json;
 using Wave.Application.Out.Minecraft.Api;
 using Wave.Domain.Minecraft;
 using Wave.Infrastructure.Out.Minecraft.Api.Dtos;
-using Wave.Infrastructure.Out.Minecraft.Api.Mappers;
 
 namespace Wave.Infrastructure.Out.Minecraft.Api;
 
@@ -28,7 +27,7 @@ public class MinecraftVersionCatalog : IMinecraftVersionCatalog
 
         foreach (MinecraftVersionJson dtoVersion in dtoVersions)
         {
-            versions.Add(MinecraftVersionJsonMapper.ToDomain(dtoVersion));
+            versions.Add(Mapper.ToDomain(dtoVersion));
         }
 
         return versions;

@@ -2,9 +2,9 @@ using System;
 using Wave.Domain.Minecraft;
 using Wave.Infrastructure.Out.Minecraft.Api.Dtos;
 
-namespace Wave.Infrastructure.Out.Minecraft.Api.Mappers;
+namespace Wave.Infrastructure.Out.Minecraft.Api;
 
-public static class MinecraftVersionJsonMapper
+public static class Mapper
 {
     public static MinecraftVersion ToDomain(MinecraftVersionJson dto)
     {

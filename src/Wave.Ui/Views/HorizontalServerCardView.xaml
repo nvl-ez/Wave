@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:Wave.Ui.ViewModels"
+             x:Class="Wave.Ui.Views.HorizontalServerCardView"
+             x:Name="Root"
+             x:DataType="viewModels:NoteViewModel">
+    <Border>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <!-- LEFT SICE -->
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Image -->
+                <BoxView Grid.Column="0"
+                         WidthRequest="40"
+                         HeightRequest="40"/>
+
+                <!-- Text Info -->
+                <VerticalStackLayout Grid.Column="1">
+                    <Label Text="{Binding Name}"
+                           TextColor="Red"/>
+                    <Label Text="{Binding Motd}"
+                           TextColor="Red"/>
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- RIGHT SIDE-->
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Buttons -->
+                <HorizontalStackLayout Grid.Column="0">
+                    <Button Text="Start"
+                            Command="{Binding Source={x:Reference Root}, Path=StartServerCommand}"
+                            CommandParameter="{Binding Source={x:Reference Root}, Path=ServerCommandParameter}"
+                            BackgroundColor="SeaGreen"/>
+                    <Button Text="Edit"
+                            Command="{Binding Source={x:Reference Root}, Path=EditServerCommand}"
+                            CommandParameter="{Binding Source={x:Reference Root}, Path=ServerCommandParameter}"
+                            Background="SteelBlue"/>
+                </HorizontalStackLayout>
+
+                <!-- Trash -->
+                <Border Grid.Column="1"
+                        Padding="4"
+                        StrokeThickness="0"
+                        BackgroundColor="Transparent"
+                        HorizontalOptions="End"
+                        VerticalOptions="Start">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding Source={x:Reference Root}, Path=DeleteServerCommand}"
+                                              CommandParameter="{Binding Source={x:Reference Root}, Path=ServerCommandParameter}"/>
+                    </Border.GestureRecognizers>
+
+                    <Image Source="icon_trash.png"
+                           WidthRequest="14"
+                           HeightRequest="14"/>
+                </Border>
+
+            </Grid>
+        </Grid>
+    </Border>
+</ContentView>

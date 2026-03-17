@@ -3,7 +3,7 @@ using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Dtos;
 
-namespace Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Mappers;
+namespace Wave.Infrastructure.Out.ModSupplier.Modrinth.Api;
 
 public static class Mapper
 {

@@ -4,7 +4,7 @@ using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
 using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Dtos;
 
-namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Mappers;
+namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
 
 public static class Mapper
 {

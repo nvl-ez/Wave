@@ -14,11 +14,12 @@
     <Folder Include="Out\Java\Repository\" />
     <Folder Include="Out\Java\Repository\Dtos\" />
     <Folder Include="Out\ModSupplier\Modrinth\Api\Dtos\" />
+    <Folder Include="Out\ServerManager\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0-preview.1.26104.118" />
-    <PackageReference Include="System.Net.Http.Json" Version="11.0.0-preview.1.26104.118" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
+    <PackageReference Include="System.Net.Http.Json" Version="10.0.5" />
   </ItemGroup>
 
   <PropertyGroup>

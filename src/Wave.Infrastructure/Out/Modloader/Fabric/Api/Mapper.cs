@@ -2,7 +2,7 @@ using System;
 using Wave.Domain.Modloaders;
 using Wave.Infrastructure.Out.Modloader.Fabric.Api.Dtos;
 
-namespace Wave.Infrastructure.Out.Modloader.Fabric.Api.Mappers;
+namespace Wave.Infrastructure.Out.Modloader.Fabric.Api;
 
 public static class Mapper
 {
