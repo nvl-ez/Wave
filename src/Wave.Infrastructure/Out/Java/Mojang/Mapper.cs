@@ -5,7 +5,7 @@ using Wave.Domain.Java;
 using Wave.Domain.Os;
 using Wave.Infrastructure.Out.Java.Mojang.Dtos;
 
-namespace Wave.Infrastructure.Out.Java.Mojang.Mappers;
+namespace Wave.Infrastructure.Out.Java.Mojang;
 
 public static class Mapper
 {

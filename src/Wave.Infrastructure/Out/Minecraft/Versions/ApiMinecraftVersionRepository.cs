@@ -1,20 +1,20 @@
 using System;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Wave.Application.Out.Minecraft.Api;
+using Wave.Application.Out.Minecraft;
 using Wave.Domain.Minecraft;
-using Wave.Infrastructure.Out.Minecraft.Api.Dtos;
+using Wave.Infrastructure.Out.Minecraft.Versions.Dtos;
 
 namespace Wave.Infrastructure.Out.Minecraft.Api;
 
-public class MinecraftVersionCatalog : IMinecraftVersionCatalog
+public class ApiMinecraftVersionRepository : IMinecraftVersionRepository
 {
     private static HttpClient client = new()
     {
         BaseAddress = new Uri("https://launchermeta.mojang.com/mc/game/version_manifest.json")
     };
 
-    public async Task<List<MinecraftVersion>> GetMinecraftVersionsAsync(CancellationToken ct)
+    public async Task<List<MinecraftVersion>> GetMinecraftVersionsAsync(CancellationToken ct = default)
     {
         string jsonResponse = await client.GetStringAsync("", ct);
 

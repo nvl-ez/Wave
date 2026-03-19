@@ -19,7 +19,7 @@ public class ManifestInstaller : IJavaInstaller
         client = new HttpClient();
     }
 
-    public async Task<JavaInstallation?> Install(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct)
+    public async Task<JavaInstallation?> Install(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct = default)
     {
         if (javaArtifact.Type != JavaArtifactType.Manifest) throw new NotSupportedException("Can only install Manifest artifacts.");
         ManifestDto manifest = await GetManifestDto(javaArtifact, ct);
@@ -37,7 +37,7 @@ public class ManifestInstaller : IJavaInstaller
         return BuildJavaInstallation(javaVersion, manifest, basePath);
     }
 
-    public async Task<bool> Uninstall(JavaInstallation javaInstallation, CancellationToken ct)
+    public async Task<bool> Uninstall(JavaInstallation javaInstallation, CancellationToken ct = default)
     {
         if (javaInstallation.JavaArtifactType != JavaArtifactType.Manifest) throw new NotSupportedException("Can only uninstall Manifest artifacts.");
         try
@@ -51,7 +51,7 @@ public class ManifestInstaller : IJavaInstaller
         }
     }
 
-    private async Task<ManifestDto> GetManifestDto(JavaArtifact javaArtifact, CancellationToken ct)
+    private async Task<ManifestDto> GetManifestDto(JavaArtifact javaArtifact, CancellationToken ct = default)
     {
         try
         {
@@ -70,7 +70,7 @@ public class ManifestInstaller : IJavaInstaller
         return new ManifestDto();
     }
 
-    private async Task DownloadFiles(ManifestDto manifest, string basePath, CancellationToken ct)
+    private async Task DownloadFiles(ManifestDto manifest, string basePath, CancellationToken ct = default)
     {
         if (manifest.Files is null) throw new NullReferenceException("Manifest contains no files.");
         var directories = manifest.Files.Where(kv => kv.Value.Type == "directory");

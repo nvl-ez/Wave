@@ -1,0 +1,39 @@
+using System;
+using Wave.Application.In;
+using Wave.Application.Out.Minecraft;
+using Wave.Domain.Minecraft;
+
+namespace Wave.Infrastructure.In;
+
+public class MinecraftCatalogService : IMinecraftCatalogService
+{
+    private readonly IMinecraftVersionRepository minecraftVersionRepository;
+    private readonly IServerPropertiesRepository serverPropertiesRepository;
+
+    public MinecraftCatalogService(IMinecraftVersionRepository minecraftVersionRepository, IServerPropertiesRepository serverPropertiesRepository)
+    {
+        this.minecraftVersionRepository = minecraftVersionRepository;
+        this.serverPropertiesRepository = serverPropertiesRepository;
+    }
+
+    public async Task<IEnumerable<MinecraftVersion>> GetMinecraftVersionsAsync(MinecraftVersionQuery query, CancellationToken ct = default)
+    {
+        return (await minecraftVersionRepository.GetMinecraftVersionsAsync(ct))
+            .Where(mv => query.IncludeSnapshots == true || mv.MinecraftVersionType == MinecraftVersionType.Release);
+    }
+
+    public IEnumerable<MinecraftVersion> GetMinecraftVersions(MinecraftVersionQuery query)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<ServerPropertyDefinition>> GetServerPropertyDefinitionsAsync(CancellationToken ct = default)
+    {
+        return await serverPropertiesRepository.GetAllServerPropertiesAsync(ct);
+    }
+
+    public IEnumerable<ServerPropertyDefinition> GetServerPropertyDefinitions()
+    {
+        return serverPropertiesRepository.GetAllServerProperties();
+    }
+}

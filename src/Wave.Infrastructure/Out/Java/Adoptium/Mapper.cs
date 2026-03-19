@@ -3,7 +3,7 @@ using Wave.Domain.Java;
 using Wave.Domain.Os;
 using Wave.Infrastructure.Out.Java.Adoptium.Dtos;
 
-namespace Wave.Infrastructure.Out.Java.Adoptium.Mappers;
+namespace Wave.Infrastructure.Out.Java.Adoptium;
 
 public static class Mapper
 {

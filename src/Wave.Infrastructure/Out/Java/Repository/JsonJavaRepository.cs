@@ -5,12 +5,12 @@ using Wave.Domain.Java;
 
 namespace Wave.Infrastructure.Out.Java.Repository;
 
-public class JavaJsonRepository : IJavaInstallRepository
+public class JsonJavaRepository : IJavaInstallRepository
 {
     private readonly string repositoryPath;
     private const string fileName = "JavaInstallations.json";
     private readonly string filePath;
-    public JavaJsonRepository(string repositoryPath)
+    public JsonJavaRepository(string repositoryPath)
     {
         this.repositoryPath = repositoryPath;
         filePath = Path.Combine(this.repositoryPath, fileName);

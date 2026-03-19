@@ -1,6 +1,6 @@
 using System;
 using Wave.Domain.Minecraft;
-using Wave.Infrastructure.Out.Minecraft.Api.Dtos;
+using Wave.Infrastructure.Out.Minecraft.Versions.Dtos;
 
 namespace Wave.Infrastructure.Out.Minecraft.Api;
 

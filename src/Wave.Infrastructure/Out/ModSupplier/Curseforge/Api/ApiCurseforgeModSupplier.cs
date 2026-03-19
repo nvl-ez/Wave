@@ -4,17 +4,16 @@ using Wave.Application.Out.ModSupplier;
 using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
 using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Dtos;
-using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Mappers;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
 
-public class CurseforgeModSupplierIntegration : IModSupplierIntegration
+public class ApiCurseforgeModSupplier : IModSupplierIntegration
 {
     private readonly HttpClient client;
     private const int MinecraftGameId = 432;
     private const int ModClassId = 6;
 
-    public CurseforgeModSupplierIntegration()
+    public ApiCurseforgeModSupplier()
     {
         client = new HttpClient()
         {
@@ -23,7 +22,7 @@ public class CurseforgeModSupplierIntegration : IModSupplierIntegration
         client.DefaultRequestHeaders.Add("x-api-key", "$2a$10$BGG5jB6kIf.QgqGtFOKEWuscWzRGs.YsZ3YXp1YJ7.0PW9i4CzmAe");
     }
 
-    public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo modInfo, CancellationToken ct)
+    public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo modInfo, CancellationToken ct = default)
     {
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
         queryParameters.Add("gameVersion", modInfo.MinecraftVersion.Version);
@@ -51,7 +50,7 @@ public class CurseforgeModSupplierIntegration : IModSupplierIntegration
         return mods;
     }
 
-    public async Task<IEnumerable<ModInfo>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct)
+    public async Task<IEnumerable<ModInfo>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct = default)
     {
         //Build Query Arguments
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();

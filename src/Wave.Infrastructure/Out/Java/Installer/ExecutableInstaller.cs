@@ -17,7 +17,7 @@ public class ExecutableInstaller : IJavaInstaller
         client = new HttpClient();
     }
 
-    public async Task<JavaInstallation?> Install(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct)
+    public async Task<JavaInstallation?> Install(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct = default)
     {
         throw new NotImplementedException("Installer is still on the works.");
         if (javaArtifact.Type != JavaArtifactType.Installer) throw new NotSupportedException("Can only install Installer artifacts.");
@@ -35,7 +35,7 @@ public class ExecutableInstaller : IJavaInstaller
         return BuildJavaInstallation(javaVersion, basePath, destinationInstaller);
     }
 
-    public async Task<bool> Uninstall(JavaInstallation javaInstallation, CancellationToken ct)
+    public async Task<bool> Uninstall(JavaInstallation javaInstallation, CancellationToken ct = default)
     {
         throw new NotImplementedException("Installer is still on the works.");
         if (javaInstallation.JavaArtifactType != JavaArtifactType.Installer) throw new NotSupportedException("Can only uninstall Installer artifacts.");
@@ -81,7 +81,7 @@ public class ExecutableInstaller : IJavaInstaller
         return false;
     }
 
-    private async Task<string> DownloadFile(JavaArtifact javaArtifact, CancellationToken ct)
+    private async Task<string> DownloadFile(JavaArtifact javaArtifact, CancellationToken ct = default)
     {
         string filePath;
         using (var response = await client.GetAsync(javaArtifact.DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
@@ -102,7 +102,7 @@ public class ExecutableInstaller : IJavaInstaller
         return filePath;
     }
 
-    private async Task<string?> InstallFiles(string basePath, string filePath, CancellationToken ct)
+    private async Task<string?> InstallFiles(string basePath, string filePath, CancellationToken ct = default)
     {
         string fileExtension = Path.GetExtension(filePath);
         string fileNameWithExtension = Path.GetFileName(filePath);

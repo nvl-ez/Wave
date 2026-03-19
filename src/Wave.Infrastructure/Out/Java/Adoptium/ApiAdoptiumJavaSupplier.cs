@@ -4,15 +4,14 @@ using Wave.Application.Out.Java;
 using Wave.Domain.Java;
 using Wave.Domain.Os;
 using Wave.Infrastructure.Out.Java.Adoptium.Dtos;
-using Wave.Infrastructure.Out.Java.Adoptium.Mappers;
 
 namespace Wave.Infrastructure.Out.Java.Adoptium;
 
-public class AdoptiumJavaSupplier : IJavaSupplier
+public class ApiAdoptiumJavaSupplier : IJavaSupplier
 {
     private readonly HttpClient client;
 
-    public AdoptiumJavaSupplier()
+    public ApiAdoptiumJavaSupplier()
     {
         client = new HttpClient()
         {
@@ -20,7 +19,7 @@ public class AdoptiumJavaSupplier : IJavaSupplier
         };
     }
 
-    public async Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery query, CancellationToken ct)
+    public async Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery query, CancellationToken ct = default)
     {
         List<int> versionsToCheck = new List<int>();
         if (query.Version is null)
@@ -66,7 +65,7 @@ public class AdoptiumJavaSupplier : IJavaSupplier
         return retrievedVersions;
     }
 
-    private async Task<FeatureVersionsDto?> GetFeatureVersions(CancellationToken ct)
+    private async Task<FeatureVersionsDto?> GetFeatureVersions(CancellationToken ct = default)
     {
         try
         {

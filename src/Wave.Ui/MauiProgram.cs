@@ -34,18 +34,18 @@ public static class MauiProgram
 		builder.Logging.AddDebug();
 #endif
 		AppComposition.Init();
-		var mcsvc = new MinecraftVersionCatalogService(new MinecraftVersionCatalog());
-		var fgsvc = new ModloaderVersionCatalogService(new ForgeVersionCatalog());
-		var fasvc = new ModloaderVersionCatalogService(new FabricVersionCatalog());
-		var cfsvc = new CurseforgeModSupplierIntegration();
-		var mdsvc = new ModrinthModSupplierIntegration();
-		var adsvc = new AdoptiumJavaSupplier();
-		var mjsvc = new MojangJavaSupplier();
+		var mcsvc = new MinecraftVersionCatalogService(new ApiMinecraftVersionRepository());
+		var fgsvc = new ModloaderVersionCatalogService(new ApiForgeVersionCatalog());
+		var fasvc = new ModloaderVersionCatalogService(new ApiFabricVersionCatalog());
+		var cfsvc = new ApiCurseforgeModSupplier();
+		var mdsvc = new ApiModrinthModSupplier();
+		var adsvc = new ApiAdoptiumJavaSupplier();
+		var mjsvc = new ApiMojangJavaSupplier();
 		var misvc = new ManifestInstaller("C:\\Users\\nahu\\Documents\\JavaTest");
 		var cisvc = new CompressedInstaller("C:\\Users\\nahu\\Documents\\JavaTest");
 		var eisvc = new ExecutableInstaller("C:\\Users\\nahu\\Documents\\JavaTest");
-		var jrsvc = new JavaJsonRepository("C:\\Users\\nahu\\Documents\\JavaTest");
-		var srsvc = new ServerJsonRepository("C:\\Users\\nahu\\Documents\\JavaTest");
+		var jrsvc = new JsonJavaRepository("C:\\Users\\nahu\\Documents\\JavaTest");
+		var srsvc = new JsonServerRepository("C:\\Users\\nahu\\Documents\\JavaTest");
 		var versions = Task.Run(async () =>
 		{
 			MinecraftVersion mc = new()

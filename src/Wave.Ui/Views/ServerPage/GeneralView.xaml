@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Wave.Ui.ViewModels"
-             xmlns:views="clr-namespace:Wave.Ui.Views.ServerPage"
+             xmlns:views="clr-namespace:Wave.Ui.Views"
              x:Class="Wave.Ui.Views.ServerPage.GeneralView"
              x:DataType="viewModels:ServerViewModel">
     <VerticalStackLayout>
@@ -64,8 +64,9 @@
                         <Picker toolkit:StateView.StateKey="Done"
                                 ItemsSource="{Binding MinecraftVersions}"
                                 ItemDisplayBinding="{Binding Version}"
-                                SelectedIndex="0"
-                                SelectedItem="{Binding SelectedMinecraftVersion}"/>
+                                SelectedItem="{Binding MinecraftVersion, Mode=OneWayToSource}"
+                                SelectedIndex="{Binding MinecraftVersionsIndex, Mode=OneWay}"/>
+
                         <BoxView toolkit:StateView.StateKey="Error"
                                  WidthRequest="200"
                                  HeightRequest="50"

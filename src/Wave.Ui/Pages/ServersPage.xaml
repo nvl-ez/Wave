@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Wave.Ui.ViewModels"
              xmlns:views="clr-namespace:Wave.Ui.Views"
+             xmlns:serverManager="clr-namespace:Wave.Domain.ServerManager;assembly=Wave.Domain"
              x:Class="Wave.Ui.Pages.ServersPage"
              Title="Servers Page"
              x:Name="Root"
@@ -25,9 +27,9 @@
             </CollectionView.ItemsLayout>
 
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:ServerViewModel">
+                <DataTemplate x:DataType="serverManager:Server">
                     <views:HorizontalServerCardView
-                        StartServerCommand="{Binding StartCommand}"
+                        StartServerCommand="{Binding Source={x:Reference Root}, Path=BindingContext.StartServerCommand}"
                         EditServerCommand="{Binding Source={x:Reference Root}, Path=BindingContext.EditServerCommand}"
                         DeleteServerCommand="{Binding Source={x:Reference Root}, Path=BindingContext.DeleteServerCommand}"
                         ServerCommandParameter="{Binding .}"/>

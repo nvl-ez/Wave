@@ -1,8 +1,10 @@
 using System;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Wave.Application.In;
 using Wave.Application.Out.ServerManager;
-using Wave.Application.Services;
+using Wave.Domain.ServerManager;
 using Wave.Infrastructure.Out.Minecraft.Api;
 using Wave.Ui.Pages;
 
@@ -10,20 +12,31 @@ namespace Wave.Ui.ViewModels;
 
 public partial class ServersViewModel : IQueryAttributable
 {
-    private IServerRepository serverRepository;
+    private IServerCatalogService serverCatalogService;
 
-    public ObservableCollection<ServerViewModel> AllServers { get; }
+    public ObservableCollection<Server> AllServers { get; private set; }
 
-    //TODO Se deberia de acceder al repo por un servicio
-    public ServersViewModel(IServerRepository serverRepository)
+    public ServersViewModel(IServerCatalogService serverCatalogService)
     {
-        this.serverRepository = serverRepository;
-        AllServers = new ObservableCollection<ServerViewModel>(serverRepository.GetServers().Select(s => new ServerViewModel(s, serverRepository, new MinecraftVersionCatalogService(new MinecraftVersionCatalog())))); //TODO Mover al AppComposition
+        this.serverCatalogService = serverCatalogService;
+        AllServers = new ObservableCollection<Server>(serverCatalogService.GetServers());
     }
 
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-
+        if (query.ContainsKey("deleted"))
+        {
+            Guid deletedId = (Guid)query["deleted"];
+            var existing = AllServers.FirstOrDefault(s => s.Id == deletedId);
+            if (existing is not null)
+                AllServers.Remove(existing);
+        }
+        else if (query.ContainsKey("saved"))
+        {
+            Guid serverId = (Guid)query["saved"];
+            AllServers.Remove(AllServers.First(s => s.Id == serverId));
+            AllServers.Add(((List<Server>)await serverCatalogService.GetServersAsync(CancellationToken.None)).First(s => s.Id == serverId));
+        }
     }
 
     [RelayCommand]
@@ -33,19 +46,25 @@ public partial class ServersViewModel : IQueryAttributable
     }
 
     [RelayCommand]
-    public async Task EditServerAsync(ServerViewModel serverViewModel)
+    public async Task EditServerAsync(Server server)
     {
-        Dictionary<string, object> parameters = new()
+        var parameters = new ShellNavigationQueryParameters
         {
-            { "server", serverViewModel.Server!}
+            { "server", server!.Id}
         };
         await Shell.Current.GoToAsync(nameof(ServerPage), parameters);
     }
 
     [RelayCommand]
-    public async Task DeleteServerAsync(ServerViewModel serverViewModel)
+    public async Task StartServerAsync(Server server)
     {
-        await serverRepository.DeleteAsync(serverViewModel.Server!, CancellationToken.None);
-        AllServers.Remove(serverViewModel);
+
+    }
+
+    [RelayCommand]
+    public async Task DeleteServerAsync(Server server)
+    {
+        await serverCatalogService.DeleteAsync(server, CancellationToken.None);
+        AllServers.Remove(AllServers.First(s => s.Id == server.Id));
     }
 }

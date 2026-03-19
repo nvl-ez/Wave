@@ -4,15 +4,14 @@ using Wave.Application.Out.ModSupplier;
 using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Dtos;
-using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Mappers;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Modrinth.Api;
 
-public class ModrinthModSupplierIntegration : IModSupplierIntegration
+public class ApiModrinthModSupplier : IModSupplierIntegration
 {
     private readonly HttpClient client;
 
-    public ModrinthModSupplierIntegration()
+    public ApiModrinthModSupplier()
     {
         client = new HttpClient()
         {
@@ -21,7 +20,7 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
         client.DefaultRequestHeaders.Add("User-Agent", "nvl-ez/Wave (nahuelvazquezlevrino@gmail.com)");
     }
 
-    public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo modInfo, CancellationToken ct)
+    public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo modInfo, CancellationToken ct = default)
     {
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
         string loaderString = Mapper.ToDtoModloaderType(modInfo.ModloaderType);
@@ -50,7 +49,7 @@ public class ModrinthModSupplierIntegration : IModSupplierIntegration
         return mods;
     }
 
-    public async Task<IEnumerable<ModInfo>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct)
+    public async Task<IEnumerable<ModInfo>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct = default)
     {
         //Build Query Arguments
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();

@@ -5,5 +5,5 @@ namespace Wave.Application.Out.Java;
 
 public interface IJavaSupplier
 {
-    public Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery query, CancellationToken ct);
+    public Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery query, CancellationToken ct = default);
 }

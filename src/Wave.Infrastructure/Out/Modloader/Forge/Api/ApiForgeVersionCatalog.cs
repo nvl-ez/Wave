@@ -1,21 +1,21 @@
 using System;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using Wave.Application.Out.Modloader.Api;
+using Wave.Application.Out.Modloader;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Modloaders;
 using Wave.Infrastructure.Out.Modloader.Forge.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.Modloader.Forge.Api;
 
-public class ForgeVersionCatalog : IModloaderVersionCatalog
+public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 {
     private static readonly HttpClient client = new()
     {
         BaseAddress = new Uri("https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml")
     };
 
-    public async Task<IEnumerable<ModloaderVersion>> GetModloaderVersionsAsync(MinecraftVersion minecraftVersion, CancellationToken ct)
+    public async Task<IEnumerable<ModloaderVersion>> GetModloaderVersionsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default)
     {
         List<ForgeVersion> forgeVersions = new List<ForgeVersion>();
         try

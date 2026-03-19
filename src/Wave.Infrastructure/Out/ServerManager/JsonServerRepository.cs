@@ -5,12 +5,12 @@ using Wave.Domain.ServerManager;
 
 namespace Wave.Infrastructure.Out.ServerManager;
 
-public class ServerJsonRepository : IServerRepository
+public class JsonServerRepository : IServerRepository
 {
     private readonly string repositoryPath;
     private const string fileName = "Servers.json";
     private readonly string filePath;
-    public ServerJsonRepository(string repositoryPath)
+    public JsonServerRepository(string repositoryPath)
     {
         this.repositoryPath = repositoryPath;
         filePath = Path.Combine(this.repositoryPath, fileName);
@@ -18,10 +18,10 @@ public class ServerJsonRepository : IServerRepository
         if (!File.Exists(filePath))
             File.Create(filePath).Dispose();
     }
-    public async Task SaveAsync(Server server, CancellationToken ct)
+    public async Task SaveAsync(Server server, CancellationToken ct = default)
     {
         //Remove if exists
-        await DeleteAsync(server, ct);
+        await DeleteAsync(server.Id, ct);
 
         //Load
         List<Server> servers = (List<Server>)await GetServersAsync(ct);
@@ -32,22 +32,22 @@ public class ServerJsonRepository : IServerRepository
 
     }
 
-    public async Task<IEnumerable<Server>> GetServersAsync(CancellationToken ct)
+    public async Task<IEnumerable<Server>> GetServersAsync(CancellationToken ct = default)
     {
         string json = await File.ReadAllTextAsync(filePath, ct);
         return json.Length != 0 ? JsonSerializer.Deserialize<List<Server>>(json)! : new List<Server>();
     }
 
-    public async Task DeleteAsync(Server server, CancellationToken ct)
+    public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
         List<Server> servers = (List<Server>)await GetServersAsync(ct);
-        if (servers.RemoveAll(s => s.Id == server.Id) > 0)
+        if (servers.RemoveAll(s => s.Id == id) > 0)
         {
             await WriteListToDiskAsync(servers, ct);
         }
     }
 
-    private async Task WriteListToDiskAsync(IEnumerable<Server> servers, CancellationToken ct)
+    private async Task WriteListToDiskAsync(IEnumerable<Server> servers, CancellationToken ct = default)
     {
         string json = JsonSerializer.Serialize(servers, new JsonSerializerOptions { WriteIndented = true });
         await File.WriteAllTextAsync(filePath, json, ct);
@@ -62,7 +62,7 @@ public class ServerJsonRepository : IServerRepository
     public void Save(Server server)
     {
         //Remove if exists
-        Delete(server);
+        Delete(server.Id);
 
         //Load
         List<Server> servers = (List<Server>)GetServers();
@@ -72,10 +72,10 @@ public class ServerJsonRepository : IServerRepository
         WriteListToDisk(servers);
     }
 
-    public void Delete(Server server)
+    public void Delete(Guid id)
     {
         List<Server> servers = (List<Server>)GetServers();
-        if (servers.RemoveAll(s => s.Id == server.Id) > 0)
+        if (servers.RemoveAll(s => s.Id == id) > 0)
         {
             WriteListToDisk(servers);
         }

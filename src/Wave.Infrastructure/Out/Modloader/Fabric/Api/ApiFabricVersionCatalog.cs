@@ -1,20 +1,20 @@
 using System;
 using System.Text.Json;
-using Wave.Application.Out.Modloader.Api;
+using Wave.Application.Out.Modloader;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Modloaders;
 using Wave.Infrastructure.Out.Modloader.Fabric.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.Modloader.Fabric.Api;
 
-public class FabricVersionCatalog : IModloaderVersionCatalog
+public class ApiFabricVersionCatalog : IModloaderVersionCatalog
 {
     private static readonly HttpClient client = new()
     {
         BaseAddress = new Uri("https://meta.fabricmc.net/v2/versions/loader/")
     };
 
-    public async Task<IEnumerable<ModloaderVersion>> GetModloaderVersionsAsync(MinecraftVersion minecraftVersion, CancellationToken ct)
+    public async Task<IEnumerable<ModloaderVersion>> GetModloaderVersionsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default)
     {
         List<FabricVersion> fabricVersions = new List<FabricVersion>();
         try

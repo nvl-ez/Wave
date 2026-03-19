@@ -3,15 +3,14 @@ using System.Text.Json;
 using Wave.Application.Out.Java;
 using Wave.Domain.Java;
 using Wave.Infrastructure.Out.Java.Mojang.Dtos;
-using Wave.Infrastructure.Out.Java.Mojang.Mappers;
 
 namespace Wave.Infrastructure.Out.Java.Mojang;
 
-public class MojangJavaSupplier : IJavaSupplier
+public class ApiMojangJavaSupplier : IJavaSupplier
 {
     private readonly HttpClient client;
 
-    public MojangJavaSupplier()
+    public ApiMojangJavaSupplier()
     {
         client = new HttpClient()
         {
@@ -19,7 +18,7 @@ public class MojangJavaSupplier : IJavaSupplier
         };
     }
 
-    public async Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery query, CancellationToken ct)
+    public async Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery query, CancellationToken ct = default)
     {
 
         string jsonResponse = await client.GetStringAsync("", ct);
