@@ -9,17 +9,17 @@ public sealed class Server
     public string Name { get; set; } = string.Empty;
     public DateTime CreationDate { get; set; } = DateTime.Now;
     public MinecraftVersion? MinecraftVersion { get; set; }
-    public Dictionary<string, string> Properties = new()
+    public Dictionary<string, string?> Properties { get; set; } = new()
     {
-        {"difficulty", "Difficulty"},
-        {"gamemode", "Gamemode"},
-        {"level-seed", "Level Seed"},
-        {"max-players", "Max Players"},
-        {"motd", "Motd"},
-        {"online-mode", "Online Mode"},
-        {"server-ip", "Server IP"},
-        {"spawn-protection", "Spawn Protection"},
-        {"view-distance", "View Distance"}
+        {"difficulty", "nromal"},
+        {"gamemode", "survival"},
+        {"level-seed", ""},
+        {"max-players", "16"},
+        {"motd", "A Minecraft Server"},
+        {"online-mode", "true"},
+        {"server-ip", ""},
+        {"spawn-protection", "16"},
+        {"view-distance", "8"}
     };
 
     public bool Equals(Server? other)

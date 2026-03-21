@@ -35,7 +35,7 @@ public partial class ServersViewModel : IQueryAttributable
         {
             Guid serverId = (Guid)query["saved"];
             AllServers.Remove(AllServers.First(s => s.Id == serverId));
-            AllServers.Add(((List<Server>)await serverCatalogService.GetServersAsync(CancellationToken.None)).First(s => s.Id == serverId));
+            AllServers.Add(await serverCatalogService.GetServerAsync(serverId));
         }
     }
 

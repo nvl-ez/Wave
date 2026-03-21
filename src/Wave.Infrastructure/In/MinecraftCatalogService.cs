@@ -19,7 +19,7 @@ public class MinecraftCatalogService : IMinecraftCatalogService
     public async Task<IEnumerable<MinecraftVersion>> GetMinecraftVersionsAsync(MinecraftVersionQuery query, CancellationToken ct = default)
     {
         return (await minecraftVersionRepository.GetMinecraftVersionsAsync(ct))
-            .Where(mv => query.IncludeSnapshots == true || mv.MinecraftVersionType == MinecraftVersionType.Release);
+            .Where(mv => query.IncludeSnapshots == true || mv.MinecraftVersionType == MinecraftVersionType.Release).ToList();
     }
 
     public IEnumerable<MinecraftVersion> GetMinecraftVersions(MinecraftVersionQuery query)
@@ -35,5 +35,15 @@ public class MinecraftCatalogService : IMinecraftCatalogService
     public IEnumerable<ServerPropertyDefinition> GetServerPropertyDefinitions()
     {
         return serverPropertiesRepository.GetAllServerProperties();
+    }
+
+    public async Task<ServerPropertyDefinition> GetServerPropertyDefinitionAsync(string key, CancellationToken ct = default)
+    {
+        return (await serverPropertiesRepository.GetAllServerPropertiesAsync(ct)).First(sp => sp.Key == key);
+    }
+
+    public ServerPropertyDefinition GetServerPropertyDefinition(string key)
+    {
+        return serverPropertiesRepository.GetAllServerProperties().First(sp => sp.Key == key);
     }
 }

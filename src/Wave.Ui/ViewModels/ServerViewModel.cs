@@ -30,12 +30,21 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     //Statuses
     [ObservableProperty]
     public partial string MinecraftVersionsStatus { get; set; } = "Loading"; //Loading, Done, Error
+    [ObservableProperty]
+    public partial string ServerPropertiesStatus { get; set; } = "Loading";
 
     //Server
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleName))]
     [NotifyPropertyChangedFor(nameof(Name))]
     [NotifyPropertyChangedFor(nameof(Motd))]
+    [NotifyPropertyChangedFor(nameof(MinecraftVersion))]
+    [NotifyPropertyChangedFor(nameof(MinecraftVersionIndex))]
+    [NotifyPropertyChangedFor(nameof(GamemodeValue))]
+    [NotifyPropertyChangedFor(nameof(DifficultyValue))]
+    [NotifyPropertyChangedFor(nameof(MotdValue))]
+    [NotifyPropertyChangedFor(nameof(ServerIpValue))]
+    [NotifyPropertyChangedFor(nameof(MaxPlayersValue))]
     private partial Server? Server { get; set; }
 
     public string TitleName => Server is null ? "New Server" : Name;
@@ -61,6 +70,9 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
             }
         }
     }
+    public DateTime? CreationDate => Server is null ? null : Server.CreationDate;
+
+    //Versions
     public MinecraftVersion? MinecraftVersion
     {
         get => Server?.MinecraftVersion;
@@ -73,19 +85,56 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
             }
         }
     }
-    public DateTime? CreationDate => Server is null ? null : Server.CreationDate;
-    //Versions
     [ObservableProperty]
     public partial List<MinecraftVersion> MinecraftVersions { get; set; } = new List<MinecraftVersion>();
     [ObservableProperty]
     public partial bool IncludeSnapshots { get; set; } = false;
+    public int? MinecraftVersionIndex => MinecraftVersions?.FindIndex(mv => mv.Version == MinecraftVersion?.Version);
+
+    //Gamemode
+    public string? GamemodeValue
+    {
+        get { return Server?.Properties["gamemode"]; }
+        set { Server?.Properties["gamemode"] = value; }
+    }
     [ObservableProperty]
-    public partial int MinecraftVersionsIndex { get; set; } = -1;
+    public partial ServerPropertyDefinition? GamemodeServerProperty { get; set; } = null;
+    //Difficulty
+    public string? DifficultyValue
+    {
+        get { return Server?.Properties["difficulty"]; }
+        set { Server?.Properties["difficulty"] = value; }
+    }
+    [ObservableProperty]
+    public partial ServerPropertyDefinition? DifficultyServerProperty { get; set; } = null;
+    //Motd
+    public string? MotdValue
+    {
+        get { return Server?.Properties["motd"]; }
+        set { Server?.Properties["motd"] = value; }
+    }
+    [ObservableProperty]
+    public partial ServerPropertyDefinition? MotdServerProperty { get; set; } = null;
+    //Ip
+    public string? ServerIpValue
+    {
+        get { return Server?.Properties["server-ip"]; }
+        set { Server?.Properties["server-ip"] = value; }
+    }
+    [ObservableProperty]
+    public partial ServerPropertyDefinition? ServerIpServerProperty { get; set; } = null;
+    //Max Players
+    public string? MaxPlayersValue
+    {
+        get { return Server?.Properties["max-players"]; }
+        set { Server?.Properties["max-players"] = value; }
+    }
+    [ObservableProperty]
+    public partial ServerPropertyDefinition? MaxPlayersServerProperty { get; set; } = null;
 
     /***************
     * CONSTRUCTORS *
     ***************/
-    //TODO: Se deberia de acceder al repo por un servicio
     public ServerViewModel(IServerCatalogService serverCatalogService, IMinecraftCatalogService minecraftCatalogService)
     {
         this.Server = null;
@@ -93,7 +142,6 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         this.minecraftCatalogService = minecraftCatalogService;
     }
 
-    //TODO: Se deberia de acceder al repo por un servicio
     public ServerViewModel(Server server, IServerCatalogService serverCatalogService, IMinecraftCatalogService minecraftCatalogService)
     {
         this.Server = server;
@@ -140,6 +188,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public async Task LoadAsync()
     {
         await RequestMinecraftVersionsAsync();
+        RequestServerPropertiesAsync();
     }
 
     [RelayCommand]
@@ -151,12 +200,20 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         if (MinecraftVersions is not null && MinecraftVersions.Count > 0)
         {
             MinecraftVersionsStatus = "Done";
-            if (MinecraftVersion is not null)
-            {
-                MinecraftVersionsIndex = MinecraftVersions.FindIndex(v => v.Version == MinecraftVersion.Version);
-            }
         }
         else MinecraftVersionsStatus = "Error";
+    }
+
+    private void RequestServerPropertiesAsync()
+    {
+        ServerPropertiesStatus = "Loading";
+
+        GamemodeServerProperty = minecraftCatalogService.GetServerPropertyDefinition("gamemode");
+        DifficultyServerProperty = minecraftCatalogService.GetServerPropertyDefinition("difficulty");
+
+
+        ServerPropertiesStatus = "Done";
+
     }
 
     //Server
