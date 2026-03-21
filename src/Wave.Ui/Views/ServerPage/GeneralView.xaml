@@ -95,8 +95,8 @@
                             Text="Gamemode:"/>
                      <views:ServerPropertyInputView Grid.Column="3"
                                                     Grid.Row="0"
-                                                    ServerPropertyDefinition="{Binding DifficultyServerProperty}"
-                                                    ServerPropertyValue="{Binding DifficultyValue}"/>
+                                                    ServerPropertyDefinition="{Binding GamemodeServerProperty}"
+                                                    ServerPropertyValue="{Binding GamemodeValue}"/>
 
                      <!-- Server IP -->
                      <Label Grid.Column="0"

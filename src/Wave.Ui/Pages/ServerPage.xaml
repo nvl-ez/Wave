@@ -47,8 +47,19 @@
                                HorizontalOptions="Center"
                                VerticalOptions="Center"
                                Margin="20">
-            <Button Text="Save"
-                    Command="{Binding SaveCommand}"/>
+
+            <VerticalStackLayout toolkit:StateContainer.CurrentState="{Binding ServerStatus}">
+                <toolkit:StateContainer.StateViews>
+                    <Button toolkit:StateView.StateKey="New"
+                            Text="Create"
+                            Command="{Binding CreateCommand}"/>
+                    <Button toolkit:StateView.StateKey="Ready"
+                            Text="Save"
+                            Command="{Binding SaveCommand}"/>
+                </toolkit:StateContainer.StateViews>
+                <views:GeneralView/>
+            </VerticalStackLayout>
+
             <Button Text="Delete"
                     Command="{Binding DeleteCommand}"/>
         </HorizontalStackLayout>

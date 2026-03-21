@@ -37,7 +37,7 @@ public class ServerHandlerService : IServerHandlerService
 
         //Create server.properties
         string propertiesFile = Path.Combine(serverDirectory, "server.properties");
-        File.Create(propertiesFile);
+        File.Create(propertiesFile).Close();
         server.ServerPropertiesFilename = "server.properties";
 
         StringBuilder propertiesStringBuilder = new StringBuilder();

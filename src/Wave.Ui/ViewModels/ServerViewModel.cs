@@ -18,6 +18,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
 {
     private readonly IServerCatalogService serverCatalogService;
     private readonly IMinecraftCatalogService minecraftCatalogService;
+    private readonly IServerHandlerService serverHandlerService;
 
     /***************************
     * VARIABLES AND PROPERTIES *
@@ -32,6 +33,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public partial string MinecraftVersionsStatus { get; set; } = "Loading"; //Loading, Done, Error
     [ObservableProperty]
     public partial string ServerPropertiesStatus { get; set; } = "Loading";
+    public string ServerStatus => Server.IsReady ? "Ready" : "New"; //New, Ready
 
     //Server
     [ObservableProperty]
@@ -45,7 +47,8 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [NotifyPropertyChangedFor(nameof(MotdValue))]
     [NotifyPropertyChangedFor(nameof(ServerIpValue))]
     [NotifyPropertyChangedFor(nameof(MaxPlayersValue))]
-    private partial Server? Server { get; set; }
+    [NotifyPropertyChangedFor(nameof(ServerStatus))]
+    private partial Server Server { get; set; } = new Server();
 
     public string TitleName => Server is null ? "New Server" : Name;
     public string Name
@@ -135,18 +138,19 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     /***************
     * CONSTRUCTORS *
     ***************/
-    public ServerViewModel(IServerCatalogService serverCatalogService, IMinecraftCatalogService minecraftCatalogService)
+    public ServerViewModel(IServerCatalogService serverCatalogService, IMinecraftCatalogService minecraftCatalogService, IServerHandlerService serverHandlerService)
     {
-        this.Server = null;
         this.serverCatalogService = serverCatalogService;
         this.minecraftCatalogService = minecraftCatalogService;
+        this.serverHandlerService = serverHandlerService;
     }
 
-    public ServerViewModel(Server server, IServerCatalogService serverCatalogService, IMinecraftCatalogService minecraftCatalogService)
+    public ServerViewModel(Server server, IServerCatalogService serverCatalogService, IMinecraftCatalogService minecraftCatalogService, IServerHandlerService serverHandlerService)
     {
         this.Server = server;
         this.serverCatalogService = serverCatalogService;
         this.minecraftCatalogService = minecraftCatalogService;
+        this.serverHandlerService = serverHandlerService;
     }
 
 
@@ -179,6 +183,10 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         {
             Guid serverId = (Guid)query["server"];
             Server = await serverCatalogService.GetServerAsync(serverId);
+        }
+        else
+        {
+            Server = new Server();
         }
     }
 
@@ -220,14 +228,21 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     public async Task SaveAsync()
     {
+
+    }
+
+    [RelayCommand]
+    public async Task CreateAsync()
+    {
         if (Server is null) return;
-        await serverCatalogService.SaveAsync(Server);
+        await serverHandlerService.CreateAsync(Server);
         var parameters = new ShellNavigationQueryParameters
         {
-            { "saved", Server!.Id}
+            { "created", Server!.Id}
         };
         await Shell.Current.GoToAsync("..", parameters);
     }
+
     [RelayCommand]
     public async Task DeleteAsync()
     {

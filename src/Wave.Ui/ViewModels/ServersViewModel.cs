@@ -12,13 +12,15 @@ namespace Wave.Ui.ViewModels;
 
 public partial class ServersViewModel : IQueryAttributable
 {
-    private IServerCatalogService serverCatalogService;
+    private readonly IServerCatalogService serverCatalogService;
+    private readonly IServerHandlerService serverHandlerService;
 
     public ObservableCollection<Server> AllServers { get; private set; }
 
-    public ServersViewModel(IServerCatalogService serverCatalogService)
+    public ServersViewModel(IServerCatalogService serverCatalogService, IServerHandlerService serverHandlerService)
     {
         this.serverCatalogService = serverCatalogService;
+        this.serverHandlerService = serverHandlerService;
         AllServers = new ObservableCollection<Server>(serverCatalogService.GetServers());
     }
 
@@ -35,6 +37,11 @@ public partial class ServersViewModel : IQueryAttributable
         {
             Guid serverId = (Guid)query["saved"];
             AllServers.Remove(AllServers.First(s => s.Id == serverId));
+            AllServers.Add(await serverCatalogService.GetServerAsync(serverId));
+        }
+        else if (query.ContainsKey("created"))
+        {
+            Guid serverId = (Guid)query["created"];
             AllServers.Add(await serverCatalogService.GetServerAsync(serverId));
         }
     }
@@ -64,7 +71,7 @@ public partial class ServersViewModel : IQueryAttributable
     [RelayCommand]
     public async Task DeleteServerAsync(Server server)
     {
-        await serverCatalogService.DeleteAsync(server, CancellationToken.None);
+        await serverHandlerService.DeleteAsync(server);
         AllServers.Remove(AllServers.First(s => s.Id == server.Id));
     }
 }

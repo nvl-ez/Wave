@@ -32,8 +32,6 @@ public static class MauiProgram
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
-		AppComposition.Init();
-
 		return builder.Build();
 	}
 }

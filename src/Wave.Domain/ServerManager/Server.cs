@@ -25,6 +25,11 @@ public sealed class Server
     public string? ServerFilename { get; set; } = null;
     public string? ServerPropertiesFilename { get; set; } = null;
 
+    public bool IsReady => ServerDirectory is not null &&
+        MinecraftVersion is not null &&
+        ServerFilename is not null &&
+        ServerPropertiesFilename is not null;
+
     public bool Equals(Server? other)
     {
         if (ReferenceEquals(this, other)) return true;
