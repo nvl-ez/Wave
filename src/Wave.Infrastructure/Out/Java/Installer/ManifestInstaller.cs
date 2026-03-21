@@ -4,7 +4,7 @@ using Wave.Application.In;
 using Wave.Application.Out.Java;
 using Wave.Domain.Java;
 using Wave.Domain.Mods;
-using Wave.Infrastructure.Out.Java.Installer.Dtos;
+using Wave.Infrastructure.Out.Java.Installer.ManifestDtos;
 
 namespace Wave.Infrastructure.Out.Java.Installer;
 
@@ -89,7 +89,7 @@ public class ManifestInstaller : IJavaInstaller
         {
             string fullPath = Path.Combine(basePath, file.Key);
 
-            if (file.Value.Downloads is null || file.Value.Downloads.Raw is null) throw new NullReferenceException("A file download has been null.");
+            if (file.Value?.Downloads?.Raw is null) throw new NullReferenceException("A file download has been null.");
             using var downloadStream = await client.GetStreamAsync(file.Value.Downloads.Raw.Url);
             using var fileStream = new FileStream(fullPath, FileMode.Create);
 

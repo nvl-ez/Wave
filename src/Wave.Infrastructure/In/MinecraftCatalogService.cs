@@ -18,7 +18,7 @@ public class MinecraftCatalogService : IMinecraftCatalogService
 
     public async Task<IEnumerable<MinecraftVersion>> GetMinecraftVersionsAsync(MinecraftVersionQuery query, CancellationToken ct = default)
     {
-        return (await minecraftVersionRepository.GetMinecraftVersionsAsync(ct))
+        return (await minecraftVersionRepository.GetAllAsync(ct))
             .Where(mv => query.IncludeSnapshots == true || mv.MinecraftVersionType == MinecraftVersionType.Release).ToList();
     }
 

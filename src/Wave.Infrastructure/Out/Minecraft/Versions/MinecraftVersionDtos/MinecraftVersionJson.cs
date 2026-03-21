@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace Wave.Infrastructure.Out.Minecraft.Versions.Dtos;
+namespace Wave.Infrastructure.Out.Minecraft.Versions.MinecraftVersionDtos;
 
 public record class MinecraftVersionJson
 {

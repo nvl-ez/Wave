@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace Wave.Infrastructure.Out.Java.Installer.Dtos;
+namespace Wave.Infrastructure.Out.Java.Installer.ManifestDtos;
 
 public record class DownloadDto
 {

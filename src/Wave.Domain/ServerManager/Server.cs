@@ -21,6 +21,9 @@ public sealed class Server
         {"spawn-protection", "16"},
         {"view-distance", "8"}
     };
+    public string? ServerDirectory { get; set; } = null;
+    public string? ServerFilename { get; set; } = null;
+    public string? ServerPropertiesFilename { get; set; } = null;
 
     public bool Equals(Server? other)
     {
