@@ -6,8 +6,6 @@ public partial class HorizontalServerCardView : ContentView
 {
 	public static readonly BindableProperty EditServerCommandProperty =
 		BindableProperty.Create(nameof(EditServerCommand), typeof(ICommand), typeof(HorizontalServerCardView));
-	public static readonly BindableProperty DeleteServerCommandProperty =
-		BindableProperty.Create(nameof(DeleteServerCommand), typeof(ICommand), typeof(HorizontalServerCardView));
 	public static readonly BindableProperty StartServerCommandProperty =
 		BindableProperty.Create(nameof(StartServerCommand), typeof(ICommand), typeof(HorizontalServerCardView));
 
@@ -18,12 +16,6 @@ public partial class HorizontalServerCardView : ContentView
 	{
 		get => (ICommand?)GetValue(EditServerCommandProperty);
 		set => SetValue(EditServerCommandProperty, value);
-	}
-
-	public ICommand? DeleteServerCommand
-	{
-		get => (ICommand?)GetValue(DeleteServerCommandProperty);
-		set => SetValue(DeleteServerCommandProperty, value);
 	}
 
 	public ICommand? StartServerCommand

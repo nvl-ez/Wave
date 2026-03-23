@@ -21,10 +21,10 @@ public class JsonServerRepository : IServerRepository
     public async Task SaveAsync(Server server, CancellationToken ct = default)
     {
         //Remove if exists
-        await DeleteAsync(server.Id, ct);
+        await DeleteAsync(server.Info.Id, ct);
 
         //Load
-        List<Server> servers = (List<Server>)await GetServersAsync(ct);
+        List<Server> servers = (List<Server>)await GetAllAsync(ct);
 
         //Add
         servers.Add(server);
@@ -32,7 +32,7 @@ public class JsonServerRepository : IServerRepository
 
     }
 
-    public async Task<IEnumerable<Server>> GetServersAsync(CancellationToken ct = default)
+    public async Task<IEnumerable<Server>> GetAllAsync(CancellationToken ct = default)
     {
         string json = await File.ReadAllTextAsync(filePath, ct);
         return json.Length != 0 ? JsonSerializer.Deserialize<List<Server>>(json)! : new List<Server>();
@@ -40,8 +40,8 @@ public class JsonServerRepository : IServerRepository
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        List<Server> servers = (List<Server>)await GetServersAsync(ct);
-        if (servers.RemoveAll(s => s.Id == id) > 0)
+        List<Server> servers = (List<Server>)await GetAllAsync(ct);
+        if (servers.RemoveAll(s => s.Info.Id == id) > 0)
         {
             await WriteListToDiskAsync(servers, ct);
         }
@@ -53,7 +53,7 @@ public class JsonServerRepository : IServerRepository
         await File.WriteAllTextAsync(filePath, json, ct);
     }
 
-    public IEnumerable<Server> GetServers()
+    public IEnumerable<Server> GetAll()
     {
         string json = File.ReadAllText(filePath);
         return json.Length != 0 ? JsonSerializer.Deserialize<List<Server>>(json)! : new List<Server>();
@@ -62,10 +62,10 @@ public class JsonServerRepository : IServerRepository
     public void Save(Server server)
     {
         //Remove if exists
-        Delete(server.Id);
+        Delete(server.Info.Id);
 
         //Load
-        List<Server> servers = (List<Server>)GetServers();
+        List<Server> servers = (List<Server>)GetAll();
 
         //Add
         servers.Add(server);
@@ -74,8 +74,8 @@ public class JsonServerRepository : IServerRepository
 
     public void Delete(Guid id)
     {
-        List<Server> servers = (List<Server>)GetServers();
-        if (servers.RemoveAll(s => s.Id == id) > 0)
+        List<Server> servers = (List<Server>)GetAll();
+        if (servers.RemoveAll(s => s.Info.Id == id) > 0)
         {
             WriteListToDisk(servers);
         }

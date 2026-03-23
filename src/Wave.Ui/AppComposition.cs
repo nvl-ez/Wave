@@ -16,40 +16,38 @@ namespace Wave.Ui;
 public static class AppComposition
 {
     //APP FOLDER NAME
-    private const string appDirectoryName = ".Wave";
     private const string serversDirectoryName = "Servers";
     private static INoteRepository noteRepository;
 
     // OUT PORTS
     private static IServerRepository serverRepository;
     private static IMinecraftVersionRepository minecraftVersionRepository;
+    private static IServerPropertyDefinitionRepository serverPropertyDefinitionRepository;
     private static IServerPropertiesRepository serverPropertiesRepository;
 
     //SERVICES
     private static IMinecraftCatalogService minecraftCatalogService;
-    private static IServerCatalogService serverCatalogService;
-    private static IServerHandlerService serverHandlerService;
+    private static IServerManagerService serverHandlerService;
 
     static AppComposition()
     {
-        string appDataDirectory = FileSystem.AppDataDirectory;
-        string appDirectory = Path.Combine(appDataDirectory, appDirectoryName);
+        string appDirectory = FileSystem.AppDataDirectory;
         string serversDirectory = Path.Combine(appDirectory, serversDirectoryName);
         Directory.CreateDirectory(appDirectory);
         Directory.CreateDirectory(serversDirectory);
 
 
-        noteRepository = new NoteRepository(appDataDirectory);
+        noteRepository = new NoteRepository(appDirectory);
 
         // OUT PORTS
         serverRepository = new JsonServerRepository(appDirectory);
         minecraftVersionRepository = new ApiMinecraftVersionRepository();
-        serverPropertiesRepository = new InMemoryServerPropertiesRepository();
+        serverPropertyDefinitionRepository = new InMemoryServerPropertyDefinitionRepository();
+        serverPropertiesRepository = new ServerPropertiesRepository();
 
         //SERVICES
-        minecraftCatalogService = new MinecraftCatalogService(minecraftVersionRepository, serverPropertiesRepository);
-        serverCatalogService = new ServerCatalogService(serverRepository);
-        serverHandlerService = new ServerHandlerService(serversDirectory, serverRepository, minecraftVersionRepository);
+        minecraftCatalogService = new MinecraftCatalogService(minecraftVersionRepository, serverPropertyDefinitionRepository);
+        serverHandlerService = new ServerManagerService(serversDirectory, serverRepository, minecraftVersionRepository, serverPropertiesRepository);
     }
 
     public static NotesViewModel CreateNotesViewModel() => new NotesViewModel(noteRepository);
@@ -57,7 +55,7 @@ public static class AppComposition
     public static NoteViewModel CreateNoteViewModel(Note note) => new NoteViewModel(noteRepository, note);
 
     // VIEW MODELS
-    public static ServersViewModel CreateServersViewModel() => new ServersViewModel(serverCatalogService, serverHandlerService);
-    public static ServerViewModel CreateServerViewModel() => new ServerViewModel(serverCatalogService, minecraftCatalogService, serverHandlerService);
+    public static ServersViewModel CreateServersViewModel() => new ServersViewModel(serverHandlerService);
+    public static ServerViewModel CreateServerViewModel() => new ServerViewModel(minecraftCatalogService, serverHandlerService);
 
 }

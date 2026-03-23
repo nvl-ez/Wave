@@ -27,11 +27,10 @@
             </CollectionView.ItemsLayout>
 
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="serverManager:Server">
+                <DataTemplate x:DataType="serverManager:ServerInfo">
                     <views:HorizontalServerCardView
                         StartServerCommand="{Binding Source={x:Reference Root}, Path=BindingContext.StartServerCommand}"
                         EditServerCommand="{Binding Source={x:Reference Root}, Path=BindingContext.EditServerCommand}"
-                        DeleteServerCommand="{Binding Source={x:Reference Root}, Path=BindingContext.DeleteServerCommand}"
                         ServerCommandParameter="{Binding .}"/>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

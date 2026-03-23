@@ -4,7 +4,7 @@ using Wave.Domain.Minecraft;
 
 namespace Wave.Infrastructure.Out.Minecraft.ServerProperties;
 
-public class InMemoryServerPropertiesRepository : Application.Out.Minecraft.IServerPropertiesRepository
+public class InMemoryServerPropertyDefinitionRepository : IServerPropertyDefinitionRepository
 {
     public static readonly List<ServerPropertyDefinition> serverProperties = new()
 {

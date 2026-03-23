@@ -8,9 +8,9 @@ namespace Wave.Infrastructure.In;
 public class MinecraftCatalogService : IMinecraftCatalogService
 {
     private readonly IMinecraftVersionRepository minecraftVersionRepository;
-    private readonly IServerPropertiesRepository serverPropertiesRepository;
+    private readonly IServerPropertyDefinitionRepository serverPropertiesRepository;
 
-    public MinecraftCatalogService(IMinecraftVersionRepository minecraftVersionRepository, IServerPropertiesRepository serverPropertiesRepository)
+    public MinecraftCatalogService(IMinecraftVersionRepository minecraftVersionRepository, IServerPropertyDefinitionRepository serverPropertiesRepository)
     {
         this.minecraftVersionRepository = minecraftVersionRepository;
         this.serverPropertiesRepository = serverPropertiesRepository;

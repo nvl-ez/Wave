@@ -12,16 +12,14 @@ namespace Wave.Ui.ViewModels;
 
 public partial class ServersViewModel : IQueryAttributable
 {
-    private readonly IServerCatalogService serverCatalogService;
-    private readonly IServerHandlerService serverHandlerService;
+    private readonly IServerManagerService serverManagerService;
 
-    public ObservableCollection<Server> AllServers { get; private set; }
+    public ObservableCollection<ServerInfo> AllServers { get; private set; }
 
-    public ServersViewModel(IServerCatalogService serverCatalogService, IServerHandlerService serverHandlerService)
+    public ServersViewModel(IServerManagerService serverManagerService)
     {
-        this.serverCatalogService = serverCatalogService;
-        this.serverHandlerService = serverHandlerService;
-        AllServers = new ObservableCollection<Server>(serverCatalogService.GetServers());
+        this.serverManagerService = serverManagerService;
+        AllServers = new ObservableCollection<ServerInfo>(serverManagerService.GetAll());
     }
 
     public async void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -37,12 +35,12 @@ public partial class ServersViewModel : IQueryAttributable
         {
             Guid serverId = (Guid)query["saved"];
             AllServers.Remove(AllServers.First(s => s.Id == serverId));
-            AllServers.Add(await serverCatalogService.GetServerAsync(serverId));
+            AllServers.Add(await serverManagerService.GetAsync(serverId));
         }
         else if (query.ContainsKey("created"))
         {
             Guid serverId = (Guid)query["created"];
-            AllServers.Add(await serverCatalogService.GetServerAsync(serverId));
+            AllServers.Add(await serverManagerService.GetAsync(serverId));
         }
     }
 
@@ -53,25 +51,18 @@ public partial class ServersViewModel : IQueryAttributable
     }
 
     [RelayCommand]
-    public async Task EditServerAsync(Server server)
+    public async Task EditServerAsync(ServerInfo info)
     {
         var parameters = new ShellNavigationQueryParameters
         {
-            { "server", server!.Id}
+            { "server", info!.Id}
         };
         await Shell.Current.GoToAsync(nameof(ServerPage), parameters);
     }
 
     [RelayCommand]
-    public async Task StartServerAsync(Server server)
+    public async Task StartServerAsync(ServerInfo info)
     {
 
-    }
-
-    [RelayCommand]
-    public async Task DeleteServerAsync(Server server)
-    {
-        await serverHandlerService.DeleteAsync(server);
-        AllServers.Remove(AllServers.First(s => s.Id == server.Id));
     }
 }

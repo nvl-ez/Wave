@@ -1,24 +1,17 @@
-using System;
-using System.ComponentModel;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Wave.Application.In;
-using Wave.Application.Out.Minecraft;
-using Wave.Application.Out.ServerManager;
-using Wave.Domain;
 using Wave.Domain.Minecraft;
-using Wave.Domain.Mods;
 using Wave.Domain.ServerManager;
-using Wave.Ui.Pages;
+
+//TODO: Server Eula automatization
 
 namespace Wave.Ui.ViewModels;
 
 public partial class ServerViewModel : ObservableObject, IQueryAttributable
 {
-    private readonly IServerCatalogService serverCatalogService;
     private readonly IMinecraftCatalogService minecraftCatalogService;
-    private readonly IServerHandlerService serverHandlerService;
+    private readonly IServerManagerService serverHandlerService;
 
     /***************************
     * VARIABLES AND PROPERTIES *
@@ -49,42 +42,44 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [NotifyPropertyChangedFor(nameof(MaxPlayersValue))]
     [NotifyPropertyChangedFor(nameof(ServerStatus))]
     private partial Server Server { get; set; } = new Server();
+    private ServerInfo Info => Server.Info;
+    private ServerDetails Details => Server.Details;
 
     public string TitleName => Server is null ? "New Server" : Name;
     public string Name
     {
-        get => Server is null ? "" : Server.Name;
+        get => Server is null ? "" : Info.Name;
         set
         {
-            if (Server is not null && value != Server.Name)
+            if (Server is not null && value != Info.Name)
             {
-                Server.Name = value;
+                Info.Name = value;
             }
         }
     }
     public string Motd
     {
-        get => Server is null || !Server.Properties.ContainsKey("motd") ? "" : Server.Properties["motd"];
+        get => Details.Properties.ContainsKey("motd") ? Details.Properties["motd"] : "";
         set
         {
-            if (Server is not null && Server.Properties.ContainsKey("motd") && value != Server.Properties["motd"])
+            if (Server is not null && Details.Properties.ContainsKey("motd") && value != Details.Properties["motd"])
             {
-                Server.Properties["motd"] = value;
+                Details.Properties["motd"] = value;
             }
         }
     }
-    public DateTime? CreationDate => Server is null ? null : Server.CreationDate;
+    public DateTime? CreationDate => Server is null ? null : Info.CreationDate;
 
     //Versions
     public MinecraftVersion? MinecraftVersion
     {
-        get => Server?.MinecraftVersion;
+        get => Details.MinecraftVersion;
         set
         {
             if (value is null) return;
             if (Server is not null)
             {
-                Server.MinecraftVersion = value;
+                Details.MinecraftVersion = value;
             }
         }
     }
@@ -95,42 +90,42 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public int? MinecraftVersionIndex => MinecraftVersions?.FindIndex(mv => mv.Version == MinecraftVersion?.Version);
 
     //Gamemode
-    public string? GamemodeValue
+    public string GamemodeValue
     {
-        get { return Server?.Properties["gamemode"]; }
-        set { Server?.Properties["gamemode"] = value; }
+        get { return Details.Properties["gamemode"]; }
+        set { Details.Properties["gamemode"] = value; }
     }
     [ObservableProperty]
     public partial ServerPropertyDefinition? GamemodeServerProperty { get; set; } = null;
     //Difficulty
-    public string? DifficultyValue
+    public string DifficultyValue
     {
-        get { return Server?.Properties["difficulty"]; }
-        set { Server?.Properties["difficulty"] = value; }
+        get { return Details.Properties["difficulty"]; }
+        set { Details.Properties["difficulty"] = value; }
     }
     [ObservableProperty]
     public partial ServerPropertyDefinition? DifficultyServerProperty { get; set; } = null;
     //Motd
-    public string? MotdValue
+    public string MotdValue
     {
-        get { return Server?.Properties["motd"]; }
-        set { Server?.Properties["motd"] = value; }
+        get { return Details.Properties["motd"]; }
+        set { Details.Properties["motd"] = value; }
     }
     [ObservableProperty]
     public partial ServerPropertyDefinition? MotdServerProperty { get; set; } = null;
     //Ip
-    public string? ServerIpValue
+    public string ServerIpValue
     {
-        get { return Server?.Properties["server-ip"]; }
-        set { Server?.Properties["server-ip"] = value; }
+        get { return Details.Properties["server-ip"]; }
+        set { Details.Properties["server-ip"] = value; }
     }
     [ObservableProperty]
     public partial ServerPropertyDefinition? ServerIpServerProperty { get; set; } = null;
     //Max Players
-    public string? MaxPlayersValue
+    public string MaxPlayersValue
     {
-        get { return Server?.Properties["max-players"]; }
-        set { Server?.Properties["max-players"] = value; }
+        get { return Details.Properties["max-players"]; }
+        set { Details.Properties["max-players"] = value; }
     }
     [ObservableProperty]
     public partial ServerPropertyDefinition? MaxPlayersServerProperty { get; set; } = null;
@@ -138,17 +133,15 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     /***************
     * CONSTRUCTORS *
     ***************/
-    public ServerViewModel(IServerCatalogService serverCatalogService, IMinecraftCatalogService minecraftCatalogService, IServerHandlerService serverHandlerService)
+    public ServerViewModel(IMinecraftCatalogService minecraftCatalogService, IServerManagerService serverHandlerService)
     {
-        this.serverCatalogService = serverCatalogService;
         this.minecraftCatalogService = minecraftCatalogService;
         this.serverHandlerService = serverHandlerService;
     }
 
-    public ServerViewModel(Server server, IServerCatalogService serverCatalogService, IMinecraftCatalogService minecraftCatalogService, IServerHandlerService serverHandlerService)
+    public ServerViewModel(Server server, IMinecraftCatalogService minecraftCatalogService, IServerManagerService serverHandlerService)
     {
         this.Server = server;
-        this.serverCatalogService = serverCatalogService;
         this.minecraftCatalogService = minecraftCatalogService;
         this.serverHandlerService = serverHandlerService;
     }
@@ -182,7 +175,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         if (query.ContainsKey("server"))
         {
             Guid serverId = (Guid)query["server"];
-            Server = await serverCatalogService.GetServerAsync(serverId);
+            Server = await serverHandlerService.LoadAsync(serverId); //TODO: Cambiar para cargar servers pasados por guid
         }
         else
         {
@@ -248,7 +241,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     {
         if (Server is null) return;
 
-        await serverCatalogService.DeleteAsync(Server.Id);
+        await serverHandlerService.DeleteAsync(Server);
         var parameters = new ShellNavigationQueryParameters
         {
             { "deleted", Server!.Id}

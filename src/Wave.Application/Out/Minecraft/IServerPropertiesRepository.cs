@@ -3,7 +3,7 @@ using Wave.Domain.Minecraft;
 
 namespace Wave.Application.Out.Minecraft;
 
-public interface IServerPropertiesRepository
+public interface IServerPropertyDefinitionRepository
 {
     public Task<IEnumerable<ServerPropertyDefinition>> GetAllServerPropertiesAsync(CancellationToken ct = default);
     public IEnumerable<ServerPropertyDefinition> GetAllServerProperties();
