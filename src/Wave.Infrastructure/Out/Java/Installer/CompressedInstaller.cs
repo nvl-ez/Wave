@@ -136,7 +136,7 @@ public class CompressedInstaller : IJavaInstaller
 
         return new JavaInstallation()
         {
-            ExecutablePath = javawPath != null ? javawPath : javaPath!,
+            ExecutableFile = javawPath != null ? javawPath : javaPath!,
             JavaArtifactType = JavaArtifactType.Compressed,
             JavaSupplierType = javaVersion.JavaSupplierType,
             Name = javaVersion.Name,

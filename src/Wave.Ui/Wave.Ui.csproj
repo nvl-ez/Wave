@@ -82,7 +82,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="ViewModels\" />
+	  <Folder Include="Pages\ExecutionContent\ViewModels\" />
+	  <Folder Include="Pages\SettingsContent\ViewModels\" />
 	</ItemGroup>
 
 </Project>

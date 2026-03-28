@@ -129,7 +129,7 @@ public class ManifestInstaller : IJavaInstaller
 
         return new JavaInstallation()
         {
-            ExecutablePath = javawPath != null ? javawPath : javaPath!,
+            ExecutableFile = javawPath != null ? javawPath : javaPath!,
             JavaArtifactType = JavaArtifactType.Manifest,
             JavaSupplierType = javaVersion.JavaSupplierType,
             Name = javaVersion.Name,

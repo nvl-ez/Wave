@@ -3,20 +3,21 @@
     x:Class="Wave.Ui.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:pages="clr-namespace:Wave.Ui.Pages"
+    xmlns:servers="clr-namespace:Wave.Ui.Pages.ServersContent"
+    xmlns:settings="clr-namespace:Wave.Ui.Pages.SettingsContent"
     Title="Wave.Ui"
     FlyoutBehavior="Locked">
 
 
     <ShellContent
         Title="Servers"
-        ContentTemplate="{DataTemplate pages:ServersPage}"
+        ContentTemplate="{DataTemplate servers:ServersPage}"
         Icon="icon_server.png">
     </ShellContent>
 
     <ShellContent
         Title="Settings"
-        ContentTemplate="{DataTemplate pages:SettingsPage}"
+        ContentTemplate="{DataTemplate settings:SettingsPage}"
         Icon="icon_settings.png"/>
 
 

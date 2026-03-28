@@ -178,7 +178,7 @@ public class ExecutableInstaller : IJavaInstaller
 
         return new JavaInstallation()
         {
-            ExecutablePath = javawPath != null ? javawPath : javaPath!,
+            ExecutableFile = javawPath != null ? javawPath : javaPath!,
             JavaArtifactType = JavaArtifactType.Installer,
             JavaSupplierType = javaVersion.JavaSupplierType,
             Name = javaVersion.Name,

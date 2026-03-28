@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServerContent.ViewModels"
+             xmlns:views="clr-namespace:Wave.Ui.Pages.ServerContent.Views"
+             x:Class="Wave.Ui.Pages.ServerContent.Views.GeneralView"
+             x:DataType="viewModels:ServerViewModel">
+       <VerticalStackLayout>
+              <!-- Icon, Name and MOTD !-->
+              <Grid>
+                     <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                     </Grid.RowDefinitions>
+                     <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                     </Grid.ColumnDefinitions>
+
+                     <BoxView Grid.Column="0"
+                              Grid.RowSpan="2"
+                              Grid.Row="0"
+                              WidthRequest="100"
+                              HeightRequest="100"/>
+
+                     <!-- Name -->
+                     <Label Grid.Column="1"
+                            Grid.Row="0"
+                            Text="Server name: "/>
+                     <Entry Grid.Column="2"
+                            Grid.Row="0"
+                            Text="{Binding Name}"/>
+
+                     <!-- Motd -->
+                     <Label Grid.Column="1"
+                            Grid.Row="1"
+                            Text="Motd: "/>
+                     <views:ServerPropertyInputView Grid.Column="2"
+                                                    Grid.Row="1"
+                                                    ServerPropertyValue="{Binding MotdValue}"
+                                                    ServerPropertyDefinition="{Binding MotdServerProperty}"/>
+              </Grid>
+
+              <!-- General Properties !-->
+              <Grid>
+                     <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                     </Grid.RowDefinitions>
+                     <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                     </Grid.ColumnDefinitions>
+
+                     <!-- Versions -->
+                     <Label Grid.Column="0"
+                            Grid.Row="0"
+                            Text="Versions:"/>
+                     <HorizontalStackLayout Grid.Row="0"
+                                            Grid.Column="1">
+                            <VerticalStackLayout
+                                   toolkit:StateContainer.CurrentState="{Binding MinecraftVersionsStatus}">
+                                   <toolkit:StateContainer.StateViews>
+                                          <Picker toolkit:StateView.StateKey="Done"
+                                                  ItemsSource="{Binding MinecraftVersions}"
+                                                  ItemDisplayBinding="{Binding Version}"
+                                                  SelectedItem="{Binding MinecraftVersion, Mode=OneWayToSource}"
+                                                  SelectedIndex="{Binding MinecraftVersionIndex, Mode=OneWay}"/>
+
+                                          <BoxView toolkit:StateView.StateKey="Error"
+                                                   WidthRequest="200"
+                                                   HeightRequest="50"
+                                                   Color="Red"/>
+                                          <BoxView toolkit:StateView.StateKey="Loading"
+                                                   WidthRequest="200"
+                                                   HeightRequest="50"/>
+                                   </toolkit:StateContainer.StateViews>
+
+                                   <BoxView WidthRequest="200"
+                                            HeightRequest="50"/>
+                            </VerticalStackLayout>
+                            <Label Text="Include Snapshots:"/>
+                            <CheckBox IsChecked="{Binding IncludeSnapshots}"
+                                      Command="{Binding RequestMinecraftVersionsCommand}"/>
+                     </HorizontalStackLayout>
+
+                     <!-- Gamemode -->
+                     <Label Grid.Column="2"
+                            Grid.Row="0"
+                            Text="Gamemode:"/>
+                     <views:ServerPropertyInputView Grid.Column="3"
+                                                    Grid.Row="0"
+                                                    ServerPropertyDefinition="{Binding GamemodeServerProperty}"
+                                                    ServerPropertyValue="{Binding GamemodeValue}"/>
+
+                     <!-- Server IP -->
+                     <Label Grid.Column="0"
+                            Grid.Row="1"
+                            Text="Server IP:"/>
+                     <views:ServerPropertyInputView Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    ServerPropertyDefinition="{Binding ServerIpServerProperty}"
+                                                    ServerPropertyValue="{Binding ServerIpValue}"/>
+
+                     <!-- Max Players -->
+                     <Label Grid.Column="2"
+                            Grid.Row="1"
+                            Text="Max Players:"/>
+                     <views:ServerPropertyInputView Grid.Column="3"
+                                                    Grid.Row="1"
+                                                    ServerPropertyDefinition="{Binding MaxPlayersServerProperty}"
+                                                    ServerPropertyValue="{Binding MaxPlayersValue}"/>
+
+                     <!-- Difficulty -->
+                     <Label Grid.Column="0"
+                            Grid.Row="2"
+                            Text="Difficulty:"/>
+                     <views:ServerPropertyInputView Grid.Column="1"
+                                                    Grid.Row="2"
+                                                    ServerPropertyDefinition="{Binding DifficultyServerProperty}"
+                                                    ServerPropertyValue="{Binding DifficultyValue}"/>
+              </Grid>
+
+       </VerticalStackLayout>
+</ContentView>
