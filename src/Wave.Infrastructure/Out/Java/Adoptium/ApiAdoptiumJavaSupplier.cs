@@ -4,19 +4,69 @@ using Wave.Application.Out.Java;
 using Wave.Domain.Java;
 using Wave.Domain.Os;
 using Wave.Infrastructure.Out.Java.Adoptium.Dtos;
+using Wave.Infrastructure.Out.Java.JavaPackage;
 
 namespace Wave.Infrastructure.Out.Java.Adoptium;
 
 public class ApiAdoptiumJavaSupplier : IJavaSupplier
 {
     private readonly HttpClient client;
+    private readonly string javaTmpDirectory;
 
-    public ApiAdoptiumJavaSupplier()
+    public ApiAdoptiumJavaSupplier(string javaTmpDirectory)
     {
-        client = new HttpClient()
+        client = new HttpClient();
+        this.javaTmpDirectory = javaTmpDirectory;
+    }
+
+    public async Task<IJavaPackage> DownloadJavaAsync(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct = default)
+    {
+        string fileName = "";
+        using (var response = await client.GetAsync(javaArtifact.DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
         {
-            BaseAddress = new Uri("https://api.adoptium.net")
-        };
+            response.EnsureSuccessStatusCode();
+
+            fileName = response.Content.Headers.ContentDisposition!.FileName!;
+
+            string filePath = Path.Combine(javaTmpDirectory, fileName);
+            using (var fileStream = File.Create(filePath))
+            {
+                using (var httpStream = await response.Content.ReadAsStreamAsync())
+                {
+                    await httpStream.CopyToAsync(fileStream);
+                }
+            }
+        }
+
+        string packagePath = Path.Combine(javaTmpDirectory, fileName);
+
+        if (!File.Exists(packagePath) || !Directory.Exists(packagePath)) throw new IOException("Nothing was downloaded.");
+
+        switch (javaArtifact.Type)
+        {
+            case JavaArtifactType.Compressed:
+                return new CompressedJavaPackage()
+                {
+                    Filename = fileName,
+                    PackageDirectory = javaTmpDirectory,
+                    JavaSupplierType = JavaSupplierType.Adoptium,
+                    JavaName = javaVersion.Name,
+                    Version = javaVersion.Version
+                };
+            case JavaArtifactType.Manifest:
+                throw new NotSupportedException("Adoptium does not support Manifest packages.");
+            case JavaArtifactType.Msi:
+                return new MsiJavaPackage()
+                {
+                    Filename = fileName,
+                    PackageDirectory = javaTmpDirectory,
+                    JavaSupplierType = JavaSupplierType.Adoptium,
+                    JavaName = javaVersion.Name,
+                    Version = javaVersion.Version
+                };
+            default:
+                throw new NotImplementedException($"The type {javaArtifact.Type} doesn't have package implementation.");
+        }
     }
 
     public async Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery query, CancellationToken ct = default)
@@ -45,7 +95,7 @@ public class ApiAdoptiumJavaSupplier : IJavaSupplier
         {
             try
             {
-                string jsonResponse = await client.GetStringAsync($"/v3/assets/feature_releases/{version}/ga?{queryString}", ct);
+                string jsonResponse = await client.GetStringAsync($"https://api.adoptium.net/v3/assets/feature_releases/{version}/ga?{queryString}", ct);
                 JsonDocument doc = JsonDocument.Parse(jsonResponse);
                 JsonElement rootElement = doc.RootElement;
 
@@ -69,7 +119,7 @@ public class ApiAdoptiumJavaSupplier : IJavaSupplier
     {
         try
         {
-            string jsonResponse = await client.GetStringAsync("/v3/info/available_releases", ct);
+            string jsonResponse = await client.GetStringAsync("https://api.adoptium.net/v3/info/available_releases", ct);
             JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement rootElement = doc.RootElement;
 

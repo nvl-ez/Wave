@@ -8,7 +8,7 @@ namespace Wave.Infrastructure.Out.Java.Repository;
 public class JsonJavaRepository : IJavaInstallRepository
 {
     private readonly string repositoryPath;
-    private const string fileName = "JavaInstallations.json";
+    private const string fileName = "IJavaInstallations.json";
     private readonly string filePath;
     public JsonJavaRepository(string repositoryPath)
     {
@@ -19,9 +19,9 @@ public class JsonJavaRepository : IJavaInstallRepository
             File.Create(filePath).Dispose();
     }
 
-    public async Task AddAsync(JavaInstallation javaInstallation, CancellationToken ct)
+    public async Task AddAsync(IJavaInstallation javaInstallation, CancellationToken ct)
     {
-        List<JavaInstallation> javaInstallations = (List<JavaInstallation>)await GetInstalledAsync(ct);
+        List<IJavaInstallation> javaInstallations = (List<IJavaInstallation>)await GetInstalledAsync(ct);
         if (!javaInstallations.Contains(javaInstallation))
         {
             javaInstallations.Add(javaInstallation);
@@ -29,15 +29,15 @@ public class JsonJavaRepository : IJavaInstallRepository
         }
     }
 
-    public async Task<IEnumerable<JavaInstallation>> GetInstalledAsync(CancellationToken ct)
+    public async Task<IEnumerable<IJavaInstallation>> GetInstalledAsync(CancellationToken ct)
     {
         string json = await File.ReadAllTextAsync(filePath, ct);
-        return json.Length != 0 ? JsonSerializer.Deserialize<List<JavaInstallation>>(json)! : new List<JavaInstallation>();
+        return json.Length != 0 ? JsonSerializer.Deserialize<List<IJavaInstallation>>(json)! : new List<IJavaInstallation>();
     }
 
-    public async Task RemoveAsync(JavaInstallation javaInstallation, CancellationToken ct)
+    public async Task RemoveAsync(IJavaInstallation javaInstallation, CancellationToken ct)
     {
-        List<JavaInstallation> javaInstallations = (List<JavaInstallation>)await GetInstalledAsync(ct);
+        List<IJavaInstallation> javaInstallations = (List<IJavaInstallation>)await GetInstalledAsync(ct);
         if (javaInstallations.Contains(javaInstallation))
         {
             javaInstallations.Remove(javaInstallation);
@@ -45,7 +45,7 @@ public class JsonJavaRepository : IJavaInstallRepository
         }
     }
 
-    private async Task WriteListToDisk(IEnumerable<JavaInstallation> javaInstallations, CancellationToken ct)
+    private async Task WriteListToDisk(IEnumerable<IJavaInstallation> javaInstallations, CancellationToken ct)
     {
         string json = JsonSerializer.Serialize(javaInstallations, new JsonSerializerOptions { WriteIndented = true });
         await File.WriteAllTextAsync(filePath, json, ct);

@@ -1,115 +1,70 @@
 using System;
 using System.Text.Json;
-using Wave.Application.In;
 using Wave.Application.Out.Java;
 using Wave.Domain.Java;
-using Wave.Domain.Mods;
-using Wave.Infrastructure.Out.Java.Installer.ManifestDtos;
+using Wave.Infrastructure.Out.Java.JavaInstallation;
+using Wave.Infrastructure.Out.Java.JavaPackage;
 
 namespace Wave.Infrastructure.Out.Java.Installer;
 
-public class ManifestInstaller : IJavaInstaller
+public class ManifestInstaller : IJavaInstaller<ManifestJavaPackage, ManifestJavaInstallation>
 {
     private string javaDirectory;
-    private readonly HttpClient client;
 
     public ManifestInstaller(string javaDirectory)
     {
         this.javaDirectory = javaDirectory;
-        client = new HttpClient();
     }
 
-    public async Task<JavaInstallation?> Install(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct = default)
+    public bool CanInstall(IJavaPackage javaPackage)
     {
-        if (javaArtifact.Type != JavaArtifactType.Manifest) throw new NotSupportedException("Can only install Manifest artifacts.");
-        ManifestDto manifest = await GetManifestDto(javaArtifact, ct);
-        if (manifest is null || manifest.Files is null)
-            return null;
-
-        string basePath = Path.Combine(javaDirectory, $"{javaVersion.JavaSupplierType}-{javaVersion.Name}-{javaVersion.Version}"); //Se deberia de abstraer
-
-        if (Directory.Exists(basePath))
-            Directory.Delete(basePath, true);
-        Directory.CreateDirectory(basePath);
-
-        await DownloadFiles(manifest, basePath, ct);
-
-        return BuildJavaInstallation(javaVersion, manifest, basePath);
+        return javaPackage is ManifestJavaPackage;
     }
 
-    public async Task<bool> Uninstall(JavaInstallation javaInstallation, CancellationToken ct = default)
+    public ManifestJavaInstallation Install(ManifestJavaPackage javaPackage, CancellationToken ct = default)
     {
-        if (javaInstallation.JavaArtifactType != JavaArtifactType.Manifest) throw new NotSupportedException("Can only uninstall Manifest artifacts.");
-        try
+        string destinationDir = Path.Combine(javaDirectory, javaPackage.Filename);
+        if (Directory.Exists(javaPackage.PackagePath))
         {
-            Directory.Delete(javaInstallation.UninstallerPath, true);
-            return true;
+            Directory.Move(javaPackage.PackagePath, destinationDir);
+            javaPackage.Dispose();
         }
-        catch
+        else
         {
-            return false;
+            javaPackage.Dispose();
+            throw new IOException($"The package path '{javaPackage.PackagePath}' does not exist.");
         }
+
+
+        //Find java binary
+        string? javaBinary = FindJavaBinary(destinationDir);
+
+
+        if (javaBinary is null) throw new FileNotFoundException("Java executable was not found in the installed files.");
+
+        return new ManifestJavaInstallation()
+        {
+            JavaSupplierType = javaPackage.JavaSupplierType,
+            Name = javaPackage.JavaName,
+            ExecutableFile = javaBinary,
+            UninstallerPath = destinationDir,
+            Version = javaPackage.Version
+        };
     }
 
-    private async Task<ManifestDto> GetManifestDto(JavaArtifact javaArtifact, CancellationToken ct = default)
+    public void Unistall(ManifestJavaInstallation javaInstallation, CancellationToken ct = default)
     {
-        try
-        {
-            string jsonResponse = await client.GetStringAsync(client.BaseAddress, ct);
-
-            JsonDocument doc = JsonDocument.Parse(jsonResponse);
-            JsonElement rootElement = doc.RootElement;
-
-            return JsonSerializer.Deserialize<ManifestDto>(rootElement) ?? new ManifestDto();
-
-        }
-        catch (HttpRequestException)
-        {
-            Console.WriteLine("Error when contacting Mojang");
-        }
-        return new ManifestDto();
+        if (Directory.Exists(javaInstallation.UninstallerPath)) Directory.Delete(javaInstallation.UninstallerPath, true);
+        else throw new IOException($"Java installation {javaInstallation.UninstallerPath} does not exist.");
     }
 
-    private async Task DownloadFiles(ManifestDto manifest, string basePath, CancellationToken ct = default)
+    private string? FindJavaBinary(string destinationDir)
     {
-        if (manifest.Files is null) throw new NullReferenceException("Manifest contains no files.");
-        var directories = manifest.Files.Where(kv => kv.Value.Type == "directory");
-        var files = manifest.Files.Where(kv => kv.Value.Type == "file");
-        var links = manifest.Files.Where(kv => kv.Value.Type == "link");
-
-        //Create all directories
-        foreach (var directory in directories)
-        {
-            string fullPath = Path.Combine(basePath, directory.Key);
-            Directory.CreateDirectory(fullPath);
-        }
-
-        //Download each file in the respective directory
-        foreach (var file in files)
-        {
-            string fullPath = Path.Combine(basePath, file.Key);
-
-            if (file.Value?.Downloads?.Raw is null) throw new NullReferenceException("A file download has been null.");
-            using var downloadStream = await client.GetStreamAsync(file.Value.Downloads.Raw.Url);
-            using var fileStream = new FileStream(fullPath, FileMode.Create);
-
-            await downloadStream.CopyToAsync(fileStream);
-            await fileStream.FlushAsync();
-            fileStream.Close();
-        }
-    }
-
-    private JavaInstallation BuildJavaInstallation(JavaVersion javaVersion, ManifestDto manifest, string basePath)
-    {
-        if (manifest.Files is null) throw new NullReferenceException("Manifest contains no files.");
-        var files = manifest.Files.Where(kv => kv.Value.Type == "file");
-
         string? javaPath = null;
         string? javawPath = null;
 
-        foreach (var file in files)
+        foreach (string fullPath in Directory.EnumerateFiles(destinationDir, "*java*", SearchOption.AllDirectories))
         {
-            string fullPath = Path.Combine(basePath, file.Key);
             var fileName = Path.GetFileNameWithoutExtension(fullPath);
             var fileExtension = Path.GetExtension(fullPath);
             if (fileExtension == "" || string.Equals(fileExtension, ".exe", StringComparison.OrdinalIgnoreCase))
@@ -125,16 +80,6 @@ public class ManifestInstaller : IJavaInstaller
             }
         }
 
-        if (javaPath is null && javawPath is null) throw new FileNotFoundException("Java executable was not found in the installed files.");
-
-        return new JavaInstallation()
-        {
-            ExecutableFile = javawPath != null ? javawPath : javaPath!,
-            JavaArtifactType = JavaArtifactType.Manifest,
-            JavaSupplierType = javaVersion.JavaSupplierType,
-            Name = javaVersion.Name,
-            UninstallerPath = basePath,
-            Version = javaVersion.Version
-        };
+        return javawPath is null ? javaPath : javawPath;
     }
 }

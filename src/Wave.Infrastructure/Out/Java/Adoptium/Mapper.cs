@@ -18,7 +18,7 @@ public static class Mapper
         {
             artifacts.Add(new()
             {
-                Type = JavaArtifactType.Installer,
+                Type = JavaArtifactType.Msi,
                 DownloadUrl = binary.Installer.DownloadUrl
             });
         }

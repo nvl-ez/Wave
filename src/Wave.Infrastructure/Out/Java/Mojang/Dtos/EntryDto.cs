@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace Wave.Infrastructure.Out.Java.Installer.ManifestDtos;
+namespace Wave.Infrastructure.Out.Java.Mojang.Dtos;
 
 public record class EntryDto
 {

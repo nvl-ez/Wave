@@ -21,7 +21,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public partial string CurrentTab { get; set; } = "General";
 
 
-    //Statuses
+    //States
     [ObservableProperty]
     public partial string MinecraftVersionsStatus { get; set; } = "Loading"; //Loading, Done, Error
     [ObservableProperty]

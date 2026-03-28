@@ -81,26 +81,7 @@ public class ExecutableInstaller : IJavaInstaller
         return false;
     }
 
-    private async Task<string> DownloadFile(JavaArtifact javaArtifact, CancellationToken ct = default)
-    {
-        string filePath;
-        using (var response = await client.GetAsync(javaArtifact.DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
-        {
-            response.EnsureSuccessStatusCode();
-            string tmpPath = Path.Combine(javaDirectory, "tmp");
-            Directory.CreateDirectory(tmpPath);
-            filePath = Path.Combine(tmpPath, response.Content.Headers.ContentDisposition!.FileName!);
-            using (var fileStream = File.Create(filePath))
-            {
-                using (var httpStream = await response.Content.ReadAsStreamAsync())
-                {
-                    await httpStream.CopyToAsync(fileStream);
-                }
-            }
-        }
 
-        return filePath;
-    }
 
     private async Task<string?> InstallFiles(string basePath, string filePath, CancellationToken ct = default)
     {

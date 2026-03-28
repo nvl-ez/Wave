@@ -2,7 +2,7 @@ namespace Wave.Domain.Java;
 
 public enum JavaArtifactType
 {
-    Installer,
+    Manifest,
     Compressed,
-    Manifest
+    Msi,
 }

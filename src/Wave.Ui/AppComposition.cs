@@ -15,6 +15,7 @@ using Wave.Infrastructure.Out.Java.Repository;
 using Wave.Ui.Pages.ServersContent.ViewModels;
 using Wave.Ui.Pages.ServerContent.ViewModels;
 using Wave.Ui.Pages.ExecutionContent;
+using Wave.Ui.Pages.SettingsContent.ViewModels;
 
 namespace Wave.Ui;
 
@@ -67,5 +68,6 @@ public static class AppComposition
     public static ServersViewModel CreateServersViewModel() => new ServersViewModel(serverHandlerService, serverExecutorService);
     public static ServerViewModel CreateServerViewModel() => new ServerViewModel(minecraftCatalogService, serverHandlerService);
     public static ExecutionViewModel CreateExecutionViewModel() => new ExecutionViewModel(serverExecutorService);
-
+    public static JavaViewModel CreateJavaViewModel() => new JavaViewModel();
+    public static SettingsViewModel CreateSettingsViewModel() => new SettingsViewModel();
 }

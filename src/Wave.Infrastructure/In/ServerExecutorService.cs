@@ -5,6 +5,7 @@ using Wave.Application.Out.ServerManager;
 using Wave.Domain.Java;
 using Wave.Domain.ServerManager;
 using Wave.Infrastructure.Exceptions;
+using Wave.Infrastructure.Out.Java.JavaInstallation;
 
 namespace Wave.Infrastructure.In;
 
@@ -33,12 +34,11 @@ public class ServerExecutorService : IServerExecutorService
         Server server = (await serverRepository.GetAllAsync()).First(s => s.Id == id);
 
         int? serverJavaVersion = server.Details.MinecraftVersion?.JavaVersion;
-        JavaInstallation? javaInstallation = (await javaInstallRepository.GetInstalledAsync()).FirstOrDefault(j => j.Version == serverJavaVersion);
+        IJavaInstallation? javaInstallation = (await javaInstallRepository.GetInstalledAsync()).FirstOrDefault(j => j.Version == serverJavaVersion);
 
-        javaInstallation = new()
+        javaInstallation = new CompressedJavaInstallation()
         {
             ExecutableFile = "C:\\Users\\nahu\\AppData\\Roaming\\PrismLauncher\\java\\java-runtime-delta\\bin\\javaw.exe",
-            JavaArtifactType = JavaArtifactType.Compressed,
             JavaSupplierType = JavaSupplierType.Mojang,
             Name = "Java",
             UninstallerPath = "C:\\Users\\nahu\\AppData\\Roaming\\PrismLauncher\\java\\java-runtime-delta",
@@ -65,4 +65,6 @@ public class ServerExecutorService : IServerExecutorService
         serverSession.ServerDisposed -= ServerDisposed;
         runningServers.Remove(id);
     }
+
+    //TODO: Kill all servers running on exit
 }
