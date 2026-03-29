@@ -2,26 +2,29 @@ using System;
 using System.Text.Json;
 using Wave.Application.Out.Java;
 using Wave.Domain.Java;
-using Wave.Infrastructure.Out.Java.JavaInstallation;
 using Wave.Infrastructure.Out.Java.JavaPackage;
 
 namespace Wave.Infrastructure.Out.Java.Installer;
 
-public class ManifestInstaller : IJavaInstaller<ManifestJavaPackage, ManifestJavaInstallation>
+public class ManifestJavaInstaller : IJavaInstaller<ManifestJavaPackage>
 {
     private string javaDirectory;
 
-    public ManifestInstaller(string javaDirectory)
+    public ManifestJavaInstaller(string javaDirectory)
     {
         this.javaDirectory = javaDirectory;
     }
 
     public bool CanInstall(IJavaPackage javaPackage)
     {
-        return javaPackage is ManifestJavaPackage;
+        return javaPackage.JavaArtifactType == JavaArtifactType.Manifest;
+    }
+    public bool CanUninstall(JavaInstallation javaInstallation)
+    {
+        return javaInstallation.JavaArtifactType == JavaArtifactType.Manifest;
     }
 
-    public ManifestJavaInstallation Install(ManifestJavaPackage javaPackage, CancellationToken ct = default)
+    public JavaInstallation Install(ManifestJavaPackage javaPackage, CancellationToken ct = default)
     {
         string destinationDir = Path.Combine(javaDirectory, javaPackage.Filename);
         if (Directory.Exists(javaPackage.PackagePath))
@@ -42,18 +45,26 @@ public class ManifestInstaller : IJavaInstaller<ManifestJavaPackage, ManifestJav
 
         if (javaBinary is null) throw new FileNotFoundException("Java executable was not found in the installed files.");
 
-        return new ManifestJavaInstallation()
+        return new JavaInstallation()
         {
             JavaSupplierType = javaPackage.JavaSupplierType,
             Name = javaPackage.JavaName,
             ExecutableFile = javaBinary,
             UninstallerPath = destinationDir,
-            Version = javaPackage.Version
+            Version = javaPackage.Version,
+            JavaArtifactType = JavaArtifactType.Manifest
         };
     }
 
-    public void Unistall(ManifestJavaInstallation javaInstallation, CancellationToken ct = default)
+    public Domain.Java.JavaInstallation Install(IJavaPackage javaPackage, CancellationToken ct = default)
     {
+        if (javaPackage is not ManifestJavaPackage) throw new InvalidOperationException("Manifest installer can only handle manifest packages.");
+        return Install((ManifestJavaPackage)javaPackage);
+    }
+
+    public void Uninstall(JavaInstallation javaInstallation, CancellationToken ct = default)
+    {
+        if (javaInstallation.JavaArtifactType != JavaArtifactType.Manifest) throw new InvalidOperationException("Manifest installer can only handle menifest installations.");
         if (Directory.Exists(javaInstallation.UninstallerPath)) Directory.Delete(javaInstallation.UninstallerPath, true);
         else throw new IOException($"Java installation {javaInstallation.UninstallerPath} does not exist.");
     }

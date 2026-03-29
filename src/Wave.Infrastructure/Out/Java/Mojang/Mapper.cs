@@ -2,7 +2,7 @@ using System;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using Wave.Domain.Java;
-using Wave.Domain.Os;
+using Wave.Domain.System;
 using Wave.Infrastructure.Out.Java.Mojang.Dtos;
 
 namespace Wave.Infrastructure.Out.Java.Mojang;
@@ -40,6 +40,38 @@ public static class Mapper
         };
     }
 
+    public static IEnumerable<int> ToDomainMajorVersions(Dictionary<string, Dictionary<string, List<ReleaseDto>>> releases)
+    {
+        var result = new HashSet<int>();
+
+        foreach (var supplierEntry in releases.Values)
+        {
+            foreach (var osEntry in supplierEntry.Values)
+            {
+                foreach (var dto in osEntry)
+                {
+                    Match regex = Regex.Match(dto.Version.Name, versionPattern);
+
+                    if (!regex.Success)
+                    {
+                        regex = Regex.Match(dto.Version.Name, legacyVersionPattern);
+                    }
+
+                    if (!regex.Success)
+                    {
+                        continue;
+                    }
+
+                    if (int.TryParse(regex.Groups["major"].Value, out int major))
+                    {
+                        result.Add(major);
+                    }
+                }
+            }
+        }
+
+        return result.OrderBy(x => x).ToList();
+    }
     public static ArchitectureType ToDomainArchitectureType(string platform)
     {
         switch (platform)

@@ -5,7 +5,6 @@ using Wave.Application.Out.ServerManager;
 using Wave.Domain.Java;
 using Wave.Domain.ServerManager;
 using Wave.Infrastructure.Exceptions;
-using Wave.Infrastructure.Out.Java.JavaInstallation;
 
 namespace Wave.Infrastructure.In;
 
@@ -15,7 +14,7 @@ public class ServerExecutorService : IServerExecutorService
     private readonly IJavaInstallRepository javaInstallRepository;
     private readonly IServerRepository serverRepository;
 
-    private Dictionary<Guid, IServerSession> runningServers = new();
+    private Dictionary<Guid, IServerSession> runningServers = new(); //TODO abstract dictionary in an out port
 
     public ServerExecutorService(IServerExecutor serverExecutor, IServerRepository serverRepository, IJavaInstallRepository javaInstallRepository)
     {
@@ -34,16 +33,10 @@ public class ServerExecutorService : IServerExecutorService
         Server server = (await serverRepository.GetAllAsync()).First(s => s.Id == id);
 
         int? serverJavaVersion = server.Details.MinecraftVersion?.JavaVersion;
-        IJavaInstallation? javaInstallation = (await javaInstallRepository.GetInstalledAsync()).FirstOrDefault(j => j.Version == serverJavaVersion);
-
-        javaInstallation = new CompressedJavaInstallation()
-        {
-            ExecutableFile = "C:\\Users\\nahu\\AppData\\Roaming\\PrismLauncher\\java\\java-runtime-delta\\bin\\javaw.exe",
-            JavaSupplierType = JavaSupplierType.Mojang,
-            Name = "Java",
-            UninstallerPath = "C:\\Users\\nahu\\AppData\\Roaming\\PrismLauncher\\java\\java-runtime-delta",
-            Version = 21
-        };
+        JavaInstallation? javaInstallation = (await javaInstallRepository.GetAllAsync())
+            .Where(j => j.Version >= serverJavaVersion)
+            .OrderBy(j => j.Version)
+            .FirstOrDefault();
 
         if (javaInstallation is null) throw new JavaInstallationNotFoundException($"No available Java installation was found for version {serverJavaVersion}.");
 

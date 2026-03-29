@@ -1,5 +1,5 @@
 using System;
-using Wave.Domain.Os;
+using Wave.Domain.System;
 
 namespace Wave.Domain.Java;
 

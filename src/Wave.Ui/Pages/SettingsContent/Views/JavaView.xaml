@@ -1,14 +1,177 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Wave.Ui.Pages.SettingsContent.ViewModels"
+             xmlns:views="clr-namespace:Wave.Ui.Pages.SettingsContent.Views"
+             xmlns:domain="clr-namespace:Wave.Domain.Java;assembly=Wave.Domain"
+             xmlns:out="clr-namespace:Wave.Application.Out.Java;assembly=Wave.Application"
              x:Class="Wave.Ui.Pages.SettingsContent.Views.JavaView"
-             x:DataType="viewModels:JavaViewModel">
+             x:DataType="viewModels:JavaViewModel"
+             x:Name="Root">
 
-    <VerticalStackLayout>
-        <Label
-            Text="Welcome Java Settings!"
-            VerticalOptions="Center"
-            HorizontalOptions="Center"/>
-    </VerticalStackLayout>
+    <View.Behaviors>
+        <toolkit:EventToCommandBehavior
+            EventName="Loaded"
+            BindingContext="{Binding Source={x:Reference Root}, Path=BindingContext}"
+            Command="{Binding LoadCommand}"/>
+    </View.Behaviors>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0"
+               Grid.Column="0"
+               Grid.ColumnSpan="2"
+               Text="Java Installation Manager"/>
+
+        <!-- Java Installations -->
+        <VerticalStackLayout Grid.Row="1"
+                             Grid.Column="0">
+            <Label Text="Installed Java Versions"/>
+            <CollectionView ItemsSource="{Binding JavaInstallations}"
+                            Margin="20"
+                            SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical"
+                                       ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="domain:JavaInstallation">
+                        <views:JavaInstallationCardView/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+
+        <!-- Add Installation -->
+
+        <VerticalStackLayout Grid.Row="1"
+                             Grid.Column="1">
+            <Label Text="Find and Download Java"/>
+            <!-- 1. Select Supplier -->
+            <Border>
+                <VerticalStackLayout>
+                    <Label Text="1. Select Supplier"/>
+                    <CollectionView ItemsSource="{Binding JavaSuppliers}"
+                                    Margin="5"
+                                    SelectionMode="Single"
+                                    SelectedItem="{Binding SelectedJavaSupplier}"
+                                    SelectionChangedCommand="{Binding JavaSupplierSelectedCommand}">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout  Orientation="Vertical"
+                                              Span="2"
+                                              VerticalItemSpacing="2"
+                                              HorizontalItemSpacing="2"/>
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="out:IJavaSupplier">
+                                <Label Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 2. Query Version -->
+            <Border IsVisible="{Binding QuerySectionIsVisible}">
+                <VerticalStackLayout>
+                    <Label Text="2. Select Major Version"/>
+                    <VerticalStackLayout toolkit:StateContainer.CurrentState="{Binding QuerySectionState}">
+                        <toolkit:StateContainer.StateViews>
+                            <!-- Loading -->
+                            <Label toolkit:StateView.StateKey="Loading"
+                                   Text="Loading"/>
+                            <!-- Loaded -->
+                            <VerticalStackLayout toolkit:StateView.StateKey="Loaded">
+                                <Picker ItemsSource="{Binding JavaVersionNumbers}"
+                                        SelectedItem="{Binding SelectedJavaVersionNumber}"/>
+                                <Button Text="Search"
+                                        Command="{Binding QueryVersionsCommand}"/>
+                            </VerticalStackLayout>
+                        </toolkit:StateContainer.StateViews>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 3. Display Versions -->
+            <Border IsVisible="{Binding VersionsSectionIsVisible}">
+                <VerticalStackLayout>
+                    <Label Text="3. Select Version"/>
+
+                    <VerticalStackLayout toolkit:StateContainer.CurrentState="{Binding VersionsSectionState}">
+                        <toolkit:StateContainer.StateViews>
+                            <!-- Loading -->
+                            <Label toolkit:StateView.StateKey="Loading"
+                                   Text="Loading"/>
+
+                            <!-- Loaded -->
+                            <VerticalStackLayout toolkit:StateView.StateKey="Loaded">
+                                <CollectionView ItemsSource="{Binding JavaVersions}"
+                                                Margin="5"
+                                                SelectionMode="Single"
+                                                SelectedItem="{Binding SelectedJavaVersion}"
+                                                SelectionChangedCommand="{Binding JavaVersionSelectedCommand}">
+                                    <CollectionView.ItemsLayout>
+                                        <LinearItemsLayout  Orientation="Vertical"
+                                                            ItemSpacing="2"/>
+                                    </CollectionView.ItemsLayout>
+
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="domain:JavaVersion">
+                                            <views:JavaVersionCardView/>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </VerticalStackLayout>
+                        </toolkit:StateContainer.StateViews>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 4. Select a Download Option -->
+            <Border IsVisible="{Binding ArtifactsSectionIsVisible}">
+                <VerticalStackLayout>
+                    <Label Text="4. Select Download Option"/>
+                    <CollectionView ItemsSource="{Binding JavaArtifacts}"
+                                    Margin="5"
+                                    SelectionMode="Single"
+                                    SelectedItem="{Binding SelectedJavaArtifact}"
+                                    SelectionChangedCommand="{Binding JavaArtifactSelectedCommand}">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout  Orientation="Horizontal"
+                                                ItemSpacing="2"/>
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="domain:JavaArtifact">
+                                <Label Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 5. Download and Install -->
+            <Border IsVisible="{Binding InstallSectionIsVisible}">
+                <VerticalStackLayout>
+                    <Label Text="5. Download and Install"/>
+                    <Button Text="GO"
+                            BackgroundColor="Green"
+                            Command="{Binding DownloadAndInstallCommand}"
+                            IsEnabled="{Binding IsInstallButtonEnabled}"/>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </Grid>
 </ContentView>

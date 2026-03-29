@@ -7,7 +7,7 @@ public partial class SettingsViewModel : ObservableObject, IQueryAttributable
 {
     /***************************
     * VARIABLES AND PROPERTIES *
-    ************P***************/
+    ****************************/
     //Pseudo Navigation
     [ObservableProperty]
     public partial string CurrentTab { get; set; } = "Java";

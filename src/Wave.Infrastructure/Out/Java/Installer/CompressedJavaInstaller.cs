@@ -3,25 +3,29 @@ using System.Formats.Tar;
 using System.IO.Compression;
 using Wave.Application.Out.Java;
 using Wave.Domain.Java;
-using Wave.Infrastructure.Out.Java.JavaInstallation;
 using Wave.Infrastructure.Out.Java.JavaPackage;
 
 namespace Wave.Infrastructure.Out.Java.Installer;
 
-public class CompressedInstaller : IJavaInstaller<CompressedJavaPackage, CompressedJavaInstallation>
+public class CompressedJavaInstaller : IJavaInstaller<CompressedJavaPackage>
 {
     private string javaDirectory;
 
-    public CompressedInstaller(string javaDirectory)
+    public CompressedJavaInstaller(string javaDirectory)
     {
         this.javaDirectory = javaDirectory;
     }
     public bool CanInstall(IJavaPackage javaPackage)
     {
-        return javaPackage is CompressedJavaPackage;
+        return javaPackage.JavaArtifactType == JavaArtifactType.Compressed; //TODO: remove inheritance, add property
     }
 
-    public CompressedJavaInstallation Install(CompressedJavaPackage javaPackage, CancellationToken ct = default)
+    public bool CanUninstall(JavaInstallation javaInstallation)
+    {
+        return javaInstallation.JavaArtifactType == JavaArtifactType.Compressed;
+    }
+
+    public JavaInstallation Install(CompressedJavaPackage javaPackage, CancellationToken ct = default)
     {
         string destinationDir = Path.Combine(javaDirectory, javaPackage.JavaName);
         ExtractFiles(javaPackage, destinationDir);
@@ -31,18 +35,26 @@ public class CompressedInstaller : IJavaInstaller<CompressedJavaPackage, Compres
 
         if (javaBinary is null) throw new FileNotFoundException("Java executable was not found in the installed files.");
 
-        return new CompressedJavaInstallation()
+        return new JavaInstallation()
         {
             JavaSupplierType = javaPackage.JavaSupplierType,
             Name = javaPackage.JavaName,
             ExecutableFile = javaBinary,
             UninstallerPath = destinationDir,
-            Version = javaPackage.Version
+            Version = javaPackage.Version,
+            JavaArtifactType = JavaArtifactType.Compressed
         };
     }
 
-    public void Unistall(CompressedJavaInstallation javaInstallation, CancellationToken ct = default)
+    public JavaInstallation Install(IJavaPackage javaPackage, CancellationToken ct = default)
     {
+        if (javaPackage is not CompressedJavaPackage) throw new InvalidOperationException("Compressed installer can only handle compressed packages.");
+        return Install((CompressedJavaPackage)javaPackage);
+    }
+
+    public void Uninstall(JavaInstallation javaInstallation, CancellationToken ct = default)
+    {
+        if (javaInstallation.JavaArtifactType != JavaArtifactType.Compressed) throw new InvalidOperationException("Compressed installer can only handle compressed installations.");
         if (Directory.Exists(javaInstallation.UninstallerPath)) Directory.Delete(javaInstallation.UninstallerPath, true);
         else throw new IOException($"Java installation {javaInstallation.UninstallerPath} does not exist.");
     }

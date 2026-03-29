@@ -10,4 +10,5 @@ public interface IJavaPackage : IDisposable
     public JavaSupplierType JavaSupplierType { get; set; }
     public string JavaName { get; set; }
     public int Version { get; set; }
+    public JavaArtifactType JavaArtifactType { get; set; }
 }

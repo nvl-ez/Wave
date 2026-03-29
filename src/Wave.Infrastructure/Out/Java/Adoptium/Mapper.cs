@@ -1,6 +1,6 @@
 using System;
 using Wave.Domain.Java;
-using Wave.Domain.Os;
+using Wave.Domain.System;
 using Wave.Infrastructure.Out.Java.Adoptium.Dtos;
 
 namespace Wave.Infrastructure.Out.Java.Adoptium;

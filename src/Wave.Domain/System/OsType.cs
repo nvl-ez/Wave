@@ -1,4 +1,4 @@
-namespace Wave.Domain.Os;
+namespace Wave.Domain.System;
 
 public enum OsType
 {

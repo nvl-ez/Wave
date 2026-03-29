@@ -13,6 +13,7 @@ public class CompressedJavaPackage : IJavaPackage
     public required JavaSupplierType JavaSupplierType { get; set; }
     public required string JavaName { get; set; }
     public required int Version { get; set; }
+    public required JavaArtifactType JavaArtifactType { get; set; }
 
     public void Dispose()
     {

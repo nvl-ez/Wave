@@ -2,6 +2,7 @@ using System;
 using System.Text.Json;
 using Wave.Application.Out.Java;
 using Wave.Domain.Java;
+using Wave.Domain.System;
 using Wave.Infrastructure.Out.Java.JavaPackage;
 using Wave.Infrastructure.Out.Java.Mojang.Dtos;
 
@@ -16,6 +17,12 @@ public class ApiMojangJavaSupplier : IJavaSupplier
     {
         client = new HttpClient();
         this.javaTmpDirectory = javaTmpDirectory;
+    }
+
+    public string Name { get; set; } = "Mojang";
+    public bool CanDownload(JavaVersion javaVersion)
+    {
+        return javaVersion.JavaSupplierType == JavaSupplierType.Mojang;
     }
 
     public async Task<IJavaPackage> DownloadJavaAsync(JavaVersion javaVersion, JavaArtifact javaArtifact, CancellationToken ct = default)
@@ -62,8 +69,21 @@ public class ApiMojangJavaSupplier : IJavaSupplier
             PackageDirectory = javaTmpDirectory,
             JavaSupplierType = JavaSupplierType.Mojang,
             JavaName = javaVersion.Name,
-            Version = javaVersion.Version
+            Version = javaVersion.Version,
+            JavaArtifactType = JavaArtifactType.Manifest
         };
+    }
+
+    public async Task<IEnumerable<int>> GetAvailableMajorVersionsAsync(OsType? os, CancellationToken ct = default)
+    {
+        string jsonResponse = await client.GetStringAsync("https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json", ct);
+
+        JsonDocument doc = JsonDocument.Parse(jsonResponse);
+        JsonElement rootElement = doc.RootElement;
+
+        var dto = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, List<ReleaseDto>>>>(rootElement) ?? new Dictionary<string, Dictionary<string, List<ReleaseDto>>>();
+
+        return Mapper.ToDomainMajorVersions(dto);
     }
 
     public async Task<IEnumerable<JavaVersion>> GetJavaVersionsAsync(JavaSupplierQuery query, CancellationToken ct = default)
@@ -90,7 +110,7 @@ public class ApiMojangJavaSupplier : IJavaSupplier
 
         //Filter items
         versions = versions.Where(v =>
-            (query.Version is null || (v.Version == query.Version)) &&
+            (v.Version == query.Version) &&
             (query.ArchitectureBitType == v.ArchitectureBitType) &&
             (query.ArchitectureType == v.ArchitectureType) &&
             (query.OsType == v.OsType)
