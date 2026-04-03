@@ -53,6 +53,7 @@ public partial class ServersViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     private async Task NewServerAsync()
     {
-        await Shell.Current.GoToAsync(nameof(ServerPage));
+        //await Shell.Current.GoToAsync(nameof(ServerPage));
+        await Shell.Current.GoToAsync(nameof(ExecutionPage));
     }
 }

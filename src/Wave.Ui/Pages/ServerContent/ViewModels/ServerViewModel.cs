@@ -15,7 +15,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
 
     /***************************
     * VARIABLES AND PROPERTIES *
-    ************P***************/
+    ****************************/
     //Pseudo Navigation
     [ObservableProperty]
     public partial string CurrentTab { get; set; } = "General";

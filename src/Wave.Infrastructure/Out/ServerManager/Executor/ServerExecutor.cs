@@ -23,13 +23,15 @@ public class WindowsServerExecutor : IServerExecutor
             {
                 FileName = javaInstallation.ExecutableFile,
                 WorkingDirectory = server.Info.ServerDirectory,
-                Arguments = $"-jar \"{serverJar}\"",
+
+                Arguments = $"-jar \"{serverJar}\" nogui",
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
-            }
+            },
+            EnableRaisingEvents = true
         };
         process.Start();
 

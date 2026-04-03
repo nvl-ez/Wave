@@ -23,9 +23,10 @@ public class ServerExecutorService : IServerExecutorService
         this.javaInstallRepository = javaInstallRepository;
     }
 
-    public Task<IServerSession> GetSession(Guid id)
+    public IServerSession? TryGetSession(Guid id)
     {
-        throw new NotImplementedException();
+        if (!runningServers.ContainsKey(id)) return null;
+        return runningServers[id];
     }
 
     public async Task<IServerSession> Start(Guid id, CancellationToken ct = default)

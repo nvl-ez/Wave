@@ -12,7 +12,7 @@ public class ServerPropertiesRepository : IServerPropertiesRepository
 {
     public async Task<Dictionary<string, string>> GetAllAsync(Server server, CancellationToken ct = default)
     {
-        var propertiesFile = ValidateServerProperties(server);
+        var propertiesFile = await ValidateServerProperties(server);
 
         string propertiesPattern = @"^(?<key>[^=\r\n]+)=(?<value>[^\r\n]*)$";
 
@@ -41,7 +41,7 @@ public class ServerPropertiesRepository : IServerPropertiesRepository
     {
         Dictionary<string, string> properties = server.Details.Properties;
 
-        var propertiesFile = ValidateServerProperties(server);
+        var propertiesFile = await ValidateServerProperties(server);
 
         Dictionary<string, string> existingProperties = await GetAllAsync(server);
 
@@ -62,7 +62,7 @@ public class ServerPropertiesRepository : IServerPropertiesRepository
 
     public async Task SetAsync(Server server, string key, string value, CancellationToken ct = default)
     {
-        var propertiesFile = ValidateServerProperties(server);
+        var propertiesFile = await ValidateServerProperties(server);
 
         Dictionary<string, string> existingProperties = await GetAllAsync(server);
 
@@ -94,7 +94,7 @@ public class ServerPropertiesRepository : IServerPropertiesRepository
         return content;
     }
 
-    private string ValidateServerProperties(Server server)
+    private async Task<string> ValidateServerProperties(Server server)
     {
         ServerInfo info = server.Info;
         ServerDetails details = server.Details;
@@ -104,7 +104,10 @@ public class ServerPropertiesRepository : IServerPropertiesRepository
 
         string propertiesFile = Path.Combine(info.ServerDirectory, details.PropertiesFilename);
 
-        if (!File.Exists(propertiesFile)) throw new IOException($"The file '{propertiesFile}' does not exist.");
+        if (!File.Exists(propertiesFile))
+        {
+            await File.WriteAllTextAsync(propertiesFile, BuildFileContent(server.Details.Properties).ToString());
+        }
 
         return propertiesFile;
     }

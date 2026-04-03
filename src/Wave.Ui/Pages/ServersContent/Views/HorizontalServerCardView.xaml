@@ -6,6 +6,14 @@
              x:Class="Wave.Ui.Pages.ServersContent.Views.HorizontalServerCardView"
              x:Name="Root"
              x:DataType="viewModels:ServerCardViewModel">
+
+    <View.Behaviors>
+        <toolkit:EventToCommandBehavior
+            EventName="Loaded"
+            BindingContext="{Binding Source={x:Reference Root}, Path=BindingContext}"
+            Command="{Binding LoadCommand}"/>
+    </View.Behaviors>
+
     <Border>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -48,7 +56,7 @@
                                     Command="{Binding StopServerCommand}"
                                     BackgroundColor="Red"/>
                             <Button Text="Console"
-                                    Command="{Binding EditServerCommand}"
+                                    Command="{Binding OpenServerCommand}"
                                     Background="DarkBlue"/>
                         </HorizontalStackLayout>
 

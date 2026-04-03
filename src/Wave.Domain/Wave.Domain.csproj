@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Folder Include="Modloaders\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
 
 </Project>

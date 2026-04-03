@@ -1,7 +1,3 @@
-using System;
-using Wave.Application.Out;
-using Wave.Domain;
-using Wave.Infrastructure.Out;
 using Wave.Application.Out.ServerManager;
 using Wave.Infrastructure.Out.ServerManager;
 using Wave.Application.Out.Minecraft;
@@ -14,13 +10,13 @@ using Wave.Infrastructure.Out.ServerManager.Executor;
 using Wave.Infrastructure.Out.Java.Repository;
 using Wave.Ui.Pages.ServersContent.ViewModels;
 using Wave.Ui.Pages.ServerContent.ViewModels;
-using Wave.Ui.Pages.ExecutionContent;
 using Wave.Ui.Pages.SettingsContent.ViewModels;
 using Wave.Infrastructure.Out.Java.Adoptium;
 using Wave.Infrastructure.Out.Java.Mojang;
 using Wave.Infrastructure.Out.Java.Installer;
 using Wave.Application.Out.Platform;
 using Wave.Infrastructure.Out.Platform;
+using Wave.Ui.Pages.ExecutionContent.ViewModels;
 
 namespace Wave.Ui;
 
