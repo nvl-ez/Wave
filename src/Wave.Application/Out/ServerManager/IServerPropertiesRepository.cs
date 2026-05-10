@@ -5,9 +5,8 @@ namespace Wave.Application.Out.ServerManager;
 
 public interface IServerPropertiesRepository
 {
-    public Task<Dictionary<string, string>> GetAllAsync(Server server, CancellationToken ct = default);
-    public Task<string> GetAsync(Server server, string key, CancellationToken ct = default);
+    public Task<Dictionary<string, string>> GetAllAsync(string propertiesPath, CancellationToken ct = default);
+    public Task<string> GetAsync(string propertiesPath, string key, CancellationToken ct = default);
 
-    public Task SetAsync(Server server, CancellationToken ct = default);
-    public Task SetAsync(Server server, string key, string value, CancellationToken ct = default);
+    public Task SetAsync(string propertiesPath, Dictionary<string, string> properties, CancellationToken ct = default);
 }

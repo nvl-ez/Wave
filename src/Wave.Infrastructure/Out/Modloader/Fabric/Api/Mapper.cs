@@ -6,7 +6,7 @@ namespace Wave.Infrastructure.Out.Modloader.Fabric.Api;
 
 public static class Mapper
 {
-    public static FabricVersion ToDomain(FabricVersionJson dto, string minecraftVersion)
+    public static FabricVersion ToDomain(FabricVersionJsonDto dto, string minecraftVersion)
     {
         return new FabricVersion()
         {

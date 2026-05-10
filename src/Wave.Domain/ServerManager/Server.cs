@@ -9,11 +9,15 @@ public sealed class Server
     public ServerDetails Details { get; set; } = new();
 
     public Guid Id => Info.Id;
+    public string? EulaPath => Info.ServerDirectory is not null ? Path.Combine(Info.ServerDirectory, Details.EulaFilename) : null;
+    public string? PropertiesPath => Info.ServerDirectory is not null ? Path.Combine(Info.ServerDirectory, Details.PropertiesFilename) : null;
+    public string? JarPath => Info.ServerDirectory is not null ? Path.Combine(Info.ServerDirectory, Details.ServerFilename!) : null;
 
     public bool IsReady => Info.ServerDirectory is not null &&
         Details.MinecraftVersion is not null &&
         Details.ServerFilename is not null &&
-        Details.PropertiesFilename is not null;
+        Details.PropertiesFilename is not null &&
+        Details.MinecraftVersionDetails is not null;
 
     public bool Equals(Server? other)
     {

@@ -14,23 +14,21 @@ public class ApiMinecraftVersionRepository : IMinecraftVersionRepository
     private static HttpClient client = new();
 
     //Download and sets the java version required for the server to run
-    public async Task<MinecraftVersion> Download(MinecraftVersion minecraftVersion, string filename, string destination, CancellationToken ct = default)
+    public async Task DownloadMinecraftServer(MinecraftVersionDetails minecraftVersionDetails, string jarPath, CancellationToken ct = default)
     {
-        string filePath = Path.Combine(destination, filename);
-        string? url = minecraftVersion.ServerUrl;
-        if (string.IsNullOrEmpty(url)) throw new InvalidDataException("Server download url cannot be null or empty");
+        string jarEndpoint = minecraftVersionDetails.ServerUrl;
+        if (string.IsNullOrEmpty(jarEndpoint)) throw new InvalidDataException("Server download url cannot be null or empty");
 
-        using var downloadStream = await client.GetStreamAsync(url);
-        using var fileStream = new FileStream(filePath, FileMode.Create);
+        using var downloadStream = await client.GetStreamAsync(jarEndpoint);
+        using var fileStream = new FileStream(jarPath, FileMode.Create);
 
         await downloadStream.CopyToAsync(fileStream);
         await fileStream.FlushAsync();
         fileStream.Close();
 
-        return minecraftVersion;
     }
 
-    public async Task<MinecraftVersion> GetDetailsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default)
+    public async Task<MinecraftVersionDetails> GetVersionDetailsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default)
     {
         string jsonResponse = await client.GetStringAsync(minecraftVersion.DetailsUrl, ct);
         JsonDocument doc = JsonDocument.Parse(jsonResponse);
@@ -39,13 +37,14 @@ public class ApiMinecraftVersionRepository : IMinecraftVersionRepository
 
         if (dto is null) throw new SerializationException("Server details DTO could not be deserialized.");
 
-        minecraftVersion.ServerUrl = dto.Downloads.Server.Url;
-        minecraftVersion.JavaVersion = dto.JavaVersion.MajorVersion;
-
-        return minecraftVersion;
+        return new MinecraftVersionDetails()
+        {
+            JavaVersion = dto.JavaVersion.MajorVersion,
+            ServerUrl = dto.Downloads.Server.Url
+        };
     }
 
-    public async Task<List<MinecraftVersion>> GetAllAsync(CancellationToken ct = default)
+    public async Task<List<MinecraftVersion>> GetAllVersionsAsync(CancellationToken ct = default)
     {
         string jsonResponse = await client.GetStringAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json", ct);
 

@@ -33,7 +33,10 @@ public class ServerExecutorService : IServerExecutorService
     {
         Server server = (await serverRepository.GetAllAsync()).First(s => s.Id == id);
 
-        int? serverJavaVersion = server.Details.MinecraftVersion?.JavaVersion;
+        int? serverJavaVersion = server.Details.MinecraftVersionDetails?.JavaVersion;
+
+        if (serverJavaVersion is null) throw new JavaInstallationNotFoundException($"Server does not have a required Java version.");
+
         JavaInstallation? javaInstallation = (await javaInstallRepository.GetAllAsync())
             .Where(j => j.Version >= serverJavaVersion)
             .OrderBy(j => j.Version)

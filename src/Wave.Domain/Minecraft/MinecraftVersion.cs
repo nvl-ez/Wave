@@ -6,10 +6,8 @@ public sealed class MinecraftVersion
 {
     public required string Version { get; set; }
     public required MinecraftVersionType MinecraftVersionType { get; set; }
-    public string? DetailsUrl { get; set; } = null;
+    public required string DetailsUrl { get; set; }
     public required DateTime ReleaseDate { get; set; }
-    public int? JavaVersion { get; set; } = null;
-    public string? ServerUrl { get; set; } = null;
 
     public bool Equals(MinecraftVersion? other)
     {

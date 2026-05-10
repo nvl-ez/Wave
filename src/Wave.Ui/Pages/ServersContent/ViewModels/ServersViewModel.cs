@@ -38,14 +38,14 @@ public partial class ServersViewModel : ObservableObject, IQueryAttributable
             Guid serverId = (Guid)query["saved"];
             AllServers.Remove(AllServers.First(s => s.ServerInfo.Id == serverId));
 
-            ServerInfo info = await serverManagerService.GetAsync(serverId);
+            ServerInfo info = await serverManagerService.GetServerInfoAsync(serverId);
             AllServers.Add(new ServerCardViewModel(info, serverExecutorService));
         }
         else if (query.ContainsKey("created"))
         {
             Guid serverId = (Guid)query["created"];
 
-            ServerInfo info = await serverManagerService.GetAsync(serverId);
+            ServerInfo info = await serverManagerService.GetServerInfoAsync(serverId);
             AllServers.Add(new ServerCardViewModel(info, serverExecutorService));
         }
     }
@@ -53,7 +53,6 @@ public partial class ServersViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     private async Task NewServerAsync()
     {
-        //await Shell.Current.GoToAsync(nameof(ServerPage));
-        await Shell.Current.GoToAsync(nameof(ExecutionPage));
+        await Shell.Current.GoToAsync(nameof(ServerPage));
     }
 }

@@ -1,25 +1,34 @@
 using System;
 using System.Text;
 using Wave.Application.In;
+using Wave.Application.Middle;
 using Wave.Application.Out.Minecraft;
 using Wave.Application.Out.ServerManager;
 using Wave.Domain.ServerManager;
+using Wave.Infrastructure.Middle;
 
 namespace Wave.Infrastructure.In;
 
 public class ServerManagerService : IServerManagerService
 {
-    private const string propertiesFilename = "server.properties";
     private readonly string serversDirectory;
     private readonly IServerRepository serverRepository;
-    private readonly IMinecraftVersionRepository minecraftVersionRepository;
-    private readonly IServerPropertiesRepository serverPropertiesRepository;
-    public ServerManagerService(string serversDirectory, IServerRepository serverRepository, IMinecraftVersionRepository minecraftVersionRepository, IServerPropertiesRepository serverPropertiesRepository)
+    private readonly IVersionManagerService versionManagerService;
+    private readonly IPropertiesManagerService propertiesManagerService;
+    private readonly IEulaManagerService eulaManagerService;
+
+    public ServerManagerService(
+        string serversDirectory,
+        IServerRepository serverRepository,
+        IVersionManagerService versionManagerService,
+        IPropertiesManagerService propertiesManagerService,
+        IEulaManagerService eulaManagerService)
     {
         this.serverRepository = serverRepository;
         this.serversDirectory = serversDirectory;
-        this.minecraftVersionRepository = minecraftVersionRepository;
-        this.serverPropertiesRepository = serverPropertiesRepository;
+        this.versionManagerService = versionManagerService;
+        this.propertiesManagerService = propertiesManagerService;
+        this.eulaManagerService = eulaManagerService;
     }
 
     public async Task CreateAsync(Server server, CancellationToken ct = default)
@@ -31,21 +40,19 @@ public class ServerManagerService : IServerManagerService
         if (server.Details.MinecraftVersion is null) throw new NullReferenceException("The Minecraft version was not specified.");
 
         //Download files
-        string serverFilename = "server.jar";
-        server.Details.MinecraftVersion = await minecraftVersionRepository.GetDetailsAsync(server.Details.MinecraftVersion);
+        server = await versionManagerService.SetVersionAsync(server);
 
-        server.Details.MinecraftVersion = await minecraftVersionRepository.Download(server.Details.MinecraftVersion, serverFilename, serverDirectory);
-
-        server.Details.ServerFilename = serverFilename;
 
         //Create server.properties
-        string propertiesFile = Path.Combine(serverDirectory, propertiesFilename);
-        File.Create(propertiesFile).Close();
-        server.Details.PropertiesFilename = propertiesFilename;
+        File.Create(server.PropertiesPath!).Close();
+        await propertiesManagerService.SetPropertiesAsync(server);
 
-        await serverPropertiesRepository.SetAsync(server);
 
-        serverRepository.Save(server);
+        //Create eula
+        await eulaManagerService.SetEulaAsync(server);
+
+        // Save Server
+        await serverRepository.SaveAsync(server);
     }
 
     public async Task DeleteAsync(Server server, CancellationToken ct = default)
@@ -58,12 +65,33 @@ public class ServerManagerService : IServerManagerService
         await serverRepository.DeleteAsync(server.Id);
     }
 
-    public Task EditAsync(Server server, CancellationToken ct = default)
+    public async Task EditAsync(Server server, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        if (server.Info.ServerDirectory is null) throw new NullReferenceException("Server directory cannot be null.");
+        if (!Directory.Exists(server.Info.ServerDirectory)) throw new IOException($"Directory '{server.Info.ServerDirectory}' does not exist.");
+
+        /************
+        * DIFFERING *
+        ************/
+        Server old = await LoadServerAsync(server.Id);
+
+        //Version
+        if (!string.Equals(old.Details.MinecraftVersion?.Version, server.Details.MinecraftVersion?.Version))
+        {
+            await versionManagerService.SetVersionAsync(server);
+        }
+
+        //Save Properties
+        await propertiesManagerService.MergeSetPropertiesAsync(server);
+
+        // Save Eula
+        await eulaManagerService.SetEulaAsync(server);
+
+        // Save server
+        await serverRepository.SaveAsync(server);
     }
 
-    public ServerInfo Get(Guid id)
+    public ServerInfo GetServerInfo(Guid id)
     {
         return serverRepository.GetAll().First(s => s.Info.Id == id).Info;
     }
@@ -78,45 +106,22 @@ public class ServerManagerService : IServerManagerService
         return (await serverRepository.GetAllAsync()).Select(s => s.Info).ToList();
     }
 
-    public async Task<ServerInfo> GetAsync(Guid id, CancellationToken ct = default)
+    public async Task<ServerInfo> GetServerInfoAsync(Guid id, CancellationToken ct = default)
     {
         return (await serverRepository.GetAllAsync()).First(s => s.Info.Id == id).Info;
     }
 
-    public async Task<Server> LoadAsync(ServerInfo serverInfo, CancellationToken ct = default)
-    {
-        Server server = (await serverRepository.GetAllAsync()).First(s => s.Id == serverInfo.Id);
-
-        var properties = await serverPropertiesRepository.GetAllAsync(server);
-
-        server.Details.Properties = properties;
-
-        return server;
-    }
-
-    public async Task<Server> LoadAsync(Guid id, CancellationToken ct = default)
+    public async Task<Server> LoadServerAsync(Guid id, CancellationToken ct = default)
     {
         Server server = (await serverRepository.GetAllAsync()).First(s => s.Id == id);
         ServerDetails details = server.Details;
 
-        var properties = await serverPropertiesRepository.GetAllAsync(server);
+        //Load Properties
+        server.Details.Properties = await propertiesManagerService.TryGetPropertiesAsync(server);
 
-        if (properties.Count > 0)
-        {
-            foreach (var property in properties)
-            {
-                if (details.Properties.ContainsKey(property.Key))
-                {
-                    details.Properties[property.Key] = property.Value;
-                }
-                else
-                {
-                    details.Properties.Add(property.Key, property.Value);
-                }
-            }
 
-            server.Details.Properties = properties;
-        }
+        // Load Eula
+        server.Details.Eula = await eulaManagerService.TryGetEulaAsync(server);
 
         return server;
     }

@@ -1,29 +1,29 @@
 using System;
+using System.Diagnostics;
 using System.Text.Json;
 using Wave.Application.Out.Modloader;
+using Wave.Domain.Java;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Modloaders;
+using Wave.Domain.ServerManager;
 using Wave.Infrastructure.Out.Modloader.Fabric.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.Modloader.Fabric.Api;
 
 public class ApiFabricVersionCatalog : IModloaderVersionCatalog
 {
-    private static readonly HttpClient client = new()
-    {
-        BaseAddress = new Uri("https://meta.fabricmc.net/v2/versions/loader/")
-    };
+    private static readonly HttpClient client = new();
 
-    public async Task<IEnumerable<ModloaderVersion>> GetModloaderVersionsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default)
+    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default)
     {
-        List<FabricVersion> fabricVersions = new List<FabricVersion>();
+        List<ModloaderInfo> fabricVersions = new List<ModloaderInfo>();
         try
         {
-            string jsonResponse = await client.GetStringAsync(minecraftVersion.Version, ct);
+            string jsonResponse = await client.GetStringAsync($"https://meta.fabricmc.net/v2/versions/loader/{minecraftVersion.Version}", ct);
             JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement versionsElement = doc.RootElement;
-            List<FabricVersionJson> dtoVersions = JsonSerializer.Deserialize<List<FabricVersionJson>>(versionsElement) ?? new List<FabricVersionJson>();
-            foreach (FabricVersionJson dtoVersion in dtoVersions)
+            List<FabricVersionJsonDto> dtoVersions = JsonSerializer.Deserialize<List<FabricVersionJsonDto>>(versionsElement) ?? new List<FabricVersionJsonDto>();
+            foreach (FabricVersionJsonDto dtoVersion in dtoVersions)
             {
                 fabricVersions.Add(Mapper.ToDomain(dtoVersion, minecraftVersion.Version));
             }
@@ -34,5 +34,88 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
         }
 
         return fabricVersions;
+    }
+
+    public async Task<ModloaderPackage> DownloadModloader(ModloaderInfo modloader, string path, CancellationToken ct = default)
+    {
+
+        string jsonResponse = await client.GetStringAsync("https://meta.fabricmc.net/v2/versions/installer", ct);
+        JsonDocument doc = JsonDocument.Parse(jsonResponse);
+        JsonElement versionsElement = doc.RootElement;
+        Dictionary<int, InstallerInfoDto> installerInfos = JsonSerializer.Deserialize<Dictionary<int, InstallerInfoDto>>(versionsElement) ?? new Dictionary<int, InstallerInfoDto>();
+
+        InstallerInfoDto latest = installerInfos.OrderBy(i => i.Key).Last(i => i.Value.Stable == true).Value;
+
+        //Download latest installer
+        string filePath = "";
+        using (var response = await client.GetAsync(latest.DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
+        {
+            response.EnsureSuccessStatusCode();
+
+            string fileName = response.Content.Headers.ContentDisposition!.FileName!;
+
+            filePath = Path.Combine(path, fileName);
+            using (var fileStream = File.Create(filePath))
+            {
+                using (var httpStream = await response.Content.ReadAsStreamAsync())
+                {
+                    await httpStream.CopyToAsync(fileStream);
+                }
+            }
+        }
+
+        if (!File.Exists(filePath)) throw new IOException("Nothing was downloaded.");
+
+        return new ModloaderPackage()
+        {
+            Type = ModloaderType.Fabric,
+            InstallerPath = filePath,
+            InstallerVersion = latest.DownloadUrl,
+            ModloaderVersion = modloader.Version,
+            MinecraftVersion = modloader.MinecraftVersion
+        };
+    }
+
+    public async Task<ModloaderInstallation> InstallModloader(string targetDirectory, ModloaderPackage modloaderPackage, JavaInstallation javaInstallation, CancellationToken ct = default)
+    {
+        if (!Directory.Exists(targetDirectory)) throw new IOException("Target directory does not exist.");
+        if (!File.Exists(modloaderPackage.InstallerPath)) throw new IOException($"File '{modloaderPackage.InstallerPath}' does not exist.");
+
+        Process process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = javaInstallation.ExecutableFile,
+                WorkingDirectory = Path.GetFullPath(modloaderPackage.InstallerPath),
+
+                Arguments = $"-jar \"{modloaderPackage.InstallerPath}\" -dir \"{targetDirectory}\" -mcversion {modloaderPackage.MinecraftVersion.Version} -noprofile -snapshot -loader {modloaderPackage.ModloaderVersion}",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            },
+            EnableRaisingEvents = true
+        };
+
+        var tcs = new TaskCompletionSource<int>();
+
+        process.Exited += (sender, args) =>
+        {
+            tcs.SetResult(process.ExitCode);
+            process.Dispose();
+        };
+
+        process.Start();
+
+        await tcs.Task;
+
+        File.Delete(modloaderPackage.InstallerPath);
+
+        if (process.ExitCode != 0) throw new Exception($"Fabric installation failed. Exited with code {process.ExitCode}"); //TODO: Mejorar handling de la excepción.
+
+        return new ModloaderInstallation()
+        {
+            Type = ModloaderType.Fabric,
+            MinecraftVersion = modloaderPackage.MinecraftVersion.Version,
+            Version = modloaderPackage.InstallerVersion
+        };
     }
 }

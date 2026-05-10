@@ -17,6 +17,8 @@ using Wave.Infrastructure.Out.Java.Installer;
 using Wave.Application.Out.Platform;
 using Wave.Infrastructure.Out.Platform;
 using Wave.Ui.Pages.ExecutionContent.ViewModels;
+using Wave.Application.Middle;
+using Wave.Infrastructure.Middle;
 
 namespace Wave.Ui;
 
@@ -32,6 +34,7 @@ public static class AppComposition
     private static IMinecraftVersionRepository minecraftVersionRepository;
     private static IServerPropertyDefinitionRepository serverPropertyDefinitionRepository;
     private static IServerPropertiesRepository serverPropertiesRepository;
+    private static IServerEulaRepository serverEulaRepository;
     private static IServerExecutor serverExecutor;
     private static IJavaInstallRepository javaInstallRepository;
     private static IJavaSupplier adoptiumJavaSupplier;
@@ -46,6 +49,9 @@ public static class AppComposition
     private static IServerExecutorService serverExecutorService;
     private static IJavaManagerService javaManagerService;
     private static IDeviceInformationService deviceInformationService;
+    private static IPropertiesManagerService propertiesManagerService;
+    private static IEulaManagerService eulaManagerService;
+    private static IVersionManagerService versionManagerService;
 
     static AppComposition()
     {
@@ -71,11 +77,16 @@ public static class AppComposition
         compressedJavaInstaller = new CompressedJavaInstaller(javaDirectory);
         manifestJavaInstaller = new ManifestJavaInstaller(javaDirectory);
         windowsDeviceInformationRepository = new WindowsDeviceInformationRepository();
+        serverEulaRepository = new ServerEulaRepository();
 
 
         //SERVICES
+        propertiesManagerService = new PropertiesManagerService(serverPropertiesRepository);
+        eulaManagerService = new EulaManagerService(serverEulaRepository);
+        versionManagerService = new VersionManagerService(minecraftVersionRepository);
+
         minecraftCatalogService = new MinecraftCatalogService(minecraftVersionRepository, serverPropertyDefinitionRepository);
-        serverHandlerService = new ServerManagerService(serverDirectory, serverRepository, minecraftVersionRepository, serverPropertiesRepository);
+        serverHandlerService = new ServerManagerService(serverDirectory, serverRepository, versionManagerService, propertiesManagerService, eulaManagerService);
         serverExecutorService = new ServerExecutorService(serverExecutor, serverRepository, javaInstallRepository);
         javaManagerService = new JavaManagerService(javaInstallRepository, [adoptiumJavaSupplier, mojangJavaSupplier], [compressedJavaInstaller, manifestJavaInstaller]);
         deviceInformationService = new DeviceInformationService(windowsDeviceInformationRepository);

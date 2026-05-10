@@ -124,6 +124,16 @@
                                                     Grid.Row="2"
                                                     ServerPropertyDefinition="{Binding DifficultyServerProperty}"
                                                     ServerPropertyValue="{Binding DifficultyValue}"/>
+
+                     <!-- Difficulty -->
+                     <Label Grid.Column="2"
+                            Grid.Row="2"
+                            Text="Eula:"/>
+                     <Picker Grid.Column="3"
+                             Grid.Row="2"
+                             ItemsSource="{Binding EulaOptions}"
+                             ItemDisplayBinding="{Binding Value}"
+                             SelectedIndex="{Binding EulaIndex}"/>
               </Grid>
 
        </VerticalStackLayout>

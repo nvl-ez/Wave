@@ -41,6 +41,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [NotifyPropertyChangedFor(nameof(ServerIpValue))]
     [NotifyPropertyChangedFor(nameof(MaxPlayersValue))]
     [NotifyPropertyChangedFor(nameof(ServerStatus))]
+    [NotifyPropertyChangedFor(nameof(EulaIndex))]
     private partial Server Server { get; set; } = new Server();
     private ServerInfo Info => Server.Info;
     private ServerDetails Details => Server.Details;
@@ -77,10 +78,8 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         set
         {
             if (value is null) return;
-            if (Server is not null)
-            {
-                Details.MinecraftVersion = value;
-            }
+
+            Details.MinecraftVersion = value;
         }
     }
     [ObservableProperty]
@@ -129,6 +128,20 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     }
     [ObservableProperty]
     public partial ServerPropertyDefinition? MaxPlayersServerProperty { get; set; } = null;
+    //Eula
+    public List<KeyValuePair<bool, string>> EulaOptions { get; set; } = [new KeyValuePair<bool, string>(true, "Agree"), new KeyValuePair<bool, string>(false, "Disagree")];
+    public int EulaIndex
+    {
+        get
+        {
+            return EulaOptions.FindIndex(e => e.Key == Server.Details.Eula);
+        }
+        set
+        {
+            if (value >= 0 && value < EulaOptions.Count)
+                Server.Details.Eula = EulaOptions[value].Key;
+        }
+    }
 
     /***************
     * CONSTRUCTORS *
@@ -175,7 +188,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         if (query.ContainsKey("server"))
         {
             Guid serverId = (Guid)query["server"];
-            Server = await serverHandlerService.LoadAsync(serverId); //TODO: Cambiar para cargar servers pasados por guid
+            Server = await serverHandlerService.LoadServerAsync(serverId);
         }
         else
         {
@@ -221,7 +234,12 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     public async Task SaveAsync()
     {
-
+        await serverHandlerService.EditAsync(Server);
+        var parameters = new ShellNavigationQueryParameters
+        {
+            { "saved", Server!.Id}
+        };
+        await Shell.Current.GoToAsync("..", parameters);
     }
 
     [RelayCommand]

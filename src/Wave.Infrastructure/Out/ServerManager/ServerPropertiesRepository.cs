@@ -10,13 +10,17 @@ namespace Wave.Infrastructure.Out.ServerManager;
 
 public class ServerPropertiesRepository : IServerPropertiesRepository
 {
-    public async Task<Dictionary<string, string>> GetAllAsync(Server server, CancellationToken ct = default)
+    private const string propertiesPattern = @"^(?<key>[^=\r\n]+)=(?<value>[^\r\n]*)\r?$";
+
+    //Prevalece lo que hay en los archivos del server
+    public async Task<Dictionary<string, string>> GetAllAsync(string propertiesPath, CancellationToken ct = default)
     {
-        var propertiesFile = await ValidateServerProperties(server);
+        if (propertiesPath is null) throw new NullReferenceException("server.properties path cannot be null");
+        if (!File.Exists(propertiesPath)) throw new IOException($"The file {propertiesPath} does not exist");
 
-        string propertiesPattern = @"^(?<key>[^=\r\n]+)=(?<value>[^\r\n]*)$";
+        string propertiesText = await File.ReadAllTextAsync(propertiesPath);
 
-        string propertiesText = await File.ReadAllTextAsync(propertiesFile);
+        if (string.IsNullOrEmpty(propertiesText)) throw new InvalidDataException("server.properties file is empty");
 
         var matches = Regex.Matches(propertiesText, propertiesPattern, RegexOptions.Multiline);
 
@@ -32,50 +36,17 @@ public class ServerPropertiesRepository : IServerPropertiesRepository
         return properties;
     }
 
-    public async Task<string> GetAsync(Server server, string key, CancellationToken ct = default)
+    public async Task<string> GetAsync(string propertiesPath, string key, CancellationToken ct = default)
     {
-        return (await GetAllAsync(server))[key];
+        return (await GetAllAsync(propertiesPath))[key];
     }
 
-    public async Task SetAsync(Server server, CancellationToken ct = default)
+
+    public async Task SetAsync(string propertiesPath, Dictionary<string, string> properties, CancellationToken ct = default)
     {
-        Dictionary<string, string> properties = server.Details.Properties;
+        if (propertiesPath is null) throw new NullReferenceException("server.properties path cannot be null");
 
-        var propertiesFile = await ValidateServerProperties(server);
-
-        Dictionary<string, string> existingProperties = await GetAllAsync(server);
-
-        foreach (var property in properties)
-        {
-            if (existingProperties.ContainsKey(property.Key))
-            {
-                existingProperties[property.Key] = property.Value;
-            }
-            else
-            {
-                existingProperties.Add(property.Key, property.Value);
-            }
-        }
-
-        await File.WriteAllTextAsync(propertiesFile, BuildFileContent(existingProperties).ToString());
-    }
-
-    public async Task SetAsync(Server server, string key, string value, CancellationToken ct = default)
-    {
-        var propertiesFile = await ValidateServerProperties(server);
-
-        Dictionary<string, string> existingProperties = await GetAllAsync(server);
-
-        if (existingProperties.ContainsKey(key))
-        {
-            existingProperties[key] = value;
-        }
-        else
-        {
-            existingProperties.Add(key, value);
-        }
-
-        await File.WriteAllTextAsync(propertiesFile, BuildFileContent(existingProperties).ToString());
+        await File.WriteAllTextAsync(propertiesPath, BuildFileContent(properties).ToString());
     }
 
     private StringBuilder BuildFileContent(Dictionary<string, string> properties)
@@ -92,23 +63,5 @@ public class ServerPropertiesRepository : IServerPropertiesRepository
         }
 
         return content;
-    }
-
-    private async Task<string> ValidateServerProperties(Server server)
-    {
-        ServerInfo info = server.Info;
-        ServerDetails details = server.Details;
-
-        if (info.ServerDirectory is null) throw new NullReferenceException("Server Directory cannot be null.");
-        if (details.PropertiesFilename is null) throw new NullReferenceException("Server Properties Filename cannot be null.");
-
-        string propertiesFile = Path.Combine(info.ServerDirectory, details.PropertiesFilename);
-
-        if (!File.Exists(propertiesFile))
-        {
-            await File.WriteAllTextAsync(propertiesFile, BuildFileContent(server.Details.Properties).ToString());
-        }
-
-        return propertiesFile;
     }
 }
