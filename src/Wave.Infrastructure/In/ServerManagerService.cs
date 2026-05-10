@@ -31,7 +31,7 @@ public class ServerManagerService : IServerManagerService
         this.eulaManagerService = eulaManagerService;
     }
 
-    public async Task CreateAsync(Server server, CancellationToken ct = default)
+    public async Task CreateServerAsync(Server server, CancellationToken ct = default)
     {
         string serverDirectory = Path.Combine(serversDirectory, server.Info.Name);
         Directory.CreateDirectory(serverDirectory);
@@ -55,7 +55,7 @@ public class ServerManagerService : IServerManagerService
         await serverRepository.SaveAsync(server);
     }
 
-    public async Task DeleteAsync(Server server, CancellationToken ct = default)
+    public async Task DeleteServerAsync(Server server, CancellationToken ct = default)
     {
         if (server.Info.ServerDirectory is null) throw new NullReferenceException("Server directory cannot be null.");
         if (!Directory.Exists(server.Info.ServerDirectory)) throw new IOException($"Directory '{server.Info.ServerDirectory}' does not exist.");
@@ -65,7 +65,7 @@ public class ServerManagerService : IServerManagerService
         await serverRepository.DeleteAsync(server.Id);
     }
 
-    public async Task EditAsync(Server server, CancellationToken ct = default)
+    public async Task EditServerAsync(Server server, CancellationToken ct = default)
     {
         if (server.Info.ServerDirectory is null) throw new NullReferenceException("Server directory cannot be null.");
         if (!Directory.Exists(server.Info.ServerDirectory)) throw new IOException($"Directory '{server.Info.ServerDirectory}' does not exist.");
@@ -96,12 +96,12 @@ public class ServerManagerService : IServerManagerService
         return serverRepository.GetAll().First(s => s.Info.Id == id).Info;
     }
 
-    public IEnumerable<ServerInfo> GetAll()
+    public IEnumerable<ServerInfo> GetAllServerInfos()
     {
         return serverRepository.GetAll().Select(s => s.Info).ToList();
     }
 
-    public async Task<IEnumerable<ServerInfo>> GetAllAsync(CancellationToken ct = default)
+    public async Task<IEnumerable<ServerInfo>> GetAllServerInfosAsync(CancellationToken ct = default)
     {
         return (await serverRepository.GetAllAsync()).Select(s => s.Info).ToList();
     }

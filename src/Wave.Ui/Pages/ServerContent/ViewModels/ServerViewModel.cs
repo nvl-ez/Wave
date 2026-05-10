@@ -234,7 +234,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     public async Task SaveAsync()
     {
-        await serverHandlerService.EditAsync(Server);
+        await serverHandlerService.EditServerAsync(Server);
         var parameters = new ShellNavigationQueryParameters
         {
             { "saved", Server!.Id}
@@ -246,7 +246,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public async Task CreateAsync()
     {
         if (Server is null) return;
-        await serverHandlerService.CreateAsync(Server);
+        await serverHandlerService.CreateServerAsync(Server);
         var parameters = new ShellNavigationQueryParameters
         {
             { "created", Server!.Id}
@@ -259,7 +259,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     {
         if (Server is null) return;
 
-        await serverHandlerService.DeleteAsync(Server);
+        await serverHandlerService.DeleteServerAsync(Server);
         var parameters = new ShellNavigationQueryParameters
         {
             { "deleted", Server!.Id}
