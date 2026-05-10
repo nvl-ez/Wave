@@ -32,10 +32,10 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 
             foreach (string versionBundle in versionBundles)
             {
-                forgeVersions.Add(Mapper.ToDomain(versionBundle));
+                forgeVersions.Add(Mapper.ToDomain(versionBundle, minecraftVersion));
             }
 
-            forgeVersions = forgeVersions.Where(f => minecraftVersion.Version == f.Version).ToList();
+            forgeVersions = forgeVersions.Where(f => minecraftVersion.Version == f.MinecraftVersion.Version).ToList();
         }
         catch (HttpRequestException)
         {
@@ -77,7 +77,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 
         return new ModloaderPackage()
         {
-            Type = ModloaderType.Fabric,
+            ModloaderType = ModloaderType.Fabric,
             InstallerPath = filePath,
             InstallerVersion = "latest",
             ModloaderVersion = modloader.Version,
@@ -126,5 +126,15 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
             MinecraftVersion = modloaderPackage.MinecraftVersion.Version,
             Version = modloaderPackage.InstallerVersion
         };
+    }
+
+    public bool CanHandleModloaderInfo(ModloaderInfo modloaderInfo)
+    {
+        return modloaderInfo.ModloaderType == ModloaderType.Forge;
+    }
+
+    public bool CanHandleModloaderPackage(ModloaderPackage modloaderPackage)
+    {
+        return modloaderPackage.ModloaderType == ModloaderType.Forge;
     }
 }

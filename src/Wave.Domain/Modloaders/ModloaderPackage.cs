@@ -5,7 +5,7 @@ namespace Wave.Domain.Modloaders;
 
 public class ModloaderPackage
 {
-    public required ModloaderType Type { get; set; }
+    public required ModloaderType ModloaderType { get; set; }
     public required string InstallerPath { get; set; }
     public required string InstallerVersion { get; set; }
     public required string ModloaderVersion { get; set; }

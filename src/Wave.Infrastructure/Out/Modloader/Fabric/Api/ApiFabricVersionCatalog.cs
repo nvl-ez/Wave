@@ -25,7 +25,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
             List<FabricVersionJsonDto> dtoVersions = JsonSerializer.Deserialize<List<FabricVersionJsonDto>>(versionsElement) ?? new List<FabricVersionJsonDto>();
             foreach (FabricVersionJsonDto dtoVersion in dtoVersions)
             {
-                fabricVersions.Add(Mapper.ToDomain(dtoVersion, minecraftVersion.Version));
+                fabricVersions.Add(Mapper.ToDomain(dtoVersion, minecraftVersion));
             }
         }
         catch (HttpRequestException)
@@ -68,7 +68,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
 
         return new ModloaderPackage()
         {
-            Type = ModloaderType.Fabric,
+            ModloaderType = ModloaderType.Fabric,
             InstallerPath = filePath,
             InstallerVersion = latest.DownloadUrl,
             ModloaderVersion = modloader.Version,
@@ -117,5 +117,15 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
             MinecraftVersion = modloaderPackage.MinecraftVersion.Version,
             Version = modloaderPackage.InstallerVersion
         };
+    }
+
+    public bool CanHandleModloaderInfo(ModloaderInfo modloaderInfo)
+    {
+        return modloaderInfo.ModloaderType == ModloaderType.Fabric;
+    }
+
+    public bool CanHandleModloaderPackage(ModloaderPackage modloaderPackage)
+    {
+        return modloaderPackage.ModloaderType == ModloaderType.Fabric;
     }
 }

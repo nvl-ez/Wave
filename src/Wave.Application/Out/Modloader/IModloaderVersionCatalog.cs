@@ -11,4 +11,6 @@ public interface IModloaderVersionCatalog
     public Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default);
     public Task<ModloaderPackage> DownloadModloader(ModloaderInfo modloader, string path, CancellationToken ct = default);
     public Task<ModloaderInstallation> InstallModloader(string targetDirectory, ModloaderPackage modloaderPackage, JavaInstallation javaInstallation, CancellationToken ct = default);
+    public bool CanHandleModloaderInfo(ModloaderInfo modloaderInfo);
+    public bool CanHandleModloaderPackage(ModloaderPackage modloaderPackage);
 }
