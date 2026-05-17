@@ -14,4 +14,6 @@ public interface IServerPathResolver
     public string CreateEulaFile(Server server);
     public string GetModsDirectory(Server server);
     public string CreateModsDirectory(Server server);
+    public string GetTmpDirectory();
+    public string CreateTmpDirectory();
 }

@@ -6,10 +6,12 @@ namespace Wave.Infrastructure.Middle;
 
 public class ServerPathResolver : IServerPathResolver
 {
+    private readonly string appDirectory;
     private readonly string serversDirectory;
 
-    public ServerPathResolver(string serversDirectory)
+    public ServerPathResolver(string appDirectory, string serversDirectory)
     {
+        this.appDirectory = appDirectory;
         this.serversDirectory = serversDirectory;
     }
 
@@ -70,5 +72,17 @@ public class ServerPathResolver : IServerPathResolver
     {
         var invalids = System.IO.Path.GetInvalidFileNameChars();
         return String.Join("_", FileName.Split(invalids, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+    }
+
+    public string GetTmpDirectory()
+    {
+        return Path.Combine(appDirectory, "tmp");
+    }
+
+    public string CreateTmpDirectory()
+    {
+        string tmpDirectory = GetTmpDirectory();
+        Directory.CreateDirectory(tmpDirectory);
+        return tmpDirectory;
     }
 }

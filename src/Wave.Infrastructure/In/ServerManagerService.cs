@@ -5,6 +5,7 @@ using Wave.Application.Middle;
 using Wave.Application.Out.Minecraft;
 using Wave.Application.Out.ServerManager;
 using Wave.Domain.ServerManager;
+using Wave.Domain.ServerManager.Modloader;
 using Wave.Infrastructure.Middle;
 
 namespace Wave.Infrastructure.In;
@@ -43,17 +44,20 @@ public class ServerManagerService : IServerManagerService
             JavaVersion = null
         };
 
-        //Download files
+        //Download server files
         server = await versionManagerService.SetVersionAsync(server);
-
 
         //Create server.properties
         serverPathResolver.CreateServerPropertiesFile(server);
         await propertiesManagerService.SetPropertiesAsync(server);
 
-
         //Create eula
+        serverPathResolver.CreateEulaFile(server);
         await eulaManagerService.SetEulaAsync(server);
+
+        //Add modloader if necessary
+        ModloaderInfo? modloaderInfo = serverCreationQuery.ModloaderInfo;
+        if (modloaderInfo != null) await modloaderManagerService.AddModloaderAsync(server, modloaderInfo);
 
         // Save Server
         await serverRepository.SaveServerAsync(server);
