@@ -1,6 +1,6 @@
 using System;
 using Wave.Domain.Minecraft;
-using Wave.Domain.Modloaders;
+using Wave.Domain.ServerManager.Modloader;
 
 namespace Wave.Domain.Mods;
 
@@ -10,7 +10,7 @@ public record class ModInfo
     public required string Name { get; set; }
     public required string Description { get; set; }
     public string? IconUrl { get; set; }
-    public required MinecraftVersion MinecraftVersion { get; set; }
+    public required string MinecraftVersion { get; set; }
     public required ModloaderType ModloaderType { get; set; }
     public required string ModId { get; set; }
     public required string Slug { get; set; }

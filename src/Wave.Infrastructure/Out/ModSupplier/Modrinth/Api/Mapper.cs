@@ -1,6 +1,6 @@
 using System;
-using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
+using Wave.Domain.ServerManager.Modloader;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Modrinth.Api;
@@ -108,8 +108,6 @@ public static class Mapper
                 return "forge";
             case ModloaderType.Fabric:
                 return "fabric";
-            case ModloaderType.Vanilla:
-                throw new NotSupportedException("Mods cannot be searched for Vanilla Minecraft.");
             default:
                 throw new NotImplementedException("Missing implementation for modloader.");
         }

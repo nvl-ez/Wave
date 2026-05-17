@@ -4,8 +4,8 @@ using System.Text.Json;
 using Wave.Application.Out.Modloader;
 using Wave.Domain.Java;
 using Wave.Domain.Minecraft;
-using Wave.Domain.Modloaders;
 using Wave.Domain.ServerManager;
+using Wave.Domain.ServerManager.Modloader;
 using Wave.Infrastructure.Out.Modloader.Fabric.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.Modloader.Fabric.Api;
@@ -14,18 +14,18 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
 {
     private static readonly HttpClient client = new();
 
-    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default)
+    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(MinecraftVersionInfo minecraftVersionInfo, CancellationToken ct = default)
     {
         List<ModloaderInfo> fabricVersions = new List<ModloaderInfo>();
         try
         {
-            string jsonResponse = await client.GetStringAsync($"https://meta.fabricmc.net/v2/versions/loader/{minecraftVersion.Version}", ct);
+            string jsonResponse = await client.GetStringAsync($"https://meta.fabricmc.net/v2/versions/loader/{minecraftVersionInfo.MinecraftVersion}", ct);
             JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement versionsElement = doc.RootElement;
             List<FabricVersionJsonDto> dtoVersions = JsonSerializer.Deserialize<List<FabricVersionJsonDto>>(versionsElement) ?? new List<FabricVersionJsonDto>();
             foreach (FabricVersionJsonDto dtoVersion in dtoVersions)
             {
-                fabricVersions.Add(Mapper.ToDomain(dtoVersion, minecraftVersion));
+                fabricVersions.Add(Mapper.ToDomain(dtoVersion, minecraftVersionInfo));
             }
         }
         catch (HttpRequestException)
@@ -36,7 +36,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
         return fabricVersions;
     }
 
-    public async Task<ModloaderPackage> DownloadModloader(ModloaderInfo modloader, string path, CancellationToken ct = default)
+    public async Task<ModloaderPackage> DownloadModloaderAsync(ModloaderInfo modloaderInfo, string path, CancellationToken ct = default)
     {
 
         string jsonResponse = await client.GetStringAsync("https://meta.fabricmc.net/v2/versions/installer", ct);
@@ -71,12 +71,12 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
             ModloaderType = ModloaderType.Fabric,
             InstallerPath = filePath,
             InstallerVersion = latest.DownloadUrl,
-            ModloaderVersion = modloader.Version,
-            MinecraftVersion = modloader.MinecraftVersion
+            ModloaderVersion = modloaderInfo.Version,
+            MinecraftVersionInfo = modloaderInfo.MinecraftVersionInfo
         };
     }
 
-    public async Task<ModloaderInstallation> InstallModloader(string targetDirectory, ModloaderPackage modloaderPackage, JavaInstallation javaInstallation, CancellationToken ct = default)
+    public async Task<ModloaderInstallation> InstallModloaderAsync(string targetDirectory, ModloaderPackage modloaderPackage, JavaInstallation javaInstallation, CancellationToken ct = default)
     {
         if (!Directory.Exists(targetDirectory)) throw new IOException("Target directory does not exist.");
         if (!File.Exists(modloaderPackage.InstallerPath)) throw new IOException($"File '{modloaderPackage.InstallerPath}' does not exist.");
@@ -88,7 +88,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
                 FileName = javaInstallation.ExecutableFile,
                 WorkingDirectory = Path.GetFullPath(modloaderPackage.InstallerPath),
 
-                Arguments = $"-jar \"{modloaderPackage.InstallerPath}\" -dir \"{targetDirectory}\" -mcversion {modloaderPackage.MinecraftVersion.Version} -noprofile -snapshot -loader {modloaderPackage.ModloaderVersion}",
+                Arguments = $"-jar \"{modloaderPackage.InstallerPath}\" -dir \"{targetDirectory}\" -mcversion {modloaderPackage.MinecraftVersionInfo.MinecraftVersion} -noprofile -snapshot -loader {modloaderPackage.ModloaderVersion}",
                 UseShellExecute = false,
                 CreateNoWindow = true
             },
@@ -114,18 +114,13 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
         return new ModloaderInstallation()
         {
             Type = ModloaderType.Fabric,
-            MinecraftVersion = modloaderPackage.MinecraftVersion.Version,
+            MinecraftVersion = modloaderPackage.MinecraftVersionInfo.MinecraftVersion,
             Version = modloaderPackage.InstallerVersion
         };
     }
 
-    public bool CanHandleModloaderInfo(ModloaderInfo modloaderInfo)
+    public bool CanHandleType(ModloaderType type)
     {
-        return modloaderInfo.ModloaderType == ModloaderType.Fabric;
-    }
-
-    public bool CanHandleModloaderPackage(ModloaderPackage modloaderPackage)
-    {
-        return modloaderPackage.ModloaderType == ModloaderType.Fabric;
+        return type == ModloaderType.Fabric;
     }
 }

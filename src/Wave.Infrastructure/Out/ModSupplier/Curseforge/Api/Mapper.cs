@@ -1,7 +1,7 @@
 using System;
 using Wave.Domain.Minecraft;
-using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
+using Wave.Domain.ServerManager.Modloader;
 using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
@@ -86,8 +86,6 @@ public static class Mapper
                 return 1;
             case ModloaderType.Fabric:
                 return 4;
-            case ModloaderType.Vanilla:
-                throw new NotSupportedException("Mods cannot be searched for Vanilla Minecraft.");
             default:
                 throw new NotImplementedException("Missing implementation for modloader.");
         }

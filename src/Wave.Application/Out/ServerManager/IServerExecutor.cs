@@ -6,5 +6,5 @@ namespace Wave.Application.Out.ServerManager;
 
 public interface IServerExecutor
 {
-    public IServerSession Start(Server server, JavaInstallation javaInstallation, CancellationToken ct = default);
+    public IServerSession Start(Guid serverId, string serverDirectory, string jarPath, JavaInstallation javaInstallation, CancellationToken ct = default);
 }

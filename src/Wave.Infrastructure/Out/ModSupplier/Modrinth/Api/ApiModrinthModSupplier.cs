@@ -1,7 +1,6 @@
 using System;
 using System.Text.Json;
 using Wave.Application.Out.ModSupplier;
-using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Dtos;
 
@@ -20,12 +19,17 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
         client.DefaultRequestHeaders.Add("User-Agent", "nvl-ez/Wave (nahuelvazquezlevrino@gmail.com)");
     }
 
+    public Task DownloadMod(ModVersion modVersion, string modsPath, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo modInfo, CancellationToken ct = default)
     {
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
         string loaderString = Mapper.ToDtoModloaderType(modInfo.ModloaderType);
         queryParameters.Add("loaders", $"[\"{loaderString}\"]");
-        queryParameters.Add("game_versions", $"[\"{modInfo.MinecraftVersion.Version}\"]");
+        queryParameters.Add("game_versions", $"[\"{modInfo.MinecraftVersion}\"]");
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
@@ -71,7 +75,7 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
         queryParameters.Add("limit", modSupplierQuery.PageSize.ToString());
 
         string loaderString = Mapper.ToDtoModloaderType(modSupplierQuery.ModloaderType);
-        string facets = $"[[\"categories:{loaderString}\"],[\"versions:{modSupplierQuery.MinecraftVersion.Version}\"],[\"project_type:mod\"]]";
+        string facets = $"[[\"categories:{loaderString}\"],[\"versions:{modSupplierQuery.MinecraftVersion}\"],[\"project_type:mod\"]]";
         queryParameters.Add("facets", facets);
 
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));

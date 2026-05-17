@@ -1,7 +1,9 @@
 using System;
+
 using Wave.Application.In;
 using Wave.Application.Out.Minecraft;
 using Wave.Domain.Minecraft;
+using Wave.Domain.ServerManager.Properties;
 
 namespace Wave.Infrastructure.In;
 
@@ -16,33 +18,33 @@ public class MinecraftCatalogService : IMinecraftCatalogService
         this.serverPropertiesRepository = serverPropertiesRepository;
     }
 
-    public async Task<IEnumerable<MinecraftVersion>> GetMinecraftVersionsAsync(MinecraftVersionQuery query, CancellationToken ct = default)
+    public async Task<IEnumerable<MinecraftVersionInfo>> GetMinecraftVersionsAsync(MinecraftVersionQuery query, CancellationToken ct = default)
     {
         return (await minecraftVersionRepository.GetAllVersionsAsync(ct))
             .Where(mv => query.IncludeSnapshots == true || mv.MinecraftVersionType == MinecraftVersionType.Release).ToList();
     }
 
-    public IEnumerable<MinecraftVersion> GetMinecraftVersions(MinecraftVersionQuery query)
+    public IEnumerable<MinecraftVersionInfo> GetMinecraftVersions(MinecraftVersionQuery query)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<IEnumerable<ServerPropertyDefinition>> GetServerPropertyDefinitionsAsync(CancellationToken ct = default)
+    public async Task<IEnumerable<PropertyDefinition>> GetServerPropertyDefinitionsAsync(CancellationToken ct = default)
     {
         return await serverPropertiesRepository.GetAllServerPropertiesAsync(ct);
     }
 
-    public IEnumerable<ServerPropertyDefinition> GetServerPropertyDefinitions()
+    public IEnumerable<PropertyDefinition> GetServerPropertyDefinitions()
     {
         return serverPropertiesRepository.GetAllServerProperties();
     }
 
-    public async Task<ServerPropertyDefinition> GetServerPropertyDefinitionAsync(string key, CancellationToken ct = default)
+    public async Task<PropertyDefinition> GetServerPropertyDefinitionAsync(string key, CancellationToken ct = default)
     {
         return (await serverPropertiesRepository.GetAllServerPropertiesAsync(ct)).First(sp => sp.Key == key);
     }
 
-    public ServerPropertyDefinition GetServerPropertyDefinition(string key)
+    public PropertyDefinition GetServerPropertyDefinition(string key)
     {
         return serverPropertiesRepository.GetAllServerProperties().First(sp => sp.Key == key);
     }

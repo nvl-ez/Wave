@@ -13,22 +13,21 @@ public class ApiMinecraftVersionRepository : IMinecraftVersionRepository
 {
     private static HttpClient client = new();
 
-    //Download and sets the java version required for the server to run
-    public async Task DownloadMinecraftServer(MinecraftVersionDetails minecraftVersionDetails, string jarPath, CancellationToken ct = default)
+    //Download and returns the java version required for the server to run
+    public async Task DownloadMinecraftServer(MinecraftVersionDetails minecraftVersionDetails, string serverJarPath, CancellationToken ct = default)
     {
         string jarEndpoint = minecraftVersionDetails.ServerUrl;
         if (string.IsNullOrEmpty(jarEndpoint)) throw new InvalidDataException("Server download url cannot be null or empty");
 
         using var downloadStream = await client.GetStreamAsync(jarEndpoint);
-        using var fileStream = new FileStream(jarPath, FileMode.Create);
+        using var fileStream = new FileStream(serverJarPath, FileMode.Create);
 
         await downloadStream.CopyToAsync(fileStream);
         await fileStream.FlushAsync();
         fileStream.Close();
-
     }
 
-    public async Task<MinecraftVersionDetails> GetVersionDetailsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default)
+    public async Task<MinecraftVersionDetails> GetVersionDetailsAsync(MinecraftVersionInfo minecraftVersion, CancellationToken ct = default)
     {
         string jsonResponse = await client.GetStringAsync(minecraftVersion.DetailsUrl, ct);
         JsonDocument doc = JsonDocument.Parse(jsonResponse);
@@ -44,7 +43,7 @@ public class ApiMinecraftVersionRepository : IMinecraftVersionRepository
         };
     }
 
-    public async Task<List<MinecraftVersion>> GetAllVersionsAsync(CancellationToken ct = default)
+    public async Task<List<MinecraftVersionInfo>> GetAllVersionsAsync(CancellationToken ct = default)
     {
         string jsonResponse = await client.GetStringAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json", ct);
 
@@ -55,7 +54,7 @@ public class ApiMinecraftVersionRepository : IMinecraftVersionRepository
 
         if (dtoVersions is null) throw new SerializationException("Server DTO could not be deserialized.");
 
-        List<MinecraftVersion> versions = new List<MinecraftVersion>();
+        List<MinecraftVersionInfo> versions = new List<MinecraftVersionInfo>();
 
         foreach (MinecraftVersionJson dtoVersion in dtoVersions)
         {

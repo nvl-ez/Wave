@@ -1,6 +1,6 @@
 using System;
 using Wave.Domain.Minecraft;
-using Wave.Domain.Modloaders;
+using Wave.Domain.ServerManager.Modloader;
 
 namespace Wave.Domain.Mods;
 
@@ -13,7 +13,7 @@ public record class ModVersion
     public required List<ModArtifact> Artifacts { get; set; }
     public List<ModDependency>? Dependencies { get; set; }
     public string? Changelog { get; set; }
-    public required MinecraftVersion MinecraftVersion { get; set; }
+    public required string MinecraftVersion { get; set; }
     public required ModVersionType ModVersionType { get; set; }
     public required ModSupplierType ModSupplierType { get; set; }
     public required ModloaderType ModloaderType { get; set; }

@@ -8,23 +8,18 @@ namespace Wave.Infrastructure.Out.ServerManager.Executor;
 
 public class WindowsServerExecutor : IServerExecutor
 {
-    public IServerSession Start(Server server, JavaInstallation javaInstallation, CancellationToken ct = default)
+    public IServerSession Start(Guid serverId, string serverDirectory, string jarPath, JavaInstallation javaInstallation, CancellationToken ct = default)
     {
-        if (server.Info.ServerDirectory is null) throw new NullReferenceException("Server Directory cannot be null.");
-        if (server.Details.ServerFilename is null) throw new NullReferenceException("Server Filename cannot be null.");
-
-        string serverJar = Path.Combine(server.Info.ServerDirectory, server.Details.ServerFilename);
-
-        if (!File.Exists(serverJar)) throw new IOException($"File '{serverJar}' does not exist.");
+        if (!File.Exists(jarPath)) throw new IOException($"File '{jarPath}' does not exist.");
 
         Process process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = javaInstallation.ExecutableFile,
-                WorkingDirectory = server.Info.ServerDirectory,
+                WorkingDirectory = serverDirectory,
 
-                Arguments = $"-jar \"{serverJar}\" nogui",
+                Arguments = $"-jar \"{jarPath}\" nogui",
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -35,6 +30,6 @@ public class WindowsServerExecutor : IServerExecutor
         };
         process.Start();
 
-        return new ServerSession(process, server.Id);
+        return new ServerSession(process, serverId);
     }
 }

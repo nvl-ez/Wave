@@ -5,7 +5,7 @@ namespace Wave.Application.Out.Minecraft;
 
 public interface IMinecraftVersionRepository
 {
-    public Task<List<MinecraftVersion>> GetAllVersionsAsync(CancellationToken ct = default);
-    public Task<MinecraftVersionDetails> GetVersionDetailsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default);
-    public Task<string> DownloadMinecraftServer(MinecraftVersionDetails minecraftVersionDetails, string serverPath, CancellationToken ct = default);
+    public Task<List<MinecraftVersionInfo>> GetAllVersionsAsync(CancellationToken ct = default);
+    public Task<MinecraftVersionDetails> GetVersionDetailsAsync(MinecraftVersionInfo minecraftVersionInfo, CancellationToken ct = default);
+    public Task DownloadMinecraftServer(MinecraftVersionDetails minecraftVersionDetails, string serverJarPath, CancellationToken ct = default);
 }

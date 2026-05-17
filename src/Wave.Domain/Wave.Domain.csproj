@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="ServerManager\Eula\" />
+    <Folder Include="ServerManager\Mods\" />
     <Folder Include="Utils\" />
   </ItemGroup>
 

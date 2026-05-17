@@ -6,14 +6,14 @@ namespace Wave.Ui.Pages.ServerContent.Views;
 public partial class ServerPropertyInputView : ContentView
 {
 	public static readonly BindableProperty ServerPropertyDefinitionProperty =
-		BindableProperty.Create(nameof(ServerPropertyDefinition), typeof(ServerPropertyDefinition), typeof(ServerPropertyInputView), propertyChanged: OnServerPropertyDefinitionChanged);
+		BindableProperty.Create(nameof(ServerPropertyDefinition), typeof(PropertyDefinition), typeof(ServerPropertyInputView), propertyChanged: OnServerPropertyDefinitionChanged);
 
 	public static readonly BindableProperty ServerPropertyValueProperty =
 		BindableProperty.Create(nameof(ServerPropertyValue), typeof(string), typeof(ServerPropertyInputView), defaultBindingMode: BindingMode.TwoWay, propertyChanged: OnServerPropertyValueChanged);
 
-	public ServerPropertyDefinition? ServerPropertyDefinition
+	public PropertyDefinition? ServerPropertyDefinition
 	{
-		get => (ServerPropertyDefinition?)GetValue(ServerPropertyDefinitionProperty);
+		get => (PropertyDefinition?)GetValue(ServerPropertyDefinitionProperty);
 		set => SetValue(ServerPropertyDefinitionProperty, value);
 	}
 	public string? ServerPropertyValue

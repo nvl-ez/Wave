@@ -1,41 +1,46 @@
 using System;
 using Wave.Application.Middle;
 using Wave.Application.Out.Minecraft;
+using Wave.Domain.Minecraft;
 using Wave.Domain.ServerManager;
 
 namespace Wave.Infrastructure.Middle;
 
 public class VersionManagerService : IVersionManagerService
 {
-    private IMinecraftVersionRepository minecraftVersionRepository;
+    private readonly IMinecraftVersionRepository minecraftVersionRepository;
+    private readonly IServerPathResolver serverPathResolver;
 
-    public VersionManagerService(IMinecraftVersionRepository minecraftVersionRepository)
+    public VersionManagerService(IServerPathResolver serverPathResolver, IMinecraftVersionRepository minecraftVersionRepository)
     {
         this.minecraftVersionRepository = minecraftVersionRepository;
+        this.serverPathResolver = serverPathResolver;
     }
 
     public async Task<Server> SetVersionAsync(Server server)
     {
-        if (server.JarPath is null) throw new NullReferenceException("Server Jar path cannot be null.");
-        if (server.Details.MinecraftVersion is null) throw new NullReferenceException("Requested Minecraft Version Cannot be null.");
-
         //Move old version if exists
-        string oldJarPath = Path.Combine(server.Info.ServerDirectory!, "old.jar");
-        if (File.Exists(server.JarPath))
+        string oldJarPath = Path.Combine(serverPathResolver.GetServerRootDirectory(server), "old.jar");
+        string jarPath = serverPathResolver.GetServerJarPath(server);
+        if (File.Exists(jarPath))
         {
-            File.Move(server.JarPath, oldJarPath, true);
+            File.Move(jarPath, oldJarPath, true);
         }
+
+        int? oldRequiredJavaVersion = server.JavaVersion;
 
         try
         {
-            server.Details.MinecraftVersionDetails = await minecraftVersionRepository.GetVersionDetailsAsync(server.Details.MinecraftVersion);
-            await minecraftVersionRepository.DownloadMinecraftServer(server.Details.MinecraftVersionDetails, server.JarPath);
+            MinecraftVersionDetails details = await minecraftVersionRepository.GetVersionDetailsAsync(server.MinecraftVersionInfo);
+            server.JavaVersion = details.JavaVersion;
+            await minecraftVersionRepository.DownloadMinecraftServer(details, jarPath);
         }
         catch (Exception)
         {
-            if (File.Exists(server.JarPath))
+            server.JavaVersion = oldRequiredJavaVersion;
+            if (File.Exists(oldJarPath))
             {
-                File.Move(oldJarPath, server.JarPath, true);
+                File.Move(oldJarPath, jarPath, true);
             }
         }
 

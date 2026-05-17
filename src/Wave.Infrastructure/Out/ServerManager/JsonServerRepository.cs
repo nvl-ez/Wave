@@ -18,13 +18,13 @@ public class JsonServerRepository : IServerRepository
         if (!File.Exists(filePath))
             File.Create(filePath).Dispose();
     }
-    public async Task SaveAsync(Server server, CancellationToken ct = default)
+    public async Task SaveServerAsync(Server server, CancellationToken ct = default)
     {
         //Remove if exists
-        await DeleteAsync(server.Info.Id, ct);
+        await DeleteServerAsync(server.Id, ct);
 
         //Load
-        List<Server> servers = (List<Server>)await GetAllAsync(ct);
+        List<Server> servers = (List<Server>)await GetAllServersAsync(ct);
 
         //Add
         servers.Add(server);
@@ -32,16 +32,16 @@ public class JsonServerRepository : IServerRepository
 
     }
 
-    public async Task<IEnumerable<Server>> GetAllAsync(CancellationToken ct = default)
+    public async Task<IEnumerable<Server>> GetAllServersAsync(CancellationToken ct = default)
     {
         string json = await File.ReadAllTextAsync(filePath, ct);
         return json.Length != 0 ? JsonSerializer.Deserialize<List<Server>>(json)! : new List<Server>();
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken ct)
+    public async Task DeleteServerAsync(Guid id, CancellationToken ct)
     {
-        List<Server> servers = (List<Server>)await GetAllAsync(ct);
-        if (servers.RemoveAll(s => s.Info.Id == id) > 0)
+        List<Server> servers = (List<Server>)await GetAllServersAsync(ct);
+        if (servers.RemoveAll(s => s.Id == id) > 0)
         {
             await WriteListToDiskAsync(servers, ct);
         }
@@ -53,29 +53,29 @@ public class JsonServerRepository : IServerRepository
         await File.WriteAllTextAsync(filePath, json, ct);
     }
 
-    public IEnumerable<Server> GetAll()
+    public IEnumerable<Server> GetAllServers()
     {
         string json = File.ReadAllText(filePath);
         return json.Length != 0 ? JsonSerializer.Deserialize<List<Server>>(json)! : new List<Server>();
     }
 
-    public void Save(Server server)
+    public void SaveServer(Server server)
     {
         //Remove if exists
-        Delete(server.Info.Id);
+        DeleteServer(server.Id);
 
         //Load
-        List<Server> servers = (List<Server>)GetAll();
+        List<Server> servers = (List<Server>)GetAllServers();
 
         //Add
         servers.Add(server);
         WriteListToDisk(servers);
     }
 
-    public void Delete(Guid id)
+    public void DeleteServer(Guid id)
     {
-        List<Server> servers = (List<Server>)GetAll();
-        if (servers.RemoveAll(s => s.Info.Id == id) > 0)
+        List<Server> servers = (List<Server>)GetAllServers();
+        if (servers.RemoveAll(s => s.Id == id) > 0)
         {
             WriteListToDisk(servers);
         }

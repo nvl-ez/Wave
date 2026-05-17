@@ -8,16 +8,18 @@ namespace Wave.Infrastructure.Middle;
 
 public class PropertiesManagerService : IPropertiesManagerService
 {
-    private IServerPropertiesRepository serverPropertiesRepository;
+    private readonly IServerPathResolver serverPathResolver;
+    private readonly IServerPropertiesRepository serverPropertiesRepository;
 
-    public PropertiesManagerService(IServerPropertiesRepository serverPropertiesRepository)
+    public PropertiesManagerService(IServerPathResolver serverPathResolver, IServerPropertiesRepository serverPropertiesRepository)
     {
+        this.serverPathResolver = serverPathResolver;
         this.serverPropertiesRepository = serverPropertiesRepository;
     }
 
     public async Task MergeSetPropertiesAsync(Server server, CancellationToken ct = default)
     {
-        Dictionary<string, string> current = server.Details.Properties;
+        Dictionary<string, string> current = server.Properties;
         Dictionary<string, string> stored = await TryGetPropertiesAsync(server);
 
         foreach (var kv in current)
@@ -25,27 +27,28 @@ public class PropertiesManagerService : IPropertiesManagerService
             stored[kv.Key] = kv.Value;
         }
 
-        await serverPropertiesRepository.SetAsync(server.PropertiesPath!, stored);
+        await serverPropertiesRepository.SetAsync(serverPathResolver.GetServerPropertiesPath(server), stored);
     }
 
     public async Task SetPropertiesAsync(Server server, CancellationToken ct = default)
     {
-        await serverPropertiesRepository.SetAsync(server.PropertiesPath!, server.Details.Properties);
+        await serverPropertiesRepository.SetAsync(serverPathResolver.GetServerPropertiesPath(server), server.Properties);
     }
 
     public async Task<Dictionary<string, string>> TryGetPropertiesAsync(Server server, CancellationToken ct = default)
     {
+        string propertiesPath = serverPathResolver.GetServerPropertiesPath(server);
         Dictionary<string, string> properties;
         try
         {
-            properties = await serverPropertiesRepository.GetAllAsync(server.PropertiesPath!);
+            properties = await serverPropertiesRepository.GetAllAsync(propertiesPath);
         }
         catch (Exception ex)
         {
             if (ex is IOException || ex is InvalidDataException)
             {
-                properties = server.Details.Properties;
-                await serverPropertiesRepository.SetAsync(server.PropertiesPath!, properties);
+                properties = server.Properties;
+                await serverPropertiesRepository.SetAsync(propertiesPath, properties);
             }
             else
             {

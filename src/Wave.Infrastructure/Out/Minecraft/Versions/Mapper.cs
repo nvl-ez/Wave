@@ -6,11 +6,11 @@ namespace Wave.Infrastructure.Out.Minecraft.Api;
 
 public static class Mapper
 {
-    public static MinecraftVersion ToDomain(MinecraftVersionJson dto)
+    public static MinecraftVersionInfo ToDomain(MinecraftVersionJson dto)
     {
-        return new MinecraftVersion()
+        return new MinecraftVersionInfo()
         {
-            Version = dto.Id,
+            MinecraftVersion = dto.Id,
             MinecraftVersionType = dto.Type == "release" ? MinecraftVersionType.Release :
                 (dto.Type == "snapshot" ? MinecraftVersionType.Snapshot : MinecraftVersionType.Other),
             DetailsUrl = dto.Url,

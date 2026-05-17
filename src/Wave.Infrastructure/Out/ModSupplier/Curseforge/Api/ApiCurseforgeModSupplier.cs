@@ -1,8 +1,8 @@
 using System;
 using System.Text.Json;
 using Wave.Application.Out.ModSupplier;
-using Wave.Domain.Modloaders;
 using Wave.Domain.Mods;
+using Wave.Domain.ServerManager.Modloader;
 using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
@@ -25,7 +25,7 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
     public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo modInfo, CancellationToken ct = default)
     {
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
-        queryParameters.Add("gameVersion", modInfo.MinecraftVersion.Version);
+        queryParameters.Add("gameVersion", modInfo.MinecraftVersion);
         ModloaderType loader = modInfo.ModloaderType;
         queryParameters.Add("modLoaderType", Mapper.ToDtoModloaderType(loader).ToString());
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
@@ -69,7 +69,7 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
                 queryParameters.Add("searchFilter", modSupplierQuery.Author);
             }
         }
-        queryParameters.Add("gameVersion", modSupplierQuery.MinecraftVersion.Version);
+        queryParameters.Add("gameVersion", modSupplierQuery.MinecraftVersion);
 
         ModloaderType loader = modSupplierQuery.ModloaderType;
         queryParameters.Add("modLoaderType", Mapper.ToDtoModloaderType(loader).ToString());
@@ -100,5 +100,10 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
             Console.WriteLine("Error when contacting Curseforge");
         }
         return mods;
+    }
+
+    public Task DownloadMod(ModVersion modVersion, string modsPath, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
     }
 }

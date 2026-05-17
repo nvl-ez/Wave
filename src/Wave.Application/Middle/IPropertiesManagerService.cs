@@ -1,5 +1,6 @@
 using System;
 using Wave.Domain.ServerManager;
+using Wave.Domain.ServerManager.Properties;
 
 namespace Wave.Application.Middle;
 

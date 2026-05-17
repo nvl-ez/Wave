@@ -1,5 +1,6 @@
 using System;
 using Wave.Application.In;
+using Wave.Application.Middle;
 using Wave.Application.Out.Java;
 using Wave.Application.Out.ServerManager;
 using Wave.Domain.Java;
@@ -10,14 +11,16 @@ namespace Wave.Infrastructure.In;
 
 public class ServerExecutorService : IServerExecutorService
 {
+    private readonly IServerPathResolver serverPathResolver;
     private readonly IServerExecutor serverExecutor;
     private readonly IJavaInstallRepository javaInstallRepository;
     private readonly IServerRepository serverRepository;
 
     private Dictionary<Guid, IServerSession> runningServers = new(); //TODO abstract dictionary in an out port
 
-    public ServerExecutorService(IServerExecutor serverExecutor, IServerRepository serverRepository, IJavaInstallRepository javaInstallRepository)
+    public ServerExecutorService(IServerPathResolver serverPathResolver, IServerExecutor serverExecutor, IServerRepository serverRepository, IJavaInstallRepository javaInstallRepository)
     {
+        this.serverPathResolver = serverPathResolver;
         this.serverExecutor = serverExecutor;
         this.serverRepository = serverRepository;
         this.javaInstallRepository = javaInstallRepository;
@@ -31,11 +34,11 @@ public class ServerExecutorService : IServerExecutorService
 
     public async Task<IServerSession> Start(Guid id, CancellationToken ct = default)
     {
-        Server server = (await serverRepository.GetAllAsync()).First(s => s.Id == id);
+        Server server = (await serverRepository.GetAllServersAsync()).First(s => s.Id == id);
 
-        int? serverJavaVersion = server.Details.MinecraftVersionDetails?.JavaVersion;
+        int? serverJavaVersion = server.JavaVersion;
 
-        if (serverJavaVersion is null) throw new JavaInstallationNotFoundException($"Server does not have a required Java version.");
+        if (serverJavaVersion is null) throw new JavaInstallationNotFoundException($"Server does not have a required Java version. Has a jar been downloaded?");
 
         JavaInstallation? javaInstallation = (await javaInstallRepository.GetAllAsync())
             .Where(j => j.Version >= serverJavaVersion)
@@ -44,9 +47,14 @@ public class ServerExecutorService : IServerExecutorService
 
         if (javaInstallation is null) throw new JavaInstallationNotFoundException($"No available Java installation was found for version {serverJavaVersion}.");
 
-        if (runningServers.ContainsKey(server.Id)) throw new ServerAlreadyRunningException($"Server '{server.Info.Name}' is already running.");
+        if (runningServers.ContainsKey(server.Id)) throw new ServerAlreadyRunningException($"Server '{server.Name}' is already running.");
 
-        IServerSession serverSession = serverExecutor.Start(server, javaInstallation);
+        IServerSession serverSession = serverExecutor.Start(
+            server.Id,
+            serverPathResolver.GetServerRootDirectory(server),
+            serverPathResolver.GetServerJarPath(server),
+            javaInstallation
+            );
 
         runningServers.Add(server.Id, serverSession);
         serverSession.ServerDisposed += ServerDisposed;

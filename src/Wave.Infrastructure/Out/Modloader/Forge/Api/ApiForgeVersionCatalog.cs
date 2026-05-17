@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 using Wave.Application.Out.Modloader;
 using Wave.Domain.Java;
 using Wave.Domain.Minecraft;
-using Wave.Domain.Modloaders;
+using Wave.Domain.ServerManager.Modloader;
 using Wave.Infrastructure.Out.Modloader.Forge.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.Modloader.Forge.Api;
@@ -14,7 +14,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 {
     private static readonly HttpClient client = new();
 
-    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(MinecraftVersion minecraftVersion, CancellationToken ct = default)
+    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(MinecraftVersionInfo minecraftVersionInfo, CancellationToken ct = default)
     {
         List<ModloaderInfo> forgeVersions = new List<ModloaderInfo>();
         try
@@ -32,10 +32,10 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 
             foreach (string versionBundle in versionBundles)
             {
-                forgeVersions.Add(Mapper.ToDomain(versionBundle, minecraftVersion));
+                forgeVersions.Add(Mapper.ToDomain(versionBundle, minecraftVersionInfo));
             }
 
-            forgeVersions = forgeVersions.Where(f => minecraftVersion.Version == f.MinecraftVersion.Version).ToList();
+            forgeVersions = forgeVersions.Where(f => minecraftVersionInfo.MinecraftVersion == f.MinecraftVersionInfo.MinecraftVersion).ToList();
         }
         catch (HttpRequestException)
         {
@@ -45,13 +45,13 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
         return forgeVersions;
     }
 
-    public async Task<ModloaderPackage> DownloadModloader(ModloaderInfo modloader, string path, CancellationToken ct = default)
+    public async Task<ModloaderPackage> DownloadModloaderAsync(ModloaderInfo modloaderInfo, string path, CancellationToken ct = default)
     {
         //Download latest installer
         string filePath = "";
 
-        string mcVersion = modloader.MinecraftVersion.Version;
-        string forgeVersion = modloader.Version;
+        string mcVersion = modloaderInfo.MinecraftVersionInfo.MinecraftVersion;
+        string forgeVersion = modloaderInfo.Version;
         using (
             var response = await client.GetAsync(
                 $"https://maven.minecraftforge.net/net/minecraftforge/forge/{mcVersion}-{forgeVersion}/forge-{mcVersion}-{forgeVersion}-installer.jar",
@@ -80,12 +80,12 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
             ModloaderType = ModloaderType.Fabric,
             InstallerPath = filePath,
             InstallerVersion = "latest",
-            ModloaderVersion = modloader.Version,
-            MinecraftVersion = modloader.MinecraftVersion
+            ModloaderVersion = modloaderInfo.Version,
+            MinecraftVersionInfo = modloaderInfo.MinecraftVersionInfo
         };
     }
 
-    public async Task<ModloaderInstallation> InstallModloader(string targetDirectory, ModloaderPackage modloaderPackage, JavaInstallation javaInstallation, CancellationToken ct = default)
+    public async Task<ModloaderInstallation> InstallModloaderAsync(string targetDirectory, ModloaderPackage modloaderPackage, JavaInstallation javaInstallation, CancellationToken ct = default)
     {
         if (!Directory.Exists(targetDirectory)) throw new IOException("Target directory does not exist.");
         if (!File.Exists(modloaderPackage.InstallerPath)) throw new IOException($"File '{modloaderPackage.InstallerPath}' does not exist.");
@@ -123,18 +123,13 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
         return new ModloaderInstallation()
         {
             Type = ModloaderType.Fabric,
-            MinecraftVersion = modloaderPackage.MinecraftVersion.Version,
+            MinecraftVersion = modloaderPackage.MinecraftVersionInfo.MinecraftVersion,
             Version = modloaderPackage.InstallerVersion
         };
     }
 
-    public bool CanHandleModloaderInfo(ModloaderInfo modloaderInfo)
+    public bool CanHandleType(ModloaderType type)
     {
-        return modloaderInfo.ModloaderType == ModloaderType.Forge;
-    }
-
-    public bool CanHandleModloaderPackage(ModloaderPackage modloaderPackage)
-    {
-        return modloaderPackage.ModloaderType == ModloaderType.Forge;
+        return type == ModloaderType.Forge;
     }
 }

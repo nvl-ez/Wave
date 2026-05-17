@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Wave.Application.In;
 using Wave.Domain.Minecraft;
 using Wave.Domain.ServerManager;
+using Wave.Domain.ServerManager.Properties;
 
 //TODO: Server Eula automatization
 
@@ -33,7 +34,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [NotifyPropertyChangedFor(nameof(TitleName))]
     [NotifyPropertyChangedFor(nameof(Name))]
     [NotifyPropertyChangedFor(nameof(Motd))]
-    [NotifyPropertyChangedFor(nameof(MinecraftVersion))]
+    [NotifyPropertyChangedFor(nameof(MinecraftVersionInfo))]
     [NotifyPropertyChangedFor(nameof(MinecraftVersionIndex))]
     [NotifyPropertyChangedFor(nameof(GamemodeValue))]
     [NotifyPropertyChangedFor(nameof(DifficultyValue))]
@@ -72,7 +73,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public DateTime? CreationDate => Server is null ? null : Info.CreationDate;
 
     //Versions
-    public MinecraftVersion? MinecraftVersion
+    public MinecraftVersionInfo? MinecraftVersionInfo
     {
         get => Details.MinecraftVersion;
         set
@@ -83,10 +84,10 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         }
     }
     [ObservableProperty]
-    public partial List<MinecraftVersion> MinecraftVersions { get; set; } = new List<MinecraftVersion>();
+    public partial List<MinecraftVersionInfo> MinecraftVersionsInfos { get; set; } = new List<MinecraftVersionInfo>();
     [ObservableProperty]
     public partial bool IncludeSnapshots { get; set; } = false;
-    public int? MinecraftVersionIndex => MinecraftVersions?.FindIndex(mv => mv.Version == MinecraftVersion?.Version);
+    public int? MinecraftVersionIndex => MinecraftVersionsInfos?.FindIndex(mv => mv.MinecraftVersion == MinecraftVersionInfo?.MinecraftVersion);
 
     //Gamemode
     public string GamemodeValue
@@ -95,7 +96,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         set { Details.Properties["gamemode"] = value; }
     }
     [ObservableProperty]
-    public partial ServerPropertyDefinition? GamemodeServerProperty { get; set; } = null;
+    public partial PropertyDefinition? GamemodeServerProperty { get; set; } = null;
     //Difficulty
     public string DifficultyValue
     {
@@ -103,7 +104,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         set { Details.Properties["difficulty"] = value; }
     }
     [ObservableProperty]
-    public partial ServerPropertyDefinition? DifficultyServerProperty { get; set; } = null;
+    public partial PropertyDefinition? DifficultyServerProperty { get; set; } = null;
     //Motd
     public string MotdValue
     {
@@ -111,7 +112,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         set { Details.Properties["motd"] = value; }
     }
     [ObservableProperty]
-    public partial ServerPropertyDefinition? MotdServerProperty { get; set; } = null;
+    public partial PropertyDefinition? MotdServerProperty { get; set; } = null;
     //Ip
     public string ServerIpValue
     {
@@ -119,7 +120,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         set { Details.Properties["server-ip"] = value; }
     }
     [ObservableProperty]
-    public partial ServerPropertyDefinition? ServerIpServerProperty { get; set; } = null;
+    public partial PropertyDefinition? ServerIpServerProperty { get; set; } = null;
     //Max Players
     public string MaxPlayersValue
     {
@@ -127,7 +128,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         set { Details.Properties["max-players"] = value; }
     }
     [ObservableProperty]
-    public partial ServerPropertyDefinition? MaxPlayersServerProperty { get; set; } = null;
+    public partial PropertyDefinition? MaxPlayersServerProperty { get; set; } = null;
     //Eula
     public List<KeyValuePair<bool, string>> EulaOptions { get; set; } = [new KeyValuePair<bool, string>(true, "Agree"), new KeyValuePair<bool, string>(false, "Disagree")];
     public int EulaIndex
@@ -188,7 +189,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         if (query.ContainsKey("server"))
         {
             Guid serverId = (Guid)query["server"];
-            Server = await serverHandlerService.LoadServerAsync(serverId);
+            Server = await serverHandlerService.GetServerAsync(serverId);
         }
         else
         {
@@ -210,8 +211,8 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     {
         MinecraftVersionsStatus = "Loading";
         MinecraftVersionQuery query = new MinecraftVersionQuery() { IncludeSnapshots = IncludeSnapshots };
-        MinecraftVersions = (List<MinecraftVersion>)await minecraftCatalogService.GetMinecraftVersionsAsync(query);
-        if (MinecraftVersions is not null && MinecraftVersions.Count > 0)
+        MinecraftVersionsInfos = (List<MinecraftVersionInfo>)await minecraftCatalogService.GetMinecraftVersionsAsync(query);
+        if (MinecraftVersionsInfos is not null && MinecraftVersionsInfos.Count > 0)
         {
             MinecraftVersionsStatus = "Done";
         }

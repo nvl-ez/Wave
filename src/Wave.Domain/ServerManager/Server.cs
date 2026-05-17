@@ -5,30 +5,42 @@ namespace Wave.Domain.ServerManager;
 
 public sealed class Server
 {
-    public ServerInfo Info { get; set; } = new();
-    public ServerDetails Details { get; set; } = new();
+    public Guid Id { get; init; } = Guid.NewGuid();
+    public required string Name { get; set; }
+    public DateTime CreationDate { get; init; } = DateTime.Now;
+    public required MinecraftVersionInfo MinecraftVersionInfo { get; set; }
+    public required int? JavaVersion { get; set; }
 
-    public Guid Id => Info.Id;
-    public string? EulaPath => Info.ServerDirectory is not null ? Path.Combine(Info.ServerDirectory, Details.EulaFilename) : null;
-    public string? PropertiesPath => Info.ServerDirectory is not null ? Path.Combine(Info.ServerDirectory, Details.PropertiesFilename) : null;
-    public string? JarPath => Info.ServerDirectory is not null ? Path.Combine(Info.ServerDirectory, Details.ServerFilename!) : null;
-
-    public bool IsReady => Info.ServerDirectory is not null &&
-        Details.MinecraftVersion is not null &&
-        Details.ServerFilename is not null &&
-        Details.PropertiesFilename is not null &&
-        Details.MinecraftVersionDetails is not null;
+    /*******************
+    * Physical Objects *
+    *******************/
+    public ServerPaths ServerPaths = new();
+    public Dictionary<string, string> Properties { get; set; } = new()
+    {
+        {"difficulty", "nromal"},
+        {"gamemode", "survival"},
+        {"level-seed", ""},
+        {"max-players", "16"},
+        {"motd", "A Minecraft Server"},
+        {"online-mode", "true"},
+        {"server-ip", ""},
+        {"spawn-protection", "16"},
+        {"view-distance", "8"}
+    };
+    public bool Eula { get; set; } = false;
+    public Modloader.ModloaderInstallation? Modloader { get; set; } = null;
+    public string? ImageFilename { get; set; } = null;
 
     public bool Equals(Server? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
 
-        return Info.Id == other.Info.Id;
+        return Id == other.Id;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Info.Id);
+        return HashCode.Combine(Id);
     }
 }

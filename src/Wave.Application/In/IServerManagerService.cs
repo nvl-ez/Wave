@@ -5,13 +5,12 @@ namespace Wave.Application.In;
 
 public interface IServerManagerService
 {
-    public Task CreateServerAsync(Server server, CancellationToken ct = default);
+    public Task CreateServerAsync(ServerCreationQuery serverCreationQuery, CancellationToken ct = default);
     public Task EditServerAsync(Server server, CancellationToken ct = default);
     public Task DeleteServerAsync(Server server, CancellationToken ct = default);
-    public Task<Server> LoadServerAsync(Guid id, CancellationToken ct = default);
 
-    public Task<ServerInfo> GetServerInfoAsync(Guid id, CancellationToken ct = default);
-    public Task<IEnumerable<ServerInfo>> GetAllServerInfosAsync(CancellationToken ct = default);
-    public ServerInfo GetServerInfo(Guid id);
-    public IEnumerable<ServerInfo> GetAllServerInfos();
+    public Task<Server> GetServerAsync(Guid id, CancellationToken ct = default);
+    public Task<IEnumerable<Server>> GetAllServersAsync(CancellationToken ct = default);
+    public Server GetServer(Guid id);
+    public IEnumerable<Server> GetAllServers();
 }

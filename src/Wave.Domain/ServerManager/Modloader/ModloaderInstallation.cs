@@ -1,6 +1,6 @@
 using System;
 
-namespace Wave.Domain.Modloaders;
+namespace Wave.Domain.ServerManager.Modloader;
 
 public class ModloaderInstallation
 {

@@ -1,25 +1,25 @@
 using System;
 using Wave.Application.Out.Minecraft;
-using Wave.Domain.Minecraft;
+using Wave.Domain.ServerManager.Properties;
 
 namespace Wave.Infrastructure.Out.Minecraft.ServerProperties;
 
 public class InMemoryServerPropertyDefinitionRepository : IServerPropertyDefinitionRepository
 {
-    public static readonly List<ServerPropertyDefinition> serverProperties = new()
+    public static readonly List<PropertyDefinition> serverProperties = new()
 {
-    new() { DisplayName = "Accepts Transfers", Key = "accepts-transfers", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Allow Flight", Key = "allow-flight", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Broadcast Console To Ops", Key = "broadcast-console-to-ops", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Broadcast RCON To Ops", Key = "broadcast-rcon-to-ops", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Bug Report Link", Key = "bug-report-link", Type = ServerPropertyType.String },
-    new() { DisplayName = "Debug", Key = "debug", Type = ServerPropertyType.Boolean },
+    new() { DisplayName = "Accepts Transfers", Key = "accepts-transfers", Type = PropertyType.Boolean },
+    new() { DisplayName = "Allow Flight", Key = "allow-flight", Type = PropertyType.Boolean },
+    new() { DisplayName = "Broadcast Console To Ops", Key = "broadcast-console-to-ops", Type = PropertyType.Boolean },
+    new() { DisplayName = "Broadcast RCON To Ops", Key = "broadcast-rcon-to-ops", Type = PropertyType.Boolean },
+    new() { DisplayName = "Bug Report Link", Key = "bug-report-link", Type = PropertyType.String },
+    new() { DisplayName = "Debug", Key = "debug", Type = PropertyType.Boolean },
 
     new()
     {
         DisplayName = "Difficulty",
         Key = "difficulty",
-        Type = ServerPropertyType.Options,
+        Type = PropertyType.Options,
         Options = new Dictionary<string, string>
         {
             ["peaceful"] = "Peaceful",
@@ -29,22 +29,22 @@ public class InMemoryServerPropertyDefinitionRepository : IServerPropertyDefinit
         }
     },
 
-    new() { DisplayName = "Enable Code Of Conduct", Key = "enable-code-of-conduct", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Enable JMX Monitoring", Key = "enable-jmx-monitoring", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Enable Query", Key = "enable-query", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Enable RCON", Key = "enable-rcon", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Enable Status", Key = "enable-status", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Enforce Secure Profile", Key = "enforce-secure-profile", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Enforce Whitelist", Key = "enforce-whitelist", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Entity Broadcast Range Percentage", Key = "entity-broadcast-range-percentage", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Force Gamemode", Key = "force-gamemode", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Function Permission Level", Key = "function-permission-level", Type = ServerPropertyType.Integer },
+    new() { DisplayName = "Enable Code Of Conduct", Key = "enable-code-of-conduct", Type = PropertyType.Boolean },
+    new() { DisplayName = "Enable JMX Monitoring", Key = "enable-jmx-monitoring", Type = PropertyType.Boolean },
+    new() { DisplayName = "Enable Query", Key = "enable-query", Type = PropertyType.Boolean },
+    new() { DisplayName = "Enable RCON", Key = "enable-rcon", Type = PropertyType.Boolean },
+    new() { DisplayName = "Enable Status", Key = "enable-status", Type = PropertyType.Boolean },
+    new() { DisplayName = "Enforce Secure Profile", Key = "enforce-secure-profile", Type = PropertyType.Boolean },
+    new() { DisplayName = "Enforce Whitelist", Key = "enforce-whitelist", Type = PropertyType.Boolean },
+    new() { DisplayName = "Entity Broadcast Range Percentage", Key = "entity-broadcast-range-percentage", Type = PropertyType.Integer },
+    new() { DisplayName = "Force Gamemode", Key = "force-gamemode", Type = PropertyType.Boolean },
+    new() { DisplayName = "Function Permission Level", Key = "function-permission-level", Type = PropertyType.Integer },
 
     new()
     {
         DisplayName = "Gamemode",
         Key = "gamemode",
-        Type = ServerPropertyType.Options,
+        Type = PropertyType.Options,
         Options = new Dictionary<string, string>
         {
             ["survival"] = "Survival",
@@ -54,20 +54,20 @@ public class InMemoryServerPropertyDefinitionRepository : IServerPropertyDefinit
         }
     },
 
-    new() { DisplayName = "Generate Structures", Key = "generate-structures", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Generator Settings", Key = "generator-settings", Type = ServerPropertyType.String },
-    new() { DisplayName = "Hardcore", Key = "hardcore", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Hide Online Players", Key = "hide-online-players", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Initial Disabled Packs", Key = "initial-disabled-packs", Type = ServerPropertyType.String },
-    new() { DisplayName = "Initial Enabled Packs", Key = "initial-enabled-packs", Type = ServerPropertyType.String },
-    new() { DisplayName = "Level Name", Key = "level-name", Type = ServerPropertyType.String },
-    new() { DisplayName = "Level Seed", Key = "level-seed", Type = ServerPropertyType.String },
+    new() { DisplayName = "Generate Structures", Key = "generate-structures", Type = PropertyType.Boolean },
+    new() { DisplayName = "Generator Settings", Key = "generator-settings", Type = PropertyType.String },
+    new() { DisplayName = "Hardcore", Key = "hardcore", Type = PropertyType.Boolean },
+    new() { DisplayName = "Hide Online Players", Key = "hide-online-players", Type = PropertyType.Boolean },
+    new() { DisplayName = "Initial Disabled Packs", Key = "initial-disabled-packs", Type = PropertyType.String },
+    new() { DisplayName = "Initial Enabled Packs", Key = "initial-enabled-packs", Type = PropertyType.String },
+    new() { DisplayName = "Level Name", Key = "level-name", Type = PropertyType.String },
+    new() { DisplayName = "Level Seed", Key = "level-seed", Type = PropertyType.String },
 
     new()
     {
         DisplayName = "Level Type",
         Key = "level-type",
-        Type = ServerPropertyType.Options,
+        Type = PropertyType.Options,
         Options = new Dictionary<string, string>
         {
             ["minecraft:normal"] = "Minecraft: Normal",
@@ -78,36 +78,36 @@ public class InMemoryServerPropertyDefinitionRepository : IServerPropertyDefinit
         }
     },
 
-    new() { DisplayName = "Log IPs", Key = "log-ips", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Management Server Allowed Origins", Key = "management-server-allowed-origins", Type = ServerPropertyType.String },
-    new() { DisplayName = "Management Server Enabled", Key = "management-server-enabled", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Management Server Host", Key = "management-server-host", Type = ServerPropertyType.String },
-    new() { DisplayName = "Management Server Port", Key = "management-server-port", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Management Server Secret", Key = "management-server-secret", Type = ServerPropertyType.String },
-    new() { DisplayName = "Management Server TLS Enabled", Key = "management-server-tls-enabled", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Management Server TLS Keystore", Key = "management-server-tls-keystore", Type = ServerPropertyType.String },
-    new() { DisplayName = "Management Server TLS Keystore Password", Key = "management-server-tls-keystore-password", Type = ServerPropertyType.String },
-    new() { DisplayName = "Max Chained Neighbor Updates", Key = "max-chained-neighbor-updates", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Max Players", Key = "max-players", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Max Tick Time", Key = "max-tick-time", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Max World Size", Key = "max-world-size", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "MOTD", Key = "motd", Type = ServerPropertyType.String },
-    new() { DisplayName = "Network Compression Threshold", Key = "network-compression-threshold", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Online Mode", Key = "online-mode", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Op Permission Level", Key = "op-permission-level", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Pause When Empty Seconds", Key = "pause-when-empty-seconds", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Player Idle Timeout", Key = "player-idle-timeout", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Prevent Proxy Connections", Key = "prevent-proxy-connections", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Query Port", Key = "query.port", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Rate Limit", Key = "rate-limit", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "RCON Password", Key = "rcon.password", Type = ServerPropertyType.String },
-    new() { DisplayName = "RCON Port", Key = "rcon.port", Type = ServerPropertyType.Integer },
+    new() { DisplayName = "Log IPs", Key = "log-ips", Type = PropertyType.Boolean },
+    new() { DisplayName = "Management Server Allowed Origins", Key = "management-server-allowed-origins", Type = PropertyType.String },
+    new() { DisplayName = "Management Server Enabled", Key = "management-server-enabled", Type = PropertyType.Boolean },
+    new() { DisplayName = "Management Server Host", Key = "management-server-host", Type = PropertyType.String },
+    new() { DisplayName = "Management Server Port", Key = "management-server-port", Type = PropertyType.Integer },
+    new() { DisplayName = "Management Server Secret", Key = "management-server-secret", Type = PropertyType.String },
+    new() { DisplayName = "Management Server TLS Enabled", Key = "management-server-tls-enabled", Type = PropertyType.Boolean },
+    new() { DisplayName = "Management Server TLS Keystore", Key = "management-server-tls-keystore", Type = PropertyType.String },
+    new() { DisplayName = "Management Server TLS Keystore Password", Key = "management-server-tls-keystore-password", Type = PropertyType.String },
+    new() { DisplayName = "Max Chained Neighbor Updates", Key = "max-chained-neighbor-updates", Type = PropertyType.Integer },
+    new() { DisplayName = "Max Players", Key = "max-players", Type = PropertyType.Integer },
+    new() { DisplayName = "Max Tick Time", Key = "max-tick-time", Type = PropertyType.Integer },
+    new() { DisplayName = "Max World Size", Key = "max-world-size", Type = PropertyType.Integer },
+    new() { DisplayName = "MOTD", Key = "motd", Type = PropertyType.String },
+    new() { DisplayName = "Network Compression Threshold", Key = "network-compression-threshold", Type = PropertyType.Integer },
+    new() { DisplayName = "Online Mode", Key = "online-mode", Type = PropertyType.Boolean },
+    new() { DisplayName = "Op Permission Level", Key = "op-permission-level", Type = PropertyType.Integer },
+    new() { DisplayName = "Pause When Empty Seconds", Key = "pause-when-empty-seconds", Type = PropertyType.Integer },
+    new() { DisplayName = "Player Idle Timeout", Key = "player-idle-timeout", Type = PropertyType.Integer },
+    new() { DisplayName = "Prevent Proxy Connections", Key = "prevent-proxy-connections", Type = PropertyType.Boolean },
+    new() { DisplayName = "Query Port", Key = "query.port", Type = PropertyType.Integer },
+    new() { DisplayName = "Rate Limit", Key = "rate-limit", Type = PropertyType.Integer },
+    new() { DisplayName = "RCON Password", Key = "rcon.password", Type = PropertyType.String },
+    new() { DisplayName = "RCON Port", Key = "rcon.port", Type = PropertyType.Integer },
 
     new()
     {
         DisplayName = "Region File Compression",
         Key = "region-file-compression",
-        Type = ServerPropertyType.Options,
+        Type = PropertyType.Options,
         Options = new Dictionary<string, string>
         {
             ["deflate"] = "Deflate",
@@ -116,24 +116,24 @@ public class InMemoryServerPropertyDefinitionRepository : IServerPropertyDefinit
         }
     },
 
-    new() { DisplayName = "Require Resource Pack", Key = "require-resource-pack", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Resource Pack", Key = "resource-pack", Type = ServerPropertyType.String },
-    new() { DisplayName = "Resource Pack Id", Key = "resource-pack-id", Type = ServerPropertyType.String },
-    new() { DisplayName = "Resource Pack Prompt", Key = "resource-pack-prompt", Type = ServerPropertyType.String },
-    new() { DisplayName = "Resource Pack Sha1", Key = "resource-pack-sha1", Type = ServerPropertyType.String },
-    new() { DisplayName = "Server IP", Key = "server-ip", Type = ServerPropertyType.String },
-    new() { DisplayName = "Server Port", Key = "server-port", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Simulation Distance", Key = "simulation-distance", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Spawn Protection", Key = "spawn-protection", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Status Heartbeat Interval", Key = "status-heartbeat-interval", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "Sync Chunk Writes", Key = "sync-chunk-writes", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "Text Filtering Config", Key = "text-filtering-config", Type = ServerPropertyType.String },
+    new() { DisplayName = "Require Resource Pack", Key = "require-resource-pack", Type = PropertyType.Boolean },
+    new() { DisplayName = "Resource Pack", Key = "resource-pack", Type = PropertyType.String },
+    new() { DisplayName = "Resource Pack Id", Key = "resource-pack-id", Type = PropertyType.String },
+    new() { DisplayName = "Resource Pack Prompt", Key = "resource-pack-prompt", Type = PropertyType.String },
+    new() { DisplayName = "Resource Pack Sha1", Key = "resource-pack-sha1", Type = PropertyType.String },
+    new() { DisplayName = "Server IP", Key = "server-ip", Type = PropertyType.String },
+    new() { DisplayName = "Server Port", Key = "server-port", Type = PropertyType.Integer },
+    new() { DisplayName = "Simulation Distance", Key = "simulation-distance", Type = PropertyType.Integer },
+    new() { DisplayName = "Spawn Protection", Key = "spawn-protection", Type = PropertyType.Integer },
+    new() { DisplayName = "Status Heartbeat Interval", Key = "status-heartbeat-interval", Type = PropertyType.Integer },
+    new() { DisplayName = "Sync Chunk Writes", Key = "sync-chunk-writes", Type = PropertyType.Boolean },
+    new() { DisplayName = "Text Filtering Config", Key = "text-filtering-config", Type = PropertyType.String },
 
     new()
     {
         DisplayName = "Text Filtering Version",
         Key = "text-filtering-version",
-        Type = ServerPropertyType.Options,
+        Type = PropertyType.Options,
         Options = new Dictionary<string, string>
         {
             ["0"] = "0",
@@ -141,26 +141,26 @@ public class InMemoryServerPropertyDefinitionRepository : IServerPropertyDefinit
         }
     },
 
-    new() { DisplayName = "Use Native Transport", Key = "use-native-transport", Type = ServerPropertyType.Boolean },
-    new() { DisplayName = "View Distance", Key = "view-distance", Type = ServerPropertyType.Integer },
-    new() { DisplayName = "White List", Key = "white-list", Type = ServerPropertyType.Boolean }
+    new() { DisplayName = "Use Native Transport", Key = "use-native-transport", Type = PropertyType.Boolean },
+    new() { DisplayName = "View Distance", Key = "view-distance", Type = PropertyType.Integer },
+    new() { DisplayName = "White List", Key = "white-list", Type = PropertyType.Boolean }
 };
-    public IEnumerable<ServerPropertyDefinition> GetAllServerProperties()
+    public IEnumerable<PropertyDefinition> GetAllServerProperties()
     {
         return serverProperties;
     }
 
-    public Task<IEnumerable<ServerPropertyDefinition>> GetAllServerPropertiesAsync(CancellationToken ct = default)
+    public Task<IEnumerable<PropertyDefinition>> GetAllServerPropertiesAsync(CancellationToken ct = default)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<ServerPropertyDefinition> GetServerProperty(string key)
+    public IEnumerable<PropertyDefinition> GetServerProperty(string key)
     {
         return serverProperties.Where(sp => sp.Key == key);
     }
 
-    public Task<IEnumerable<ServerPropertyDefinition>> GetServerPropertyAsync(string key, CancellationToken ct = default)
+    public Task<IEnumerable<PropertyDefinition>> GetServerPropertyAsync(string key, CancellationToken ct = default)
     {
         throw new NotImplementedException();
     }
