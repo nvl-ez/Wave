@@ -32,6 +32,11 @@ public class ServerPathResolver : IServerPathResolver
         return Path.Combine(GetServerRootDirectory(server), server.ServerPaths.ServerJarFilename);
     }
 
+    public string? GetModloaderJarPath(Server server)
+    {
+        return server.Modloader != null ? Path.Combine(GetServerRootDirectory(server), server.ServerPaths.ModloaderJarFileName) : null;
+    }
+
     public string GetServerPropertiesPath(Server server)
     {
         string serverDirectory = GetServerRootDirectory(server);

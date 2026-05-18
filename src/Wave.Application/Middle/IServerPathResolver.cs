@@ -10,6 +10,7 @@ public interface IServerPathResolver
     public string GetServerPropertiesPath(Server server);
     public string CreateServerPropertiesFile(Server server);
     public string GetServerJarPath(Server server);
+    public string? GetModloaderJarPath(Server server);
     public string GetEulaPath(Server server);
     public string CreateEulaFile(Server server);
     public string GetModsDirectory(Server server);

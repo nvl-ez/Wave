@@ -42,6 +42,7 @@ public class ModloaderManagerService : IModloaderManagerService
     {
         if (server.Modloader is not null) throw new InvalidDataException($"The server already has an installed modloader.");
 
+        //Find modloader manager that can handle the request
         IModloaderVersionCatalog? target = null;
         foreach (var modloader in modloaders)
         {
@@ -50,7 +51,7 @@ public class ModloaderManagerService : IModloaderManagerService
 
         if (target is null) throw new InvalidDataException($"The type {modloaderInfo.ModloaderType} is not supported by any modloader.");
 
-        string filePath = Path.Combine(serverPathResolver.GetTmpDirectory(), "modloader.jar");
+        string filePath = Path.Combine(serverPathResolver.GetTmpDirectory(), "modloaderInstaller.jar");
 
         //Obtener el paquete
         ModloaderPackage modloaderPackage = await target.DownloadModloaderAsync(modloaderInfo, filePath);
@@ -58,17 +59,27 @@ public class ModloaderManagerService : IModloaderManagerService
         //Obtener la verion de java mas nueva
         JavaInstallation javaInstallation = (await javaInstallRepository.GetAllAsync()).OrderByDescending(j => j.Version).First();
 
+        //Instalar el modloader
         server.Modloader = await target.InstallModloaderAsync(
             serverPathResolver.GetServerRootDirectory(server),
             modloaderPackage,
             javaInstallation
-            );
+        );
+
+        var modloaderNames = new[] { "forge", "fabric", "modloader" };
+
+        //Rename the installed modloader accordingly
+        string? modloaderJar = Directory.GetFiles(serverPathResolver.GetServerRootDirectory(server), "*.jar")
+        .FirstOrDefault(file => modloaderNames.Any(c => Path.GetFileName(file).Contains(c, StringComparison.OrdinalIgnoreCase)));
+
+        if (modloaderJar is null) throw new IOException($"The installed modloader '.jar' of type {modloaderInfo.ModloaderType} could not be found.");
+        File.Move(modloaderJar, serverPathResolver.GetModloaderJarPath(server)!, true);
 
         //Clear tmp folder
         string[] allFiles = Directory.GetFiles(serverPathResolver.GetTmpDirectory());
         foreach (string file in allFiles)
         {
-            if (new[] { "forge", "fabric", "modloader" }.Any(c => Path.GetFileName(file).ToLower().Contains(c)))
+            if (modloaderNames.Any(c => Path.GetFileName(file).Contains(c, StringComparison.OrdinalIgnoreCase)))
             {
                 File.Delete(file);
             }
@@ -83,11 +94,13 @@ public class ModloaderManagerService : IModloaderManagerService
 
         string serverDirectory = serverPathResolver.GetServerRootDirectory(server);
 
+        var modloaderNames = new[] { "forge", "fabric", "modloader" };
+
         //Obtain all directories in the server folder
         var directories = Directory.GetDirectories(serverDirectory, "*", SearchOption.AllDirectories);
         foreach (var directory in directories)
         {
-            if (new[] { "forge", "fabric", "modloader" }.Any(c => Path.GetDirectoryName(directory)!.ToLower().Contains(c)))
+            if (modloaderNames.Any(c => Path.GetDirectoryName(directory)!.Contains(c, StringComparison.OrdinalIgnoreCase)))
             {
                 Directory.Delete(directory, true);
             }
@@ -97,7 +110,7 @@ public class ModloaderManagerService : IModloaderManagerService
         var files = Directory.GetFiles(serverPathResolver.GetTmpDirectory(), "*", SearchOption.AllDirectories);
         foreach (string file in files)
         {
-            if (new[] { "forge", "fabric", "modloader" }.Any(c => Path.GetFileName(file).ToLower().Contains(c)))
+            if (modloaderNames.Any(c => Path.GetFileName(file).Contains(c, StringComparison.OrdinalIgnoreCase)))
             {
                 File.Delete(file);
             }
