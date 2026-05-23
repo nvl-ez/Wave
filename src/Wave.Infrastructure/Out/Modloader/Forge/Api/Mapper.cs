@@ -6,7 +6,7 @@ namespace Wave.Infrastructure.Out.Modloader.Forge.Api;
 
 public static class Mapper
 {
-    public static ModloaderInfo ToDomain(string dto, MinecraftVersionInfo minecraftVersionInfo) //TODO: SACAR MINECRAFT VERSION DE AQUI: es incorrecto porque no todas las versiones de forge son de la version actual.
+    public static ModloaderInfo ToDomain(string dto, string minecraftVersion) //TODO: SACAR MINECRAFT VERSION DE AQUI: es incorrecto porque no todas las versiones de forge son de la version actual.
     {
         int charLocation = dto.IndexOf('-');
         string mcVersion = dto.Substring(0, charLocation);
@@ -15,7 +15,7 @@ public static class Mapper
         return new ModloaderInfo()
         {
             Version = version,
-            MinecraftVersion = minecraftVersionInfo.MinecraftVersion,
+            MinecraftVersion = minecraftVersion,
             DowloadUrl = $"https://maven.minecraftforge.net/net/minecraftforge/forge/{dto}/forge-{dto}-installer.jar",
             ModloaderType = ModloaderType.Forge
         };

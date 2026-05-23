@@ -14,18 +14,20 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
 {
     private static readonly HttpClient client = new();
 
-    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(MinecraftVersionInfo minecraftVersionInfo, CancellationToken ct = default)
+    public ModloaderType ModloaderType { get; private set; } = ModloaderType.Fabric;
+
+    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(string minecraftVersion, CancellationToken ct = default)
     {
         List<ModloaderInfo> fabricVersions = new List<ModloaderInfo>();
         try
         {
-            string jsonResponse = await client.GetStringAsync($"https://meta.fabricmc.net/v2/versions/loader/{minecraftVersionInfo.MinecraftVersion}", ct);
+            string jsonResponse = await client.GetStringAsync($"https://meta.fabricmc.net/v2/versions/loader/{minecraftVersion}", ct);
             JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement versionsElement = doc.RootElement;
             List<FabricVersionJsonDto> dtoVersions = JsonSerializer.Deserialize<List<FabricVersionJsonDto>>(versionsElement) ?? new List<FabricVersionJsonDto>();
             foreach (FabricVersionJsonDto dtoVersion in dtoVersions)
             {
-                fabricVersions.Add(Mapper.ToDomain(dtoVersion, minecraftVersionInfo));
+                fabricVersions.Add(Mapper.ToDomain(dtoVersion, minecraftVersion));
             }
         }
         catch (HttpRequestException)
@@ -68,7 +70,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
 
         return new ModloaderPackage()
         {
-            ModloaderType = ModloaderType.Fabric,
+            ModloaderType = ModloaderType,
             InstallerPath = filePath,
             InstallerVersion = latest.DownloadUrl,
             ModloaderVersion = modloaderInfo.Version,
@@ -113,7 +115,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
 
         return new ModloaderInstallation()
         {
-            Type = ModloaderType.Fabric,
+            Type = ModloaderType,
             MinecraftVersion = modloaderPackage.MinecraftVersion,
             Version = modloaderPackage.InstallerVersion
         };
@@ -121,6 +123,6 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
 
     public bool CanHandleType(ModloaderType type)
     {
-        return type == ModloaderType.Fabric;
+        return type == ModloaderType;
     }
 }

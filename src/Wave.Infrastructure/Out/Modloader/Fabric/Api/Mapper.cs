@@ -7,12 +7,12 @@ namespace Wave.Infrastructure.Out.Modloader.Fabric.Api;
 
 public static class Mapper
 {
-    public static ModloaderInfo ToDomain(FabricVersionJsonDto dto, MinecraftVersionInfo minecraftVersionInfo)
+    public static ModloaderInfo ToDomain(FabricVersionJsonDto dto, string minecraftVersion)
     {
         return new ModloaderInfo()
         {
             Version = dto.Loader.Version,
-            MinecraftVersion = minecraftVersionInfo.MinecraftVersion,
+            MinecraftVersion = minecraftVersion,
             DowloadUrl = $"https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.1.1/fabric-installer-1.1.1.jar",
             ModloaderType = ModloaderType.Fabric
         };

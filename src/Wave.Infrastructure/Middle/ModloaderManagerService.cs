@@ -21,7 +21,7 @@ public class ModloaderManagerService : IModloaderManagerService
         this.javaInstallRepository = javaInstallRepository;
     }
 
-    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(ModloaderType modloaderType, MinecraftVersionInfo minecraftVersionInfo, CancellationToken ct = default)
+    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(ModloaderType modloaderType, string minecraftVersion, CancellationToken ct = default)
     {
         IModloaderVersionCatalog? targetModloader = null;
         foreach (var modloader in modloaders)
@@ -35,7 +35,7 @@ public class ModloaderManagerService : IModloaderManagerService
 
         if (targetModloader is null) throw new InvalidDataException($"There is no modloader that can handle the typ {modloaderType}.");//TODO: Fix error handling
 
-        return await targetModloader.GetModloaderVersionsAsync(minecraftVersionInfo);
+        return await targetModloader.GetModloaderVersionsAsync(minecraftVersion);
     }
 
     public async Task<Server> AddModloaderAsync(Server server, ModloaderInfo modloaderInfo, CancellationToken ct = default)

@@ -49,6 +49,8 @@ public partial class Form : VerticalStackLayout
 
 		foreach (var child in element.GetVisualTreeDescendants().OfType<Element>())
 		{
+			if (child is Form) continue;
+
 			foreach (var result in GetFormElements(child, visited))
 				yield return result;
 		}
@@ -59,6 +61,8 @@ public partial class Form : VerticalStackLayout
 
 			foreach (var stateView in stateViews.OfType<Element>())
 			{
+				if (stateView is Form) continue;
+
 				foreach (var result in GetFormElements(stateView, visited))
 					yield return result;
 			}
@@ -72,6 +76,8 @@ public partial class Form : VerticalStackLayout
 
 		foreach (var child in Children.OfType<Element>())
 		{
+			if (child is Form) continue;
+
 			foreach (var formElement in GetFormElements(child, visited))
 			{
 				if (formElement is not SubmitButton)

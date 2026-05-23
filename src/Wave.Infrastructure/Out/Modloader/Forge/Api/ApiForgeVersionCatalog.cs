@@ -14,7 +14,9 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 {
     private static readonly HttpClient client = new();
 
-    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(MinecraftVersionInfo minecraftVersionInfo, CancellationToken ct = default)
+    public ModloaderType ModloaderType { get; private set; } = ModloaderType.Forge;
+
+    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(string minecraftVersion, CancellationToken ct = default)
     {
         List<ModloaderInfo> forgeVersions = new List<ModloaderInfo>();
         try
@@ -32,10 +34,10 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 
             foreach (string versionBundle in versionBundles)
             {
-                forgeVersions.Add(Mapper.ToDomain(versionBundle, minecraftVersionInfo));
+                forgeVersions.Add(Mapper.ToDomain(versionBundle, minecraftVersion));
             }
 
-            forgeVersions = forgeVersions.Where(f => minecraftVersionInfo.MinecraftVersion == f.MinecraftVersion).ToList();
+            forgeVersions = forgeVersions.Where(f => minecraftVersion == f.MinecraftVersion).ToList();
         }
         catch (HttpRequestException)
         {
@@ -77,7 +79,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 
         return new ModloaderPackage()
         {
-            ModloaderType = ModloaderType.Fabric,
+            ModloaderType = ModloaderType,
             InstallerPath = filePath,
             InstallerVersion = "latest",
             ModloaderVersion = modloaderInfo.Version,
@@ -122,7 +124,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 
         return new ModloaderInstallation()
         {
-            Type = ModloaderType.Fabric,
+            Type = ModloaderType,
             MinecraftVersion = modloaderPackage.MinecraftVersion,
             Version = modloaderPackage.InstallerVersion
         };
@@ -130,6 +132,6 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 
     public bool CanHandleType(ModloaderType type)
     {
-        return type == ModloaderType.Forge;
+        return type == ModloaderType;
     }
 }
