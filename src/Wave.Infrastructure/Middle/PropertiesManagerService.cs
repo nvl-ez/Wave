@@ -17,17 +17,16 @@ public class PropertiesManagerService : IPropertiesManagerService
         this.serverPropertiesRepository = serverPropertiesRepository;
     }
 
-    public async Task MergeSetPropertiesAsync(Server server, CancellationToken ct = default)
+    public async Task MergeSetPropertiesAsync(Server server, ServerQuery serverQuery, CancellationToken ct = default)
     {
-        Dictionary<string, string> current = server.Properties;
-        Dictionary<string, string> stored = await TryGetPropertiesAsync(server);
+        if (serverQuery.Properties is null) return;
 
-        foreach (var kv in current)
+        foreach (var kv in serverQuery.Properties)
         {
-            stored[kv.Key] = kv.Value;
+            server.Properties[kv.Key] = kv.Value;
         }
 
-        await serverPropertiesRepository.SetAsync(serverPathResolver.GetServerPropertiesPath(server), stored);
+        await serverPropertiesRepository.SetAsync(serverPathResolver.GetServerPropertiesPath(server), server.Properties);
     }
 
     public async Task SetPropertiesAsync(Server server, CancellationToken ct = default)

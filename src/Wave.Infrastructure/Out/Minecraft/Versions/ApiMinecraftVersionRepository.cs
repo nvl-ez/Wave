@@ -14,7 +14,7 @@ public class ApiMinecraftVersionRepository : IMinecraftVersionRepository
     private static HttpClient client = new();
 
     //Download and returns the java version required for the server to run
-    public async Task DownloadMinecraftServer(MinecraftVersionDetails minecraftVersionDetails, string serverJarPath, CancellationToken ct = default)
+    public async Task<MinecraftVersionInstallation> DownloadMinecraftServer(MinecraftVersionDetails minecraftVersionDetails, string serverJarPath, CancellationToken ct = default)
     {
         string jarEndpoint = minecraftVersionDetails.ServerUrl;
         if (string.IsNullOrEmpty(jarEndpoint)) throw new InvalidDataException("Server download url cannot be null or empty");
@@ -25,11 +25,19 @@ public class ApiMinecraftVersionRepository : IMinecraftVersionRepository
         await downloadStream.CopyToAsync(fileStream);
         await fileStream.FlushAsync();
         fileStream.Close();
+
+        return new MinecraftVersionInstallation()
+        {
+            JavaVersion = minecraftVersionDetails.JavaVersion,
+            MinecraftVersion = minecraftVersionDetails.MinecraftVersion,
+            MinecraftVersionType = minecraftVersionDetails.MinecraftVersionType,
+            ReleaseDate = minecraftVersionDetails.ReleaseDate
+        };
     }
 
-    public async Task<MinecraftVersionDetails> GetVersionDetailsAsync(MinecraftVersionInfo minecraftVersion, CancellationToken ct = default)
+    public async Task<MinecraftVersionDetails> GetVersionDetailsAsync(MinecraftVersionInfo minecraftVersionInfo, CancellationToken ct = default)
     {
-        string jsonResponse = await client.GetStringAsync(minecraftVersion.DetailsUrl, ct);
+        string jsonResponse = await client.GetStringAsync(minecraftVersionInfo.DetailsUrl, ct);
         JsonDocument doc = JsonDocument.Parse(jsonResponse);
 
         VersionDetailDto? dto = JsonSerializer.Deserialize<VersionDetailDto>(doc.RootElement) ?? null;
@@ -39,7 +47,10 @@ public class ApiMinecraftVersionRepository : IMinecraftVersionRepository
         return new MinecraftVersionDetails()
         {
             JavaVersion = dto.JavaVersion.MajorVersion,
-            ServerUrl = dto.Downloads.Server.Url
+            ServerUrl = dto.Downloads.Server.Url,
+            MinecraftVersion = minecraftVersionInfo.MinecraftVersion,
+            MinecraftVersionType = minecraftVersionInfo.MinecraftVersionType,
+            ReleaseDate = minecraftVersionInfo.ReleaseDate
         };
     }
 

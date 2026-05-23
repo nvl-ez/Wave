@@ -8,25 +8,14 @@ public sealed class Server
     public Guid Id { get; init; } = Guid.NewGuid();
     public required string Name { get; set; }
     public DateTime CreationDate { get; init; } = DateTime.Now;
-    public required MinecraftVersionInfo MinecraftVersionInfo { get; set; }
-    public required int? JavaVersion { get; set; }
+    public MinecraftVersionInstallation? MinecraftVersionInstallation { get; set; }
+
 
     /*******************
     * Physical Objects *
     *******************/
     public ServerPaths ServerPaths = new();
-    public Dictionary<string, string> Properties { get; set; } = new()
-    {
-        {"difficulty", "nromal"},
-        {"gamemode", "survival"},
-        {"level-seed", ""},
-        {"max-players", "16"},
-        {"motd", "A Minecraft Server"},
-        {"online-mode", "true"},
-        {"server-ip", ""},
-        {"spawn-protection", "16"},
-        {"view-distance", "8"}
-    };
+    public required Dictionary<string, string> Properties { get; set; }
     public bool Eula { get; set; } = false;
     public Modloader.ModloaderInstallation? Modloader { get; set; } = null;
     public string? ImageFilename { get; set; } = null;

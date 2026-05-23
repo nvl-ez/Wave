@@ -1,30 +1,44 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Class="Wave.Ui.Pages.ServerContent.Views.ServerPropertyInputView"
-             x:Name="Root">
+<ContentView
+    x:Class="Wave.Ui.Pages.ServerContent.Views.ServerPropertyInputView"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:form="clr-namespace:Wave.Ui.Views.FormComponents">
 
     <VerticalStackLayout
         toolkit:StateContainer.CurrentState="{Binding Source={x:Reference Root}, Path=ServerPropertyType}">
+
         <toolkit:StateContainer.StateViews>
 
-            <CheckBox toolkit:StateView.StateKey="Boolean"
-                      IsChecked="{Binding Source={x:Reference Root}, Path=IsChecked}"/>
+            <form:FormCheckBox
+                toolkit:StateView.StateKey="Boolean"
+                IsChecked="{Binding Source={x:Reference Root}, Path=IsChecked, Mode=TwoWay}"
+                IsRequired="False"/>
 
-            <Picker toolkit:StateView.StateKey="Options"
-                    ItemsSource="{Binding Source={x:Reference Root}, Path=Options}"
-                    ItemDisplayBinding="{Binding Value}"
-                    SelectedIndex="{Binding Source={x:Reference Root}, Path=ListIndex, Mode=TwoWay}"/>
+            <form:FormPicker
+                toolkit:StateView.StateKey="Options"
+                ItemsSource="{Binding Source={x:Reference Root}, Path=Options}"
+                ItemDisplayBinding="{Binding Value}"
+                SelectedIndex="{Binding Source={x:Reference Root}, Path=ListIndex, Mode=TwoWay}"
+                IsRequired="False"/>
 
-            <Entry toolkit:StateView.StateKey="Integer"
-                   Text="{Binding Source={x:Reference Root}, Path=StringValue, Mode=TwoWay}"/>
+            <form:FormEntry
+                toolkit:StateView.StateKey="Integer"
+                Text="{Binding Source={x:Reference Root}, Path=StringValue, Mode=TwoWay}"
+                IsRequired="False"/>
 
-            <Entry toolkit:StateView.StateKey="String"
-                   Text="{Binding Source={x:Reference Root}, Path=StringValue, Mode=TwoWay}"/>
+            <form:FormEntry
+                toolkit:StateView.StateKey="String"
+                Text="{Binding Source={x:Reference Root}, Path=StringValue, Mode=TwoWay}"
+                IsRequired="False"/>
 
         </toolkit:StateContainer.StateViews>
 
-        <Entry  Text="{Binding Source={x:Reference Root}, Path=StringValue, Mode=TwoWay}"/>
+        <form:FormEntry
+            Text="{Binding Source={x:Reference Root}, Path=StringValue, Mode=TwoWay}"
+            IsRequired="False"/>
+
     </VerticalStackLayout>
 </ContentView>

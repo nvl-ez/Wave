@@ -17,7 +17,7 @@ public partial class ServerCardViewModel : ObservableObject
     public string RunningState => IsRunning ? "Running" : "Stopped";
 
     [ObservableProperty]
-    public partial ServerInfo ServerInfo { get; set; }
+    public partial ServerQuery Server { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsRunning))]
@@ -26,18 +26,18 @@ public partial class ServerCardViewModel : ObservableObject
 
     public bool IsRunning => ServerSession is not null && ServerSession.IsRunning;
 
-    public string? Name => ServerInfo?.Name;
+    public string? Name => Server?.Name;
 
-    public ServerCardViewModel(ServerInfo serverInfo, IServerExecutorService serverExecutorService)
+    public ServerCardViewModel(ServerQuery serverInfo, IServerExecutorService serverExecutorService)
     {
-        ServerInfo = serverInfo;
+        Server = serverInfo;
         this.serverExecutorService = serverExecutorService;
     }
 
     [RelayCommand]
     public async Task LoadAsync()
     {
-        ServerSession = serverExecutorService.TryGetSession(ServerInfo.Id);
+        ServerSession = serverExecutorService.TryGetSession((Guid)Server.Id!);
     }
 
     [RelayCommand]
@@ -45,7 +45,7 @@ public partial class ServerCardViewModel : ObservableObject
     {
         var parameters = new ShellNavigationQueryParameters
         {
-            { "server", ServerInfo.Id}
+            { "server", Server.Id!}
         };
         await Shell.Current.GoToAsync(nameof(ServerPage), parameters);
     }
@@ -55,13 +55,13 @@ public partial class ServerCardViewModel : ObservableObject
     {
         if (!IsRunning)
         {
-            ServerSession = await serverExecutorService.Start(ServerInfo.Id);
+            ServerSession = await serverExecutorService.Start((Guid)Server.Id!);
             ServerSession.ServerDisposed += StopServerAsync;
         }
 
         var parameters = new ShellNavigationQueryParameters
         {
-            { "server", ServerInfo}
+            { "server", Server}
         };
         await Shell.Current.GoToAsync(nameof(ExecutionPage), parameters);
     }
@@ -77,7 +77,7 @@ public partial class ServerCardViewModel : ObservableObject
     {
         var parameters = new ShellNavigationQueryParameters
         {
-            { "server", ServerInfo}
+            { "server", Server}
         };
         await Shell.Current.GoToAsync(nameof(ExecutionPage), parameters);
     }

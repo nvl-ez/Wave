@@ -10,28 +10,45 @@
              x:Name="Root"
              x:DataType="viewModels:ServersViewModel">
 
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+            EventName="Appearing"
+            BindingContext="{Binding Source={x:Reference Root}, Path=BindingContext}"
+            Command="{Binding LoadCommand}"/>
+    </ContentPage.Behaviors>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <VerticalStackLayout Grid.Row="0"
+                             toolkit:StateContainer.CurrentState="{Binding ServerListStatus}">
+            <toolkit:StateContainer.StateViews>
+                <CollectionView toolkit:StateView.StateKey="Loaded"
+                                x:Name="serversCollection"
+                                ItemsSource="{Binding AllServers}"
+                                Grid.Row="0"
+                                Margin="20"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical"
+                                           ItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
 
-        <CollectionView x:Name="serversCollection"
-                        ItemsSource="{Binding AllServers}"
-                        Grid.Row="0"
-                        Margin="20"
-                        SelectionMode="None">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical"
-                                   ItemSpacing="10"/>
-            </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:ServerCardViewModel">
+                            <views:HorizontalServerCardView/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:ServerCardViewModel">
-                    <views:HorizontalServerCardView/>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                <BoxView toolkit:StateView.StateKey="Loading"/>
+            </toolkit:StateContainer.StateViews>
+            <BoxView/>
+        </VerticalStackLayout>
+
+
 
         <Button
             Text="New Server"

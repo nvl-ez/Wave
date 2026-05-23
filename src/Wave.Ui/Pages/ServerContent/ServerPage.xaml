@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServerContent.ViewModels"
              xmlns:navigation="clr-namespace:Wave.Ui.Views.Navigation"
              xmlns:views="clr-namespace:Wave.Ui.Pages.ServerContent.Views"
+             xmlns:form="clr-namespace:Wave.Ui.Views.FormComponents"
              x:Class="Wave.Ui.Pages.ServerContent.ServerPage"
              x:DataType="viewModels:ServerViewModel"
              x:Name="Root"
@@ -17,51 +18,47 @@
             Command="{Binding LoadCommand}"/>
     </ContentPage.Behaviors>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <form:Form Model="{Binding Server}"
+               SubmitCommand="{Binding SaveCommand}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <navigation:TabContainerView Grid.Row="0">
-            <navigation:TabView Text="General"
-                                Command="{Binding ShowGeneralViewCommand}"/>
-            <navigation:TabView Text="Mods"
-                                Command="{Binding ShowModsViewCommand}"/>
-            <navigation:TabView Text="Properties"
-                                Command="{Binding ShowPropertiesViewCommand}"/>
-        </navigation:TabContainerView>
+            <navigation:TabContainerView Grid.Row="0">
+                <navigation:TabView Text="General"
+                                    Command="{Binding ShowGeneralViewCommand}"/>
+                <navigation:TabView Text="Mods"
+                                    Command="{Binding ShowModsViewCommand}"/>
+                <navigation:TabView Text="Properties"
+                                    Command="{Binding ShowPropertiesViewCommand}"/>
+            </navigation:TabContainerView>
 
-        <VerticalStackLayout Grid.Row="1"
-                             toolkit:StateContainer.CurrentState="{Binding CurrentTab}">
-            <toolkit:StateContainer.StateViews>
-                <views:GeneralView toolkit:StateView.StateKey="General"/>
-                <views:ModsView toolkit:StateView.StateKey="Mods"/>
-                <views:PropertiesView toolkit:StateView.StateKey="Properties"/>
-            </toolkit:StateContainer.StateViews>
-            <views:GeneralView/>
-        </VerticalStackLayout>
 
-        <HorizontalStackLayout Grid.Row="2"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               Margin="20">
-
-            <VerticalStackLayout toolkit:StateContainer.CurrentState="{Binding ServerStatus}">
+            <VerticalStackLayout Grid.Row="1"
+                                 toolkit:StateContainer.CurrentState="{Binding CurrentTab}">
                 <toolkit:StateContainer.StateViews>
-                    <Button toolkit:StateView.StateKey="New"
-                            Text="Create"
-                            Command="{Binding CreateCommand}"/>
-                    <Button toolkit:StateView.StateKey="Ready"
-                            Text="Save"
-                            Command="{Binding SaveCommand}"/>
+                    <views:GeneralView toolkit:StateView.StateKey="General"/>
+                    <views:ModsView toolkit:StateView.StateKey="Mods"/>
+                    <views:PropertiesView toolkit:StateView.StateKey="Properties"/>
                 </toolkit:StateContainer.StateViews>
                 <views:GeneralView/>
             </VerticalStackLayout>
 
-            <Button Text="Delete"
-                    Command="{Binding DeleteCommand}"/>
-        </HorizontalStackLayout>
-    </Grid>
+
+            <HorizontalStackLayout Grid.Row="2"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   Margin="20">
+
+                <form:SubmitButton Text="Save"/>
+
+                <Button Text="Delete"
+                        Command="{Binding DeleteCommand}"/>
+            </HorizontalStackLayout>
+
+        </Grid>
+    </form:Form>
 </ContentPage>

@@ -35,17 +35,19 @@ public class ServerManagerService : IServerManagerService
         this.modloaderManagerService = modloaderManagerService;
     }
 
-    public async Task CreateServerAsync(ServerCreationQuery serverCreationQuery, CancellationToken ct = default)
+    public async Task<ServerQuery> CreateServerAsync(ServerQuery query, CancellationToken ct = default)
     {
         Server server = new()
         {
-            Name = serverCreationQuery.Name,
-            MinecraftVersionInfo = serverCreationQuery.MinecraftVersionInfo,
-            JavaVersion = null
+            Name = query.Name,
+            Properties = query.Properties,
+            Eula = query.Eula,
         };
 
+        serverPathResolver.CreateServerRootDirectory(server);
+
         //Download server files
-        server = await versionManagerService.SetVersionAsync(server);
+        server = await versionManagerService.SetVersionAsync(server, query);
 
         //Create server.properties
         serverPathResolver.CreateServerPropertiesFile(server);
@@ -53,18 +55,21 @@ public class ServerManagerService : IServerManagerService
 
         //Create eula
         serverPathResolver.CreateEulaFile(server);
-        await eulaManagerService.SetEulaAsync(server);
+        await eulaManagerService.SetEulaAsync(server, query);
 
         //Add modloader if necessary
-        ModloaderInfo? modloaderInfo = serverCreationQuery.ModloaderInfo;
+        ModloaderInfo? modloaderInfo = query.Modloader;
         if (modloaderInfo != null) await modloaderManagerService.AddModloaderAsync(server, modloaderInfo);
 
         // Save Server
         await serverRepository.SaveServerAsync(server);
+
+        return new ServerQuery(server);
     }
 
-    public async Task DeleteServerAsync(Server server, CancellationToken ct = default)
+    public async Task DeleteServerAsync(Guid id, CancellationToken ct = default)
     {
+        Server server = await GetServerAsync(id);
         string serverPath = serverPathResolver.GetServerRootDirectory(server);
 
         if (!Directory.Exists(serverPath)) throw new IOException($"Directory '{serverPath}' does not exist.");
@@ -74,27 +79,21 @@ public class ServerManagerService : IServerManagerService
         await serverRepository.DeleteServerAsync(server.Id);
     }
 
-    public async Task EditServerAsync(Server server, CancellationToken ct = default)
+    public async Task EditServerAsync(ServerQuery query, CancellationToken ct = default)
     {
-        string serverPath = serverPathResolver.GetServerRootDirectory(server);
-        if (!Directory.Exists(serverPath)) throw new IOException($"Directory '{serverPath}' does not exist.");
-
         /************
         * DIFFERING *
         ************/
-        Server old = await GetServerAsync(server.Id);
+        Server server = await GetServerAsync((Guid)query.Id);
 
         //Version
-        if (!string.Equals(old.MinecraftVersionInfo.MinecraftVersion, server.MinecraftVersionInfo.MinecraftVersion))
-        {
-            await versionManagerService.SetVersionAsync(server);
-        }
+        await versionManagerService.SetVersionAsync(server, query);
 
         //Save Properties
-        await propertiesManagerService.MergeSetPropertiesAsync(server);
+        await propertiesManagerService.MergeSetPropertiesAsync(server, query);
 
         // Save Eula
-        await eulaManagerService.SetEulaAsync(server);
+        await eulaManagerService.SetEulaAsync(server, query);
 
         // Save server
         await serverRepository.SaveServerAsync(server);
@@ -102,10 +101,10 @@ public class ServerManagerService : IServerManagerService
 
     public Server GetServer(Guid id)
     {
-        return serverRepository.GetAllServers().First(s => s.Id == id); //TODO: Cargar informacion del servidor desde los archivos
+        return serverRepository.GetAllServers().First(s => s.Id == id); //TODO: Cargar informacion del servidor desde los archivos like Async
     }
 
-    //CUIDADO: Get all servers devuelve datos de los servidores que pueden estar outdated si se han modificado los archivos manualmente.
+    //TODO: CUIDADO: Get all servers devuelve datos de los servidores que pueden estar outdated si se han modificado los archivos manualmente.
     public IEnumerable<Server> GetAllServers()
     {
         return serverRepository.GetAllServers().ToList();
@@ -127,5 +126,15 @@ public class ServerManagerService : IServerManagerService
         server.Eula = await eulaManagerService.TryGetEulaAsync(server);
 
         return server;
+    }
+
+    public async Task<ServerQuery> GetServerQueryAsync(Guid id, CancellationToken ct = default)
+    {
+        return new ServerQuery(await GetServerAsync(id));
+    }
+
+    public async Task<IEnumerable<ServerQuery>> GetAllServerQueriesAsync(CancellationToken ct = default)
+    {
+        return (await GetAllServersAsync()).Select(s => new ServerQuery(s));
     }
 }

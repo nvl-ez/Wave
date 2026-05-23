@@ -72,7 +72,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
             InstallerPath = filePath,
             InstallerVersion = latest.DownloadUrl,
             ModloaderVersion = modloaderInfo.Version,
-            MinecraftVersionInfo = modloaderInfo.MinecraftVersionInfo
+            MinecraftVersion = modloaderInfo.MinecraftVersion
         };
     }
 
@@ -88,7 +88,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
                 FileName = javaInstallation.ExecutableFile,
                 WorkingDirectory = Path.GetFullPath(modloaderPackage.InstallerPath),
 
-                Arguments = $"-jar \"{modloaderPackage.InstallerPath}\" -dir \"{targetDirectory}\" -mcversion {modloaderPackage.MinecraftVersionInfo.MinecraftVersion} -noprofile -snapshot -loader {modloaderPackage.ModloaderVersion}",
+                Arguments = $"-jar \"{modloaderPackage.InstallerPath}\" -dir \"{targetDirectory}\" -mcversion {modloaderPackage.MinecraftVersion} -noprofile -snapshot -loader {modloaderPackage.ModloaderVersion}",
                 UseShellExecute = false,
                 CreateNoWindow = true
             },
@@ -114,7 +114,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
         return new ModloaderInstallation()
         {
             Type = ModloaderType.Fabric,
-            MinecraftVersion = modloaderPackage.MinecraftVersionInfo.MinecraftVersion,
+            MinecraftVersion = modloaderPackage.MinecraftVersion,
             Version = modloaderPackage.InstallerVersion
         };
     }

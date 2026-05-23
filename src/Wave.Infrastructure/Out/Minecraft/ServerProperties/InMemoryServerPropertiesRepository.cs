@@ -150,9 +150,9 @@ public class InMemoryServerPropertyDefinitionRepository : IServerPropertyDefinit
         return serverProperties;
     }
 
-    public Task<IEnumerable<PropertyDefinition>> GetAllServerPropertiesAsync(CancellationToken ct = default)
+    public async Task<IEnumerable<PropertyDefinition>> GetAllServerPropertiesAsync(CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        return GetAllServerProperties();
     }
 
     public IEnumerable<PropertyDefinition> GetServerProperty(string key)

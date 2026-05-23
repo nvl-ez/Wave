@@ -9,5 +9,5 @@ public class ModloaderPackage
     public required string InstallerPath { get; set; }
     public required string InstallerVersion { get; set; }
     public required string ModloaderVersion { get; set; }
-    public required MinecraftVersionInfo MinecraftVersionInfo { get; set; }
+    public required string MinecraftVersion { get; set; }
 }

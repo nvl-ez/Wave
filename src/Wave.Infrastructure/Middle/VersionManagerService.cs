@@ -17,8 +17,13 @@ public class VersionManagerService : IVersionManagerService
         this.serverPathResolver = serverPathResolver;
     }
 
-    public async Task<Server> SetVersionAsync(Server server)
+    public async Task<Server> SetVersionAsync(Server server, ServerQuery serverQuery, CancellationToken ct = default)
     {
+        if (
+            serverQuery.MinecraftVersionBase is null ||
+            string.Equals(server.MinecraftVersionInstallation?.MinecraftVersion, serverQuery.MinecraftVersionBase.MinecraftVersion, StringComparison.OrdinalIgnoreCase)
+        ) return server;
+
         //Move old version if exists
         string oldJarPath = Path.Combine(serverPathResolver.GetServerRootDirectory(server), "old.jar");
         string jarPath = serverPathResolver.GetServerJarPath(server);
@@ -27,17 +32,16 @@ public class VersionManagerService : IVersionManagerService
             File.Move(jarPath, oldJarPath, true);
         }
 
-        int? oldRequiredJavaVersion = server.JavaVersion;
+        MinecraftVersionInstallation? oldMinecraftVersionInstallation = server.MinecraftVersionInstallation;
 
         try
         {
-            MinecraftVersionDetails details = await minecraftVersionRepository.GetVersionDetailsAsync(server.MinecraftVersionInfo);
-            server.JavaVersion = details.JavaVersion;
-            await minecraftVersionRepository.DownloadMinecraftServer(details, jarPath);
+            MinecraftVersionDetails details = await minecraftVersionRepository.GetVersionDetailsAsync((MinecraftVersionInfo)serverQuery.MinecraftVersionBase);
+            server.MinecraftVersionInstallation = await minecraftVersionRepository.DownloadMinecraftServer(details, jarPath);
         }
         catch (Exception)
         {
-            server.JavaVersion = oldRequiredJavaVersion;
+            server.MinecraftVersionInstallation = oldMinecraftVersionInstallation;
             if (File.Exists(oldJarPath))
             {
                 File.Move(oldJarPath, jarPath, true);

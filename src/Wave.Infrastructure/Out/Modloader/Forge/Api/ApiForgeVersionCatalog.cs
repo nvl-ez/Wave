@@ -35,7 +35,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
                 forgeVersions.Add(Mapper.ToDomain(versionBundle, minecraftVersionInfo));
             }
 
-            forgeVersions = forgeVersions.Where(f => minecraftVersionInfo.MinecraftVersion == f.MinecraftVersionInfo.MinecraftVersion).ToList();
+            forgeVersions = forgeVersions.Where(f => minecraftVersionInfo.MinecraftVersion == f.MinecraftVersion).ToList();
         }
         catch (HttpRequestException)
         {
@@ -50,7 +50,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
         //Download latest installer
         string filePath = "";
 
-        string mcVersion = modloaderInfo.MinecraftVersionInfo.MinecraftVersion;
+        string mcVersion = modloaderInfo.MinecraftVersion;
         string forgeVersion = modloaderInfo.Version;
         using (
             var response = await client.GetAsync(
@@ -81,7 +81,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
             InstallerPath = filePath,
             InstallerVersion = "latest",
             ModloaderVersion = modloaderInfo.Version,
-            MinecraftVersionInfo = modloaderInfo.MinecraftVersionInfo
+            MinecraftVersion = modloaderInfo.MinecraftVersion
         };
     }
 
@@ -123,7 +123,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
         return new ModloaderInstallation()
         {
             Type = ModloaderType.Fabric,
-            MinecraftVersion = modloaderPackage.MinecraftVersionInfo.MinecraftVersion,
+            MinecraftVersion = modloaderPackage.MinecraftVersion,
             Version = modloaderPackage.InstallerVersion
         };
     }

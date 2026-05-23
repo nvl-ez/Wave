@@ -15,7 +15,7 @@ public static class Mapper
         return new ModloaderInfo()
         {
             Version = version,
-            MinecraftVersionInfo = minecraftVersionInfo,
+            MinecraftVersion = minecraftVersionInfo.MinecraftVersion,
             DowloadUrl = $"https://maven.minecraftforge.net/net/minecraftforge/forge/{dto}/forge-{dto}-installer.jar",
             ModloaderType = ModloaderType.Forge
         };

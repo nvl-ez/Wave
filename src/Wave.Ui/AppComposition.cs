@@ -25,8 +25,9 @@ namespace Wave.Ui;
 public static class AppComposition
 {
     //APP FOLDER NAME
-    private const string serverDirectoryName = "Servers";
+    private const string serversDirectoryName = "Servers";
     private const string javaDirectoryName = "Java";
+    private const string tmpDirectoryName = "tmp";
 
 
     // OUT PORTS
@@ -52,17 +53,19 @@ public static class AppComposition
     private static IPropertiesManagerService propertiesManagerService;
     private static IEulaManagerService eulaManagerService;
     private static IVersionManagerService versionManagerService;
+    private static IModloaderManagerService modloaderManagerService;
+    private static IServerPathResolver serverPathResolver;
 
     static AppComposition()
     {
         string appDirectory = FileSystem.AppDataDirectory;
-        string serverDirectory = Path.Combine(appDirectory, serverDirectoryName);
+        string serversDirectory = Path.Combine(appDirectory, serversDirectoryName);
         string javaDirectory = Path.Combine(appDirectory, javaDirectoryName);
-        string javaTmpDirectory = Path.Combine(javaDirectory, "tmp");
+        string tmpDirectory = Path.Combine(appDirectory, tmpDirectoryName);
         Directory.CreateDirectory(appDirectory);
-        Directory.CreateDirectory(serverDirectory);
+        Directory.CreateDirectory(serversDirectory);
         Directory.CreateDirectory(javaDirectory);
-        Directory.CreateDirectory(javaTmpDirectory);
+        Directory.CreateDirectory(tmpDirectory);
 
 
         // OUT PORTS
@@ -72,8 +75,8 @@ public static class AppComposition
         serverPropertiesRepository = new ServerPropertiesRepository();
         serverExecutor = new WindowsServerExecutor(); //TODO: Add OSs
         javaInstallRepository = new JsonJavaRepository(javaDirectory);
-        adoptiumJavaSupplier = new ApiAdoptiumJavaSupplier(javaTmpDirectory);
-        mojangJavaSupplier = new ApiMojangJavaSupplier(javaTmpDirectory);
+        adoptiumJavaSupplier = new ApiAdoptiumJavaSupplier(tmpDirectory);
+        mojangJavaSupplier = new ApiMojangJavaSupplier(tmpDirectory);
         compressedJavaInstaller = new CompressedJavaInstaller(javaDirectory);
         manifestJavaInstaller = new ManifestJavaInstaller(javaDirectory);
         windowsDeviceInformationRepository = new WindowsDeviceInformationRepository();
@@ -81,13 +84,16 @@ public static class AppComposition
 
 
         //SERVICES
-        propertiesManagerService = new PropertiesManagerService(serverPropertiesRepository);
-        eulaManagerService = new EulaManagerService(serverEulaRepository);
-        versionManagerService = new VersionManagerService(minecraftVersionRepository);
+        serverPathResolver = new ServerPathResolver(appDirectory, serversDirectory, tmpDirectory);
+        propertiesManagerService = new PropertiesManagerService(serverPathResolver, serverPropertiesRepository);
+        eulaManagerService = new EulaManagerService(serverPathResolver, serverEulaRepository);
+        versionManagerService = new VersionManagerService(serverPathResolver, minecraftVersionRepository);
+        modloaderManagerService = new ModloaderManagerService(serverPathResolver, [], javaInstallRepository);
+
 
         minecraftCatalogService = new MinecraftCatalogService(minecraftVersionRepository, serverPropertyDefinitionRepository);
-        serverHandlerService = new ServerManagerService(serverDirectory, serverRepository, versionManagerService, propertiesManagerService, eulaManagerService);
-        serverExecutorService = new ServerExecutorService(serverExecutor, serverRepository, javaInstallRepository);
+        serverHandlerService = new ServerManagerService(serverPathResolver, serverRepository, versionManagerService, propertiesManagerService, eulaManagerService, modloaderManagerService);
+        serverExecutorService = new ServerExecutorService(serverPathResolver, serverExecutor, serverRepository, javaInstallRepository);
         javaManagerService = new JavaManagerService(javaInstallRepository, [adoptiumJavaSupplier, mojangJavaSupplier], [compressedJavaInstaller, manifestJavaInstaller]);
         deviceInformationService = new DeviceInformationService(windowsDeviceInformationRepository);
     }

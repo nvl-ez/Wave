@@ -12,7 +12,7 @@ public static class Mapper
         return new ModloaderInfo()
         {
             Version = dto.Loader.Version,
-            MinecraftVersionInfo = minecraftVersionInfo,
+            MinecraftVersion = minecraftVersionInfo.MinecraftVersion,
             DowloadUrl = $"https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.1.1/fabric-installer-1.1.1.jar",
             ModloaderType = ModloaderType.Fabric
         };

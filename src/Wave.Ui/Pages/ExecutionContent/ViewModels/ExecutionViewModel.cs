@@ -22,7 +22,7 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
     // Main Objects
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Name))]
-    public partial ServerInfo? ServerInfo { get; set; }
+    public partial ServerQuery? Server { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanStopServer))]
@@ -34,7 +34,7 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
     public partial ObservableCollection<string> Logs { get; set; } = new ObservableCollection<string>();
 
     // Properties
-    public string? Name => ServerInfo?.Name;
+    public string? Name => Server?.Name;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanSendCommand))]
@@ -61,10 +61,10 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     public async Task LoadAsync()
     {
-        if (ServerInfo is not null)
+        if (Server is not null)
         {
             await StopReadLoopAsync();
-            ServerSession = serverExecutorService.TryGetSession(ServerInfo.Id);
+            ServerSession = serverExecutorService.TryGetSession((Guid)Server.Id!);
             if (ServerSession is not null)
             {
                 StartReadLoop(ServerSession);
@@ -89,14 +89,14 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     public async Task StartServer()
     {
-        if (ServerInfo is null)
+        if (Server is null)
             return;
 
         await serverLock.WaitAsync();
         try
         {
             // Start the new server/session first
-            var newSession = await serverExecutorService.Start(ServerInfo.Id);
+            var newSession = await serverExecutorService.Start((Guid)Server.Id!);
             newSession.ServerDisposed += StopServer;
 
             // Stop only the old reader loop, not the old server process
@@ -120,7 +120,7 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
 
         if (query.ContainsKey("server"))
         {
-            ServerInfo = (ServerInfo)query["server"];
+            Server = (ServerQuery)query["server"];
         }
     }
 
@@ -219,7 +219,7 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
     // Event Delegates
     private async void StopServer(object? sender, Guid id)
     {
-        if (ServerInfo is not null && id == ServerInfo.Id)
+        if (Server is not null && id == Server.Id)
         {
             await DisposeServer();
         }

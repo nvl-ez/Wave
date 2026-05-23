@@ -8,11 +8,13 @@ public class ServerPathResolver : IServerPathResolver
 {
     private readonly string appDirectory;
     private readonly string serversDirectory;
+    private readonly string tmpDirectory;
 
-    public ServerPathResolver(string appDirectory, string serversDirectory)
+    public ServerPathResolver(string appDirectory, string serversDirectory, string tmpDirectory)
     {
         this.appDirectory = appDirectory;
         this.serversDirectory = serversDirectory;
+        this.tmpDirectory = tmpDirectory;
     }
 
     public string GetServerRootDirectory(Server server)
@@ -81,7 +83,7 @@ public class ServerPathResolver : IServerPathResolver
 
     public string GetTmpDirectory()
     {
-        return Path.Combine(appDirectory, "tmp");
+        return tmpDirectory;
     }
 
     public string CreateTmpDirectory()

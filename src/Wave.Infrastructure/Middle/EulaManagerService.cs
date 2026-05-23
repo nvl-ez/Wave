@@ -16,9 +16,9 @@ public class EulaManagerService : IEulaManagerService
         this.serverEulaRepository = serverEulaRepository;
     }
 
-    public async Task SetEulaAsync(Server server, CancellationToken ct = default)
+    public async Task SetEulaAsync(Server server, ServerQuery serverQuery, CancellationToken ct = default)
     {
-        await serverEulaRepository.SetAsync(serverPathResolver.GetEulaPath(server), server.Eula);
+        await serverEulaRepository.SetAsync(serverPathResolver.GetEulaPath(server), serverQuery.Eula);
     }
 
     public async Task<bool> TryGetEulaAsync(Server server, CancellationToken ct = default)

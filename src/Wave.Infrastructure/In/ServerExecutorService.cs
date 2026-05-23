@@ -36,7 +36,7 @@ public class ServerExecutorService : IServerExecutorService
     {
         Server server = (await serverRepository.GetAllServersAsync()).First(s => s.Id == id);
 
-        int? serverJavaVersion = server.JavaVersion;
+        int? serverJavaVersion = server.MinecraftVersionInstallation.JavaVersion;
 
         if (serverJavaVersion is null) throw new JavaInstallationNotFoundException($"Server does not have a required Java version. Has a jar been downloaded?");
 

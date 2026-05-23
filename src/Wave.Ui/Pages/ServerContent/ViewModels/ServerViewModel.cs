@@ -19,130 +19,50 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     ****************************/
     //Pseudo Navigation
     [ObservableProperty]
-    public partial string CurrentTab { get; set; } = "General";
+    public partial string CurrentTab { get; set; } = "General"; //General, Mods, Properties
 
 
     //States
     [ObservableProperty]
     public partial string MinecraftVersionsStatus { get; set; } = "Loading"; //Loading, Done, Error
     [ObservableProperty]
-    public partial string ServerPropertiesStatus { get; set; } = "Loading";
-    public string ServerStatus => Server.IsReady ? "Ready" : "New"; //New, Ready
+    public partial string ServerPropertiesStatus { get; set; } = "Loading"; //Loading, Done, Error
 
     //Server
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleName))]
-    [NotifyPropertyChangedFor(nameof(Name))]
-    [NotifyPropertyChangedFor(nameof(Motd))]
-    [NotifyPropertyChangedFor(nameof(MinecraftVersionInfo))]
     [NotifyPropertyChangedFor(nameof(MinecraftVersionIndex))]
-    [NotifyPropertyChangedFor(nameof(GamemodeValue))]
-    [NotifyPropertyChangedFor(nameof(DifficultyValue))]
-    [NotifyPropertyChangedFor(nameof(MotdValue))]
-    [NotifyPropertyChangedFor(nameof(ServerIpValue))]
-    [NotifyPropertyChangedFor(nameof(MaxPlayersValue))]
-    [NotifyPropertyChangedFor(nameof(ServerStatus))]
-    [NotifyPropertyChangedFor(nameof(EulaIndex))]
-    private partial Server Server { get; set; } = new Server();
-    private ServerInfo Info => Server.Info;
-    private ServerDetails Details => Server.Details;
+    public partial ServerQuery Server { get; set; } = new();
 
-    public string TitleName => Server is null ? "New Server" : Name;
-    public string Name
-    {
-        get => Server is null ? "" : Info.Name;
-        set
-        {
-            if (Server is not null && value != Info.Name)
-            {
-                Info.Name = value;
-            }
-        }
-    }
-    public string Motd
-    {
-        get => Details.Properties.ContainsKey("motd") ? Details.Properties["motd"] : "";
-        set
-        {
-            if (Server is not null && Details.Properties.ContainsKey("motd") && value != Details.Properties["motd"])
-            {
-                Details.Properties["motd"] = value;
-            }
-        }
-    }
-    public DateTime? CreationDate => Server is null ? null : Info.CreationDate;
+    public string TitleName => Server.Id is null ? "New Server" : Server.Name!;
+    public DateTime? CreationDate => Server is null ? null : Server.CreationDate;
 
     //Versions
-    public MinecraftVersionInfo? MinecraftVersionInfo
-    {
-        get => Details.MinecraftVersion;
-        set
-        {
-            if (value is null) return;
-
-            Details.MinecraftVersion = value;
-        }
-    }
     [ObservableProperty]
     public partial List<MinecraftVersionInfo> MinecraftVersionsInfos { get; set; } = new List<MinecraftVersionInfo>();
     [ObservableProperty]
     public partial bool IncludeSnapshots { get; set; } = false;
-    public int? MinecraftVersionIndex => MinecraftVersionsInfos?.FindIndex(mv => mv.MinecraftVersion == MinecraftVersionInfo?.MinecraftVersion);
+    public int? MinecraftVersionIndex => MinecraftVersionsInfos?.FindIndex(mv => mv.MinecraftVersion == Server.MinecraftVersionBase?.MinecraftVersion);
 
     //Gamemode
-    public string GamemodeValue
-    {
-        get { return Details.Properties["gamemode"]; }
-        set { Details.Properties["gamemode"] = value; }
-    }
     [ObservableProperty]
     public partial PropertyDefinition? GamemodeServerProperty { get; set; } = null;
     //Difficulty
-    public string DifficultyValue
-    {
-        get { return Details.Properties["difficulty"]; }
-        set { Details.Properties["difficulty"] = value; }
-    }
     [ObservableProperty]
     public partial PropertyDefinition? DifficultyServerProperty { get; set; } = null;
     //Motd
-    public string MotdValue
-    {
-        get { return Details.Properties["motd"]; }
-        set { Details.Properties["motd"] = value; }
-    }
     [ObservableProperty]
     public partial PropertyDefinition? MotdServerProperty { get; set; } = null;
     //Ip
-    public string ServerIpValue
-    {
-        get { return Details.Properties["server-ip"]; }
-        set { Details.Properties["server-ip"] = value; }
-    }
     [ObservableProperty]
     public partial PropertyDefinition? ServerIpServerProperty { get; set; } = null;
     //Max Players
-    public string MaxPlayersValue
-    {
-        get { return Details.Properties["max-players"]; }
-        set { Details.Properties["max-players"] = value; }
-    }
     [ObservableProperty]
     public partial PropertyDefinition? MaxPlayersServerProperty { get; set; } = null;
+
     //Eula
-    public List<KeyValuePair<bool, string>> EulaOptions { get; set; } = [new KeyValuePair<bool, string>(true, "Agree"), new KeyValuePair<bool, string>(false, "Disagree")];
-    public int EulaIndex
-    {
-        get
-        {
-            return EulaOptions.FindIndex(e => e.Key == Server.Details.Eula);
-        }
-        set
-        {
-            if (value >= 0 && value < EulaOptions.Count)
-                Server.Details.Eula = EulaOptions[value].Key;
-        }
-    }
+    public List<KeyValuePair<bool, string>> EulaOptions { get; set; } = [new KeyValuePair<bool, string>(true, "Agree"), new KeyValuePair<bool, string>(false, "Disagree")]; //TODO: Arreglar eula
+
 
     /***************
     * CONSTRUCTORS *
@@ -152,14 +72,6 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         this.minecraftCatalogService = minecraftCatalogService;
         this.serverHandlerService = serverHandlerService;
     }
-
-    public ServerViewModel(Server server, IMinecraftCatalogService minecraftCatalogService, IServerManagerService serverHandlerService)
-    {
-        this.Server = server;
-        this.minecraftCatalogService = minecraftCatalogService;
-        this.serverHandlerService = serverHandlerService;
-    }
-
 
     /**********
     * METHODS *
@@ -189,16 +101,14 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         if (query.ContainsKey("server"))
         {
             Guid serverId = (Guid)query["server"];
-            Server = await serverHandlerService.GetServerAsync(serverId);
+            Server = await serverHandlerService.GetServerQueryAsync(serverId);
         }
         else
         {
-            Server = new Server();
+            Server = new ServerQuery();
         }
     }
 
-
-    //API Petitions
     [RelayCommand]
     public async Task LoadAsync()
     {
@@ -206,6 +116,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         RequestServerPropertiesAsync();
     }
 
+    //API Petitions
     [RelayCommand]
     private async Task RequestMinecraftVersionsAsync()
     {
@@ -219,51 +130,40 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         else MinecraftVersionsStatus = "Error";
     }
 
-    private void RequestServerPropertiesAsync()
+    private async void RequestServerPropertiesAsync()
     {
         ServerPropertiesStatus = "Loading";
 
-        GamemodeServerProperty = minecraftCatalogService.GetServerPropertyDefinition("gamemode");
-        DifficultyServerProperty = minecraftCatalogService.GetServerPropertyDefinition("difficulty");
-
+        GamemodeServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("gamemode");
+        DifficultyServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("difficulty");
+        MotdServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("motd");
+        ServerIpServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("server-ip");
+        MaxPlayersServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("max-players");
 
         ServerPropertiesStatus = "Done";
-
     }
 
     //Server
     [RelayCommand]
     public async Task SaveAsync()
     {
-        await serverHandlerService.EditServerAsync(Server);
-        var parameters = new ShellNavigationQueryParameters
-        {
-            { "saved", Server!.Id}
-        };
-        await Shell.Current.GoToAsync("..", parameters);
-    }
+        if (Server.Id is not null)
+            await serverHandlerService.EditServerAsync(Server);
+        else
+            await serverHandlerService.CreateServerAsync(Server);
 
-    [RelayCommand]
-    public async Task CreateAsync()
-    {
-        if (Server is null) return;
-        await serverHandlerService.CreateServerAsync(Server);
-        var parameters = new ShellNavigationQueryParameters
-        {
-            { "created", Server!.Id}
-        };
-        await Shell.Current.GoToAsync("..", parameters);
+        await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
     public async Task DeleteAsync()
     {
-        if (Server is null) return;
+        if (Server?.Id is null) return;
 
-        await serverHandlerService.DeleteServerAsync(Server);
+        await serverHandlerService.DeleteServerAsync((Guid)Server.Id);
         var parameters = new ShellNavigationQueryParameters
         {
-            { "deleted", Server!.Id}
+            { "deleted", Server.Id}
         };
         await Shell.Current.GoToAsync("..", parameters);
     }
