@@ -1,14 +1,19 @@
 using System;
+using System.Net;
 using System.Text.Json;
 using Wave.Application.Out.ModSupplier;
 using Wave.Domain.Mods;
+using Wave.Domain.Utils;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Dtos;
+using Markdig;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Modrinth.Api;
 
 public class ApiModrinthModSupplier : IModSupplierIntegration
 {
     private readonly HttpClient client;
+
+    public ModSupplierType ModSupplierType { get => ModSupplierType.Modrinth; }
 
     public ApiModrinthModSupplier()
     {
@@ -19,41 +24,12 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
         client.DefaultRequestHeaders.Add("User-Agent", "nvl-ez/Wave (nahuelvazquezlevrino@gmail.com)");
     }
 
-    public Task DownloadMod(ModVersion modVersion, string modsPath, CancellationToken ct = default)
+    public bool CanHandle(ModSupplierType modSupplierType)
     {
-        throw new NotImplementedException();
+        return modSupplierType == ModSupplierType;
     }
 
-    public async Task<IEnumerable<ModVersion>> GetModVersionsAsync(ModInfo modInfo, CancellationToken ct = default)
-    {
-        Dictionary<string, string> queryParameters = new Dictionary<string, string>();
-        string loaderString = Mapper.ToDtoModloaderType(modInfo.ModloaderType);
-        queryParameters.Add("loaders", $"[\"{loaderString}\"]");
-        queryParameters.Add("game_versions", $"[\"{modInfo.MinecraftVersion}\"]");
-
-        string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
-
-        List<ModVersion> mods = new List<ModVersion>();
-        try
-        {
-            string jsonResponse = await client.GetStringAsync($"/v2/project/{modInfo.ModId}/version?{queryString}", ct);
-            JsonDocument doc = JsonDocument.Parse(jsonResponse);
-            JsonElement rootElement = doc.RootElement;
-
-            List<ProjectVersionDto> dto = JsonSerializer.Deserialize<List<ProjectVersionDto>>(rootElement) ?? new List<ProjectVersionDto>();
-            foreach (ProjectVersionDto versionDto in dto)
-            {
-                mods.Add(Mapper.ToDomain(versionDto, modInfo));
-            }
-        }
-        catch (HttpRequestException)
-        {
-            Console.WriteLine("Error when contacting Modrinth");
-        }
-        return mods;
-    }
-
-    public async Task<IEnumerable<ModInfo>> SearchModsAsync(ModSupplierQuery modSupplierQuery, CancellationToken ct = default)
+    public async Task<ModInfoSupplierResponse> SearchModsAsync(ModInfoSupplierQuery modSupplierQuery, CancellationToken ct = default)
     {
         //Build Query Arguments
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
@@ -71,8 +47,8 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
                 queryParameters.Add("query", modSupplierQuery.Author);
             }
         }
-        queryParameters.Add("offset", modSupplierQuery.Offset.ToString());
-        queryParameters.Add("limit", modSupplierQuery.PageSize.ToString());
+        queryParameters.Add("offset", modSupplierQuery.PaginationState.Index.ToString());
+        queryParameters.Add("limit", modSupplierQuery.PaginationState.PageSize.ToString());
 
         string loaderString = Mapper.ToDtoModloaderType(modSupplierQuery.ModloaderType);
         string facets = $"[[\"categories:{loaderString}\"],[\"versions:{modSupplierQuery.MinecraftVersion}\"],[\"project_type:mod\"]]";
@@ -81,6 +57,7 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
         List<ModInfo> mods = new List<ModInfo>();
+        PaginationState paginationState = new PaginationState();
         try
         {
             string jsonResponse = await client.GetStringAsync($"/v2/search?{queryString}", ct);
@@ -92,11 +69,97 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
             {
                 mods.Add(Mapper.ToDomain(modDto, modSupplierQuery));
             }
+            paginationState = Mapper.ToDomain(dto);
         }
         catch (HttpRequestException)
         {
             Console.WriteLine("Error when contacting Modrinth");
         }
-        return mods;
+        return new()
+        {
+            Mods = mods,
+            PaginationState = paginationState
+        };
+    }
+
+    public async Task<ModDetails> GetModDetailsAsync(string modId, CancellationToken ct = default)
+    {
+
+        string jsonResponse = await client.GetStringAsync($"/v2/project/{modId}", ct);
+        JsonDocument doc = JsonDocument.Parse(jsonResponse);
+        JsonElement rootElement = doc.RootElement;
+
+        ProjectDetailsDto dto = JsonSerializer.Deserialize<ProjectDetailsDto>(rootElement) ?? new ProjectDetailsDto();
+
+        return new()
+        {
+            ModDescription = BuildHtml(dto.Body),
+            ModDescriptionType = ModDescriptionType.Html
+        };
+    }
+
+    public async Task<ModVersionSupplierResponse> GetModVersionsAsync(ModVersionSupplierQuery modInfo, CancellationToken ct = default)
+    {
+        Dictionary<string, string> queryParameters = new Dictionary<string, string>();
+        string loaderString = Mapper.ToDtoModloaderType(modInfo.ModloaderType);
+        queryParameters.Add("loaders", $"[\"{loaderString}\"]");
+        queryParameters.Add("game_versions", $"[\"{modInfo.MinecraftVersion}\"]");
+
+        string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
+
+        List<ModVersion> versions = new List<ModVersion>();
+        PaginationState paginationState = new PaginationState();
+        try
+        {
+            string jsonResponse = await client.GetStringAsync($"/v2/project/{modInfo.ModId}/version?{queryString}", ct);
+            JsonDocument doc = JsonDocument.Parse(jsonResponse);
+            JsonElement rootElement = doc.RootElement;
+
+            List<ProjectVersionDto> dto = JsonSerializer.Deserialize<List<ProjectVersionDto>>(rootElement) ?? new List<ProjectVersionDto>();
+            foreach (ProjectVersionDto versionDto in dto)
+            {
+                versions.Add(Mapper.ToDomain(versionDto, modInfo));
+            }
+            paginationState = new()
+            {
+                Index = 0,
+                PageSize = versions.Count,
+                ResultCount = versions.Count,
+                TotalCount = versions.Count
+            };
+        }
+        catch (HttpRequestException)
+        {
+            Console.WriteLine("Error when contacting Modrinth");
+        }
+        return new()
+        {
+            Versions = versions,
+            PaginationState = paginationState
+        };
+    }
+
+    public Task DownloadMod(ModVersion modVersion, string modsPath, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    private string BuildHtml(string body)
+    {
+
+        var html = Markdown.ToHtml(body);
+        var decodedHtml = WebUtility.HtmlDecode(html);
+
+        return $"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        {decodedHtml}
+    </body>
+    </html>
+    """;
     }
 }

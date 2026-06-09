@@ -21,26 +21,12 @@ public class ModloaderManagerService : IModloaderManagerService
         this.javaInstallRepository = javaInstallRepository;
     }
 
-    public async Task<IEnumerable<ModloaderInfo>> GetModloaderVersionsAsync(ModloaderType modloaderType, string minecraftVersion, CancellationToken ct = default)
-    {
-        IModloaderVersionCatalog? targetModloader = null;
-        foreach (var modloader in modloaders)
-        {
-            if (modloader.CanHandleType(modloaderType))
-            {
-                targetModloader = modloader;
-                break;
-            }
-        }
-
-        if (targetModloader is null) throw new InvalidDataException($"There is no modloader that can handle the typ {modloaderType}.");//TODO: Fix error handling
-
-        return await targetModloader.GetModloaderVersionsAsync(minecraftVersion);
-    }
-
-    public async Task<Server> AddModloaderAsync(Server server, ModloaderInfo modloaderInfo, CancellationToken ct = default)
+    public async Task<Server> AddModloaderAsync(Server server, ServerQuery query, CancellationToken ct = default)
     {
         if (server.Modloader is not null) throw new InvalidDataException($"The server already has an installed modloader.");
+        if (query.Modloader is null || query.Modloader is not ModloaderInfo) return server;
+
+        ModloaderInfo modloaderInfo = (ModloaderInfo)query.Modloader;
 
         //Find modloader manager that can handle the request
         IModloaderVersionCatalog? target = null;
@@ -100,8 +86,11 @@ public class ModloaderManagerService : IModloaderManagerService
         var directories = Directory.GetDirectories(serverDirectory, "*", SearchOption.AllDirectories);
         foreach (var directory in directories)
         {
-            if (modloaderNames.Any(c => Path.GetDirectoryName(directory)!.Contains(c, StringComparison.OrdinalIgnoreCase)))
+            if (
+                modloaderNames.Any(c => Path.GetDirectoryName(directory)!.Contains(c, StringComparison.OrdinalIgnoreCase))
+                && Directory.Exists(directory))
             {
+
                 Directory.Delete(directory, true);
             }
         }
@@ -110,7 +99,9 @@ public class ModloaderManagerService : IModloaderManagerService
         var files = Directory.GetFiles(serverPathResolver.GetTmpDirectory(), "*", SearchOption.AllDirectories);
         foreach (string file in files)
         {
-            if (modloaderNames.Any(c => Path.GetFileName(file).Contains(c, StringComparison.OrdinalIgnoreCase)))
+            if (
+                modloaderNames.Any(c => Path.GetFileName(file).Contains(c, StringComparison.OrdinalIgnoreCase))
+                && File.Exists(file))
             {
                 File.Delete(file);
             }

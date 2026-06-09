@@ -16,11 +16,11 @@ public class ModloaderCatalogService : IModloaderCatalogService
         this.modloaders = modloaders;
     }
 
-    public async Task<IEnumerable<KeyValuePair<string, ModloaderType>>> GetModloaderTypesAsync(CancellationToken ct = default)
+    public async Task<IEnumerable<KeyValuePair<ModloaderType, string>>> GetModloaderTypesAsync(CancellationToken ct = default)
     {
         TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
         return modloaders.Select(
-            m => new KeyValuePair<string, ModloaderType>(ti.ToTitleCase(m.ModloaderType.ToString()), m.ModloaderType)
+            m => new KeyValuePair<ModloaderType, string>(m.ModloaderType, ti.ToTitleCase(m.ModloaderType.ToString()))
         );
     }
 

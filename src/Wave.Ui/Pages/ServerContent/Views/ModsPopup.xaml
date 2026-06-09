@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServerContent.ViewModels"
+             xmlns:views="clr-namespace:Wave.Ui.Pages.ServerContent.Views"
+             xmlns:collectionComponents="clr-namespace:Wave.Ui.Views.CollectionComponents"
+             xmlns:form="clr-namespace:Wave.Ui.Views.FormComponents"
+             x:Class="Wave.Ui.Pages.ServerContent.Views.ModsPopup"
+             x:DataType="viewModels:ModsPopupViewModel"
+             x:Name="Root"
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}"
+             MinimumWidthRequest="1000"
+             MinimumHeightRequest="700"
+             WidthRequest="1500">
+
+    <ContentView.Behaviors>
+        <toolkit:EventToCommandBehavior
+            x:DataType="viewModels:ModsPopupViewModel"
+            EventName="Loaded"
+            BindingContext="{Binding BindingContext,
+                                 Source={x:Reference Root},
+                                 x:DataType=views:ModsPopup}"
+            Command="{Binding LoadCommand}"/>
+    </ContentView.Behaviors>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!-- Header -->
+        <Grid Grid.Row="0"
+              Grid.Column="0"
+              Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0"
+                   Text="Mod Browser"
+                   FontAttributes="Bold"
+                   FontSize="24"/>
+            <Button Grid.Column="1"
+                    Text="X"
+                    Command="{Binding ClosePopupCommand}"/>
+        </Grid>
+
+        <!-- Searcher -->
+        <form:Form Grid.Row="1"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="3"
+                   Model="{Binding ModInfoSupplierQuery}"
+                   SubmitCommand="{Binding SearchModsCommand}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Mod Supplier Query -->
+                <Label Text="Mod Supplier:"
+                       Grid.Row="0"
+                       Grid.Column="0"/>
+
+                <form:FormPicker Grid.Row="1"
+                                 Grid.Column="0"
+                                 IsRequired="True"
+                                 ItemsSource="{Binding ModSupplierTypes}"
+                                 ItemDisplayBinding="{Binding Value}"
+                                 SelectedValueMemberPath="Key"
+                                 SelectedValueModelPath="ModSupplierType"/>
+
+                <!-- Text Query -->
+                <Label Text="Text:"
+                       Grid.Row="0"
+                       Grid.Column="1"/>
+                <form:FormEntry Grid.Row="1"
+                                Grid.Column="1"
+                                TextModelPath="TextQuery"/>
+
+                <!-- Author Query -->
+                <Label Text="Author:"
+                       Grid.Row="0"
+                       Grid.Column="2"/>
+                <form:FormEntry Grid.Row="1"
+                                Grid.Column="2"
+                                TextModelPath="Author"/>
+
+                <!-- Search Button -->
+                <form:SubmitButton Text="Search"
+                                   Grid.Row="1"
+                                   Grid.Column="3"/>
+            </Grid>
+        </form:Form>
+
+        <!-- Returned Mods -->
+        <collectionComponents:PaginatedCollectionView Grid.Row="2"
+                                                      Grid.Column="0"
+                                                      x:Name="ModsCollection"
+                                                      NavigateCommand="{Binding PaginatedSearchModsCommand}"
+                                                      PaginationState="{Binding ObservablePaginationState}"
+                                                      ItemsSource="{Binding ModInfos}"
+                                                      SelectionMode="Single"
+                                                      SelectionChangedCommand="{Binding GetModDetailsWithModInfoCommand}"
+                                                      SelectionChangedCommandParameter="{Binding Source={x:Reference ModsCollection}, Path=SelectedItem.ModInfo}">
+
+            <collectionComponents:PaginatedCollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical"
+                                   ItemSpacing="10"/>
+            </collectionComponents:PaginatedCollectionView.ItemsLayout>
+
+            <collectionComponents:PaginatedCollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:ModCardViewModel">
+                    <views:ModCardView/>
+                </DataTemplate>
+            </collectionComponents:PaginatedCollectionView.ItemTemplate>
+
+        </collectionComponents:PaginatedCollectionView>
+
+        <!-- Mod Details -->
+        <Grid Grid.Row="2"
+              Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <HorizontalStackLayout Grid.Row="0">
+                <Image Source="{Binding ModIconUrl}"
+                       SemanticProperties.Description="Mod Image"
+                       WidthRequest="120"
+                       HeightRequest="120"/>
+                <Label Text="{Binding ModName}"/>
+            </HorizontalStackLayout>
+
+            <Grid Grid.Row="1"
+                  HorizontalOptions="Fill"
+                  VerticalOptions="Fill"
+                  toolkit:StateContainer.CurrentState="{Binding ModDescriptionType}">
+                <toolkit:StateContainer.StateViews>
+                    <!-- Renderizar HTML -->
+                    <WebView toolkit:StateView.StateKey="Html"
+                             HorizontalOptions="Fill"
+                             VerticalOptions="Fill">
+                        <WebView.Source>
+                            <HtmlWebViewSource Html="{Binding ModDescription}"/>
+                        </WebView.Source>
+                    </WebView>
+
+                    <!-- Mostrar Texto -->
+                    <Editor toolkit:StateView.StateKey="Text"
+                            IsReadOnly="True"
+                            Text="{Binding ModDescription}"/>
+
+                    <!-- Loader -->
+                    <BoxView toolkit:StateView.StateKey="Loading"
+                             WidthRequest="200"
+                             HeightRequest="50"
+                             Color="Green"/>
+                </toolkit:StateContainer.StateViews>
+                <!-- Loader -->
+                <BoxView WidthRequest="200"
+                         HeightRequest="50"
+                         Color="Red"/>
+            </Grid>
+
+            <form:Form Grid.Row="2">
+                <HorizontalStackLayout>
+                    <Label Text="Version:"/>
+                    <form:FormPicker IsRequired="True"/>
+                    <form:SubmitButton Text="Add Mod"/>
+                </HorizontalStackLayout>
+            </form:Form>
+        </Grid>
+
+        <!-- Added Mods -->
+    </Grid>
+</ContentView>

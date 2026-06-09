@@ -28,9 +28,9 @@ public partial class ServerCardViewModel : ObservableObject
 
     public string? Name => Server?.Name;
 
-    public ServerCardViewModel(ServerQuery serverInfo, IServerExecutorService serverExecutorService)
+    public ServerCardViewModel(ServerQuery server, IServerExecutorService serverExecutorService)
     {
-        Server = serverInfo;
+        Server = server;
         this.serverExecutorService = serverExecutorService;
     }
 

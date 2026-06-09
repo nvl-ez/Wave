@@ -3,16 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServersContent.ViewModels"
+             xmlns:views="clr-namespace:Wave.Ui.Pages.ServersContent.Views"
              x:Class="Wave.Ui.Pages.ServersContent.Views.HorizontalServerCardView"
              x:Name="Root"
              x:DataType="viewModels:ServerCardViewModel">
 
-    <View.Behaviors>
+    <ContentView.Behaviors>
         <toolkit:EventToCommandBehavior
+            x:DataType="viewModels:ServerCardViewModel"
             EventName="Loaded"
-            BindingContext="{Binding Source={x:Reference Root}, Path=BindingContext}"
+            BindingContext="{Binding BindingContext,
+                                 Source={x:Reference Root},
+                                 x:DataType=views:HorizontalServerCardView}"
             Command="{Binding LoadCommand}"/>
-    </View.Behaviors>
+    </ContentView.Behaviors>
 
     <Border>
         <Grid>

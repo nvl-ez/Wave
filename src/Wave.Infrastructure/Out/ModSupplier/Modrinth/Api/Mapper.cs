@@ -1,28 +1,37 @@
 using System;
 using Wave.Domain.Mods;
 using Wave.Domain.ServerManager.Modloader;
+using Wave.Domain.Utils;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Modrinth.Api;
 
 public static class Mapper
 {
-    public static ModInfo ToDomain(ProjectDto dto, ModSupplierQuery query)
+    public static ModInfo ToDomain(ProjectDto dto, ModInfoSupplierQuery query)
     {
-        return new ModInfo()
+        return new()
         {
             Name = dto.Title,
             ModId = dto.ProjectId,
-            MinecraftVersion = query.MinecraftVersion,
             ModSupplierType = ModSupplierType.Modrinth,
-            ModloaderType = query.ModloaderType,
             IconUrl = dto.IconUrl,
             Slug = dto.Slug,
-            Description = dto.Description
+            Summary = dto.Description
         };
     }
 
-    public static ModVersion ToDomain(ProjectVersionDto dto, ModInfo modInfoResult)
+    public static PaginationState ToDomain(SearchModsResponseDto searchModsResponseDto)
+    {
+        return new()
+        {
+            Index = searchModsResponseDto.Offset,
+            ResultCount = searchModsResponseDto.Limit,
+            TotalCount = searchModsResponseDto.TotalHits
+        };
+    }
+
+    public static ModVersion ToDomain(ProjectVersionDto dto, ModVersionSupplierQuery modInfoResult)
     {
         List<ModArtifact> artifacts = new List<ModArtifact>();
         if (dto.Files is not null && dto.Files.Count > 0)
@@ -52,8 +61,7 @@ public static class Mapper
 
         ModVersion mod = new ModVersion()
         {
-            Name = dto.Name,
-            ModId = dto.ProjectId,
+            VersionName = dto.Name,
             MinecraftVersion = modInfoResult.MinecraftVersion,
             ModSupplierType = ModSupplierType.Modrinth,
             ModloaderType = modInfoResult.ModloaderType,

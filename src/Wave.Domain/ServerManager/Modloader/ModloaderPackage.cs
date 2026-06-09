@@ -3,11 +3,8 @@ using Wave.Domain.Minecraft;
 
 namespace Wave.Domain.ServerManager.Modloader;
 
-public class ModloaderPackage
+public class ModloaderPackage : ModloaderBase
 {
-    public required ModloaderType ModloaderType { get; set; }
     public required string InstallerPath { get; set; }
     public required string InstallerVersion { get; set; }
-    public required string ModloaderVersion { get; set; }
-    public required string MinecraftVersion { get; set; }
 }

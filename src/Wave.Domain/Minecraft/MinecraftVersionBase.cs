@@ -16,6 +16,11 @@ public abstract class MinecraftVersionBase
         return MinecraftVersion == other.MinecraftVersion;
     }
 
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as MinecraftVersionBase);
+    }
+
     public override int GetHashCode()
     {
         return HashCode.Combine(MinecraftVersion);

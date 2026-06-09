@@ -8,6 +8,6 @@ namespace Wave.Application.Middle;
 
 public interface IModloaderManagerService
 {
-    public Task<Server> AddModloaderAsync(Server server, ModloaderInfo modloaderInfo, CancellationToken ct = default);
+    public Task<Server> AddModloaderAsync(Server server, ServerQuery query, CancellationToken ct = default);
     public Task<Server> RemoveModloaderAsync(Server server, CancellationToken ct = default);
 }

@@ -19,6 +19,12 @@ using Wave.Infrastructure.Out.Platform;
 using Wave.Ui.Pages.ExecutionContent.ViewModels;
 using Wave.Application.Middle;
 using Wave.Infrastructure.Middle;
+using Wave.Application.Out.Modloader;
+using Wave.Infrastructure.Out.Modloader.Forge.Api;
+using Wave.Infrastructure.Out.Modloader.Fabric.Api;
+using Wave.Application.Out.ModSupplier;
+using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
+using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api;
 
 namespace Wave.Ui;
 
@@ -31,30 +37,36 @@ public static class AppComposition
 
 
     // OUT PORTS
-    private static IServerRepository serverRepository;
-    private static IMinecraftVersionRepository minecraftVersionRepository;
-    private static IServerPropertyDefinitionRepository serverPropertyDefinitionRepository;
-    private static IServerPropertiesRepository serverPropertiesRepository;
-    private static IServerEulaRepository serverEulaRepository;
-    private static IServerExecutor serverExecutor;
-    private static IJavaInstallRepository javaInstallRepository;
-    private static IJavaSupplier adoptiumJavaSupplier;
-    private static IJavaSupplier mojangJavaSupplier;
-    private static IJavaInstaller compressedJavaInstaller;
-    private static IJavaInstaller manifestJavaInstaller;
-    private static IDeviceInformationRepository windowsDeviceInformationRepository;
+    private static readonly IServerRepository serverRepository;
+    private static readonly IMinecraftVersionRepository minecraftVersionRepository;
+    private static readonly IServerPropertyDefinitionRepository serverPropertyDefinitionRepository;
+    private static readonly IServerPropertiesRepository serverPropertiesRepository;
+    private static readonly IServerEulaRepository serverEulaRepository;
+    private static readonly IServerExecutor serverExecutor;
+    private static readonly IJavaInstallRepository javaInstallRepository;
+    private static readonly IJavaSupplier adoptiumJavaSupplier;
+    private static readonly IJavaSupplier mojangJavaSupplier;
+    private static readonly IJavaInstaller compressedJavaInstaller;
+    private static readonly IJavaInstaller manifestJavaInstaller;
+    private static readonly IDeviceInformationRepository windowsDeviceInformationRepository;
+    private static readonly IModloaderVersionCatalog forgeVersionCatalog;
+    private static readonly IModloaderVersionCatalog fabricVersionCatalog;
+    private static readonly IModSupplierIntegration curseforgeModSupplier;
+    private static readonly IModSupplierIntegration modrinthModSupplier;
 
     //SERVICES
-    private static IMinecraftCatalogService minecraftCatalogService;
-    private static IServerManagerService serverHandlerService;
-    private static IServerExecutorService serverExecutorService;
-    private static IJavaManagerService javaManagerService;
-    private static IDeviceInformationService deviceInformationService;
-    private static IPropertiesManagerService propertiesManagerService;
-    private static IEulaManagerService eulaManagerService;
-    private static IVersionManagerService versionManagerService;
-    private static IModloaderManagerService modloaderManagerService;
-    private static IServerPathResolver serverPathResolver;
+    private static readonly IMinecraftCatalogService minecraftCatalogService;
+    private static readonly IServerManagerService serverHandlerService;
+    private static readonly IServerExecutorService serverExecutorService;
+    private static readonly IJavaManagerService javaManagerService;
+    private static readonly IDeviceInformationService deviceInformationService;
+    private static readonly IPropertiesManagerService propertiesManagerService;
+    private static readonly IEulaManagerService eulaManagerService;
+    private static readonly IVersionManagerService versionManagerService;
+    private static readonly IModloaderManagerService modloaderManagerService;
+    private static readonly IServerPathResolver serverPathResolver;
+    private static readonly IModloaderCatalogService modloaderCatalogService;
+    private static readonly IModCatalogService modCatalogService;
 
     static AppComposition()
     {
@@ -81,6 +93,11 @@ public static class AppComposition
         manifestJavaInstaller = new ManifestJavaInstaller(javaDirectory);
         windowsDeviceInformationRepository = new WindowsDeviceInformationRepository();
         serverEulaRepository = new ServerEulaRepository();
+        forgeVersionCatalog = new ApiForgeVersionCatalog();
+        fabricVersionCatalog = new ApiFabricVersionCatalog();
+        curseforgeModSupplier = new ApiCurseforgeModSupplier();
+        modrinthModSupplier = new ApiModrinthModSupplier();
+
 
 
         //SERVICES
@@ -88,7 +105,9 @@ public static class AppComposition
         propertiesManagerService = new PropertiesManagerService(serverPathResolver, serverPropertiesRepository);
         eulaManagerService = new EulaManagerService(serverPathResolver, serverEulaRepository);
         versionManagerService = new VersionManagerService(serverPathResolver, minecraftVersionRepository);
-        modloaderManagerService = new ModloaderManagerService(serverPathResolver, [], javaInstallRepository);
+        modloaderManagerService = new ModloaderManagerService(serverPathResolver, [forgeVersionCatalog, fabricVersionCatalog], javaInstallRepository);
+        modloaderCatalogService = new ModloaderCatalogService([forgeVersionCatalog, fabricVersionCatalog]);
+        modCatalogService = new ModCatalogService([curseforgeModSupplier, modrinthModSupplier]);
 
 
         minecraftCatalogService = new MinecraftCatalogService(minecraftVersionRepository, serverPropertyDefinitionRepository);
@@ -100,7 +119,7 @@ public static class AppComposition
 
     // VIEW MODELS
     public static ServersViewModel CreateServersViewModel() => new ServersViewModel(serverHandlerService, serverExecutorService);
-    public static ServerViewModel CreateServerViewModel() => new ServerViewModel(minecraftCatalogService, serverHandlerService);
+    public static ServerViewModel CreateServerViewModel() => new ServerViewModel(minecraftCatalogService, serverHandlerService, modloaderCatalogService, modCatalogService);
     public static ExecutionViewModel CreateExecutionViewModel() => new ExecutionViewModel(serverExecutorService);
     public static JavaViewModel CreateJavaViewModel() => new JavaViewModel(deviceInformationService, javaManagerService);
     public static SettingsViewModel CreateSettingsViewModel() => new SettingsViewModel();

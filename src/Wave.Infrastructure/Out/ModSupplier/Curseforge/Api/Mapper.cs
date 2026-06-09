@@ -2,28 +2,36 @@ using System;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Mods;
 using Wave.Domain.ServerManager.Modloader;
+using Wave.Domain.Utils;
 using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api.Dtos;
 
 namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
 
 public static class Mapper
 {
-    public static ModInfo ToDomain(ModInfoDto dto, ModSupplierQuery modSupplierQuery)
+    public static ModInfo ToDomain(ModInfoDto modInfoDto, ModInfoSupplierQuery modInfoSupplierQuery)
     {
-        return new ModInfo()
+        return new()
         {
-            ModId = dto.Id.ToString(),
-            MinecraftVersion = modSupplierQuery.MinecraftVersion,
-            ModloaderType = modSupplierQuery.ModloaderType,
+            ModId = modInfoDto.Id.ToString(),
+            Summary = modInfoDto.Summary,
             ModSupplierType = ModSupplierType.Curseforge,
-            Name = dto.Name,
-            IconUrl = dto.Logo.ThumbnailUrl,
-            Slug = dto.Slug,
-            Description = dto.Summary
+            Name = modInfoDto.Name,
+            Slug = modInfoDto.Slug,
+            IconUrl = modInfoDto.Logo?.ThumbnailUrl
+        };
+    }
+    public static PaginationState ToDomain(PaginationDto paginationDto)
+    {
+        return new PaginationState()
+        {
+            Index = paginationDto.Index,
+            ResultCount = paginationDto.ResultCount,
+            TotalCount = paginationDto.TotalCount
         };
     }
 
-    public static ModVersion ToDomain(ModFileDto dto, ModInfo modInfoResult)
+    public static ModVersion ToDomain(ModFileDto dto, ModVersionSupplierQuery modVersionSupplierQuery)
     {
         List<ModArtifact> artifacts = new List<ModArtifact>();
         ModArtifact artifact = new()
@@ -48,13 +56,12 @@ public static class Mapper
 
         ModVersion mod = new ModVersion()
         {
-            ModId = dto.ModId.ToString(),
             VersionId = dto.FileId.ToString(),
-            Name = dto.DisplayName,
+            VersionName = dto.DisplayName,
             Dependencies = dependencies,
             Artifacts = artifacts,
-            MinecraftVersion = modInfoResult.MinecraftVersion,
-            ModloaderType = modInfoResult.ModloaderType,
+            MinecraftVersion = modVersionSupplierQuery.MinecraftVersion,
+            ModloaderType = modVersionSupplierQuery.ModloaderType,
             ModSupplierType = ModSupplierType.Curseforge,
             ModVersionType = ToDomainModVersionType(dto.ReleaseType),
             Version = ""

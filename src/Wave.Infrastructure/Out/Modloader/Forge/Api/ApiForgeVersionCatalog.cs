@@ -34,10 +34,11 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 
             foreach (string versionBundle in versionBundles)
             {
-                forgeVersions.Add(Mapper.ToDomain(versionBundle, minecraftVersion));
+                forgeVersions.Add(Mapper.ToDomain(versionBundle));
             }
 
             forgeVersions = forgeVersions.Where(f => minecraftVersion == f.MinecraftVersion).ToList();
+            forgeVersions.Reverse();
         }
         catch (HttpRequestException)
         {
@@ -47,10 +48,9 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
         return forgeVersions;
     }
 
-    public async Task<ModloaderPackage> DownloadModloaderAsync(ModloaderInfo modloaderInfo, string path, CancellationToken ct = default)
+    public async Task<ModloaderPackage> DownloadModloaderAsync(ModloaderInfo modloaderInfo, string filePath, CancellationToken ct = default)
     {
         //Download latest installer
-        string filePath = "";
 
         string mcVersion = modloaderInfo.MinecraftVersion;
         string forgeVersion = modloaderInfo.Version;
@@ -63,9 +63,6 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
         {
             response.EnsureSuccessStatusCode();
 
-            string fileName = response.Content.Headers.ContentDisposition!.FileName!;
-
-            filePath = Path.Combine(path, fileName);
             using (var fileStream = File.Create(filePath))
             {
                 using (var httpStream = await response.Content.ReadAsStreamAsync())
@@ -82,7 +79,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
             ModloaderType = ModloaderType,
             InstallerPath = filePath,
             InstallerVersion = "latest",
-            ModloaderVersion = modloaderInfo.Version,
+            Version = modloaderInfo.Version,
             MinecraftVersion = modloaderInfo.MinecraftVersion
         };
     }
@@ -97,7 +94,7 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
             StartInfo = new ProcessStartInfo
             {
                 FileName = javaInstallation.ExecutableFile,
-                WorkingDirectory = Path.GetFullPath(modloaderPackage.InstallerPath),
+                WorkingDirectory = Path.GetDirectoryName(modloaderPackage.InstallerPath),
 
                 Arguments = $"-jar \"{modloaderPackage.InstallerPath}\" -installServer {targetDirectory}",
                 UseShellExecute = false,
@@ -116,17 +113,17 @@ public class ApiForgeVersionCatalog : IModloaderVersionCatalog
 
         process.Start();
 
-        await tcs.Task;
+        int result = await tcs.Task;
 
         File.Delete(modloaderPackage.InstallerPath);
 
-        if (process.ExitCode != 0) throw new Exception($"Fabric installation failed. Exited with code {process.ExitCode}"); //TODO: Mejorar handling de la excepción.
+        if (result != 0) throw new Exception($"Fabric installation failed. Exited with code {result}"); //TODO: Mejorar handling de la excepción.
 
         return new ModloaderInstallation()
         {
-            Type = ModloaderType,
+            ModloaderType = ModloaderType,
             MinecraftVersion = modloaderPackage.MinecraftVersion,
-            Version = modloaderPackage.InstallerVersion
+            Version = modloaderPackage.Version
         };
     }
 

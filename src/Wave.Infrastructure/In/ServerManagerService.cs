@@ -57,9 +57,8 @@ public class ServerManagerService : IServerManagerService
         serverPathResolver.CreateEulaFile(server);
         await eulaManagerService.SetEulaAsync(server, query);
 
-        //Add modloader if necessary
-        ModloaderInfo? modloaderInfo = query.Modloader;
-        if (modloaderInfo != null) await modloaderManagerService.AddModloaderAsync(server, modloaderInfo);
+        //Add modloader
+        await modloaderManagerService.AddModloaderAsync(server, query);
 
         // Save Server
         await serverRepository.SaveServerAsync(server);
@@ -94,6 +93,15 @@ public class ServerManagerService : IServerManagerService
 
         // Save Eula
         await eulaManagerService.SetEulaAsync(server, query);
+
+        //Manage Modloader
+        if (server.Modloader != query.Modloader)
+        {
+            if (server.Modloader is not null)
+                await modloaderManagerService.RemoveModloaderAsync(server);
+            if (query.Modloader is not null)
+                await modloaderManagerService.AddModloaderAsync(server, query);
+        }
 
         // Save server
         await serverRepository.SaveServerAsync(server);

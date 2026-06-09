@@ -1,5 +1,7 @@
 using System;
 using Wave.Domain.Minecraft;
+using Wave.Domain.Mods;
+using Wave.Domain.ServerManager.Modloader;
 
 namespace Wave.Domain.ServerManager;
 
@@ -8,17 +10,19 @@ public sealed class Server
     public Guid Id { get; init; } = Guid.NewGuid();
     public required string Name { get; set; }
     public DateTime CreationDate { get; init; } = DateTime.Now;
-    public MinecraftVersionInstallation? MinecraftVersionInstallation { get; set; }
+    public ServerPaths ServerPaths = new();
+
 
 
     /*******************
     * Physical Objects *
     *******************/
-    public ServerPaths ServerPaths = new();
+    public MinecraftVersionInstallation? MinecraftVersionInstallation { get; set; }
     public required Dictionary<string, string> Properties { get; set; }
     public bool Eula { get; set; } = false;
-    public Modloader.ModloaderInstallation? Modloader { get; set; } = null;
+    public ModloaderInstallation? Modloader { get; set; } = null;
     public string? ImageFilename { get; set; } = null;
+    public IEnumerable<ModFile> Mods { get; set; } = [];
 
     public bool Equals(Server? other)
     {

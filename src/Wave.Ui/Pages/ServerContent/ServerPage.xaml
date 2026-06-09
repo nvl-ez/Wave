@@ -6,6 +6,7 @@
              xmlns:navigation="clr-namespace:Wave.Ui.Views.Navigation"
              xmlns:views="clr-namespace:Wave.Ui.Pages.ServerContent.Views"
              xmlns:form="clr-namespace:Wave.Ui.Views.FormComponents"
+             xmlns:page="clr-namespace:Wave.Ui.Pages.ServerContent"
              x:Class="Wave.Ui.Pages.ServerContent.ServerPage"
              x:DataType="viewModels:ServerViewModel"
              x:Name="Root"
@@ -13,8 +14,11 @@
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior
+            x:DataType="viewModels:ServerViewModel"
             EventName="Appearing"
-            BindingContext="{Binding Source={x:Reference Root}, Path=BindingContext}"
+            BindingContext="{Binding BindingContext,
+                                 Source={x:Reference Root},
+                                 x:DataType=page:ServerPage}"
             Command="{Binding LoadCommand}"/>
     </ContentPage.Behaviors>
 
@@ -37,15 +41,12 @@
             </navigation:TabContainerView>
 
 
-            <VerticalStackLayout Grid.Row="1"
-                                 toolkit:StateContainer.CurrentState="{Binding CurrentTab}">
-                <toolkit:StateContainer.StateViews>
-                    <views:GeneralView toolkit:StateView.StateKey="General"/>
-                    <views:ModsView toolkit:StateView.StateKey="Mods"/>
-                    <views:PropertiesView toolkit:StateView.StateKey="Properties"/>
-                </toolkit:StateContainer.StateViews>
-                <views:GeneralView/>
-            </VerticalStackLayout>
+            <navigation:KeepAliveTabHost Grid.Row="1"
+                                         CurrentTab="{Binding CurrentTab}">
+                <views:GeneralView navigation:KeepAliveTabHost.TabKey="General"/>
+                <views:ModsView navigation:KeepAliveTabHost.TabKey="Mods"/>
+                <views:PropertiesView navigation:KeepAliveTabHost.TabKey="Properties"/>
+            </navigation:KeepAliveTabHost>
 
 
             <HorizontalStackLayout Grid.Row="2"

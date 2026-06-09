@@ -82,7 +82,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Pages\ServerContent\Classes\" />
 	  <Folder Include="Pages\SettingsContent\ViewModels\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Pages\ServerContent\Views\ModCardView.xaml.cs">
+	    <DependentUpon>ModCardView.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 </Project>

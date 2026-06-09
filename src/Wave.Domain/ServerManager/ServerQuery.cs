@@ -1,5 +1,6 @@
 using System;
 using Wave.Domain.Minecraft;
+using Wave.Domain.Mods;
 using Wave.Domain.ServerManager.Modloader;
 
 namespace Wave.Domain.ServerManager;
@@ -15,13 +16,7 @@ public record class ServerQuery
         Eula = server.Eula;
         Properties = server.Properties;
         CreationDate = server.CreationDate;
-        Modloader = server.Modloader is not null ? new ModloaderInfo()
-        {
-            DowloadUrl = "",
-            MinecraftVersion = server.MinecraftVersionInstallation!.MinecraftVersion,
-            ModloaderType = server.Modloader.Type,
-            Version = server.Modloader.Version
-        } : null;
+        Modloader = server.Modloader;
     }
     public Guid? Id { get; set; }
     public string? Name { get; set; }
@@ -39,6 +34,7 @@ public record class ServerQuery
         {"spawn-protection", "16"},
         {"view-distance", "8"}
     };
-    public ModloaderInfo? Modloader { get; set; }
+    public ModloaderBase? Modloader { get; set; }
     public DateTime? CreationDate { get; set; }
+    public IEnumerable<ModFile> Mods { get; set; } = [];
 }

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServerContent.ViewModels"
+             x:Class="Wave.Ui.Pages.ServerContent.Views.ModCardView"
+             x:DataType="viewModels:ModCardViewModel">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!-- Mod Selection -->
+        <Border Grid.Row="0"
+                Grid.RowSpan="2"
+                Grid.Column="0"
+                IsVisible="{Binding IsSelected}"
+                Stroke="Green"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 10,0,10,0"
+                Padding="5">
+            <Grid>
+                <Label
+                    Text="✓"
+                    TextColor="Green"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"/>
+            </Grid>
+        </Border>
+
+
+        <!-- Mod Image -->
+        <Image Source="{Binding Image}"
+               SemanticProperties.Description="Mod Image"
+               Grid.Column="1"
+               Grid.Row="0"
+               Grid.RowSpan="2"
+               WidthRequest="70"
+               HeightRequest="70"/>
+        <!-- Mod Name -->
+        <Label Text="{Binding Name}"
+               Grid.Row="0"
+               Grid.Column="2"
+               FontAttributes="Bold"
+               FontSize="22"/>
+        <!-- Mod Description -->
+        <Label Text="{Binding Summary}"
+               Grid.Row="1"
+               Grid.Column="2"
+               Grid.ColumnSpan="4"
+               FontSize="16"/>
+    </Grid>
+</ContentView>

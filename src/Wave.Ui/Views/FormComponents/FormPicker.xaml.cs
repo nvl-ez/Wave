@@ -5,6 +5,8 @@ using System.Collections;
 public partial class FormPicker : Picker, IFormElement
 {
 	private bool syncingFromModel;
+	private bool updatingSelection;
+	private bool writingToModel;
 
 	public static readonly BindableProperty IsRequiredProperty =
 		BindableProperty.Create(
@@ -176,11 +178,8 @@ public partial class FormPicker : Picker, IFormElement
 
 	private static void OnSelectionConfigChanged(BindableObject bindable, object oldValue, object newValue)
 	{
-		if (bindable is not FormPicker picker)
-			return;
-
-		picker.UpdateSelectedValueFromSelectedItem();
-		picker.WriteSelectionToModel();
+		if (bindable is FormPicker picker)
+			picker.HandleControlSelectionChanged();
 	}
 
 	private static void OnDisplayConfigChanged(BindableObject bindable, object oldValue, object newValue)
@@ -194,11 +193,14 @@ public partial class FormPicker : Picker, IFormElement
 		if (bindable is not FormPicker picker)
 			return;
 
-		if (picker.syncingFromModel)
+		if (picker.syncingFromModel || picker.updatingSelection)
 			return;
 
-		picker.SelectItemByValue(newValue);
-		picker.WriteSelectionToModel();
+		picker.RunSelectionUpdate(() =>
+		{
+			picker.SelectItemByValue(newValue);
+			picker.WriteSelectionToModel();
+		});
 	}
 
 	protected override void OnPropertyChanged(string? propertyName = null)
@@ -206,19 +208,47 @@ public partial class FormPicker : Picker, IFormElement
 		base.OnPropertyChanged(propertyName);
 
 		if (propertyName == nameof(ItemsSource))
+		{
 			LoadSelectionFromModel();
+			return;
+		}
 
 		if (propertyName == nameof(SelectedItem))
-		{
-			UpdateSelectedValueFromSelectedItem();
-			WriteSelectionToModel();
-		}
+			HandleControlSelectionChanged();
 	}
 
 	private void OnSelectedIndexChanged(object? sender, EventArgs e)
 	{
-		UpdateSelectedValueFromSelectedItem();
-		WriteSelectionToModel();
+		HandleControlSelectionChanged();
+	}
+
+	private void HandleControlSelectionChanged()
+	{
+		if (syncingFromModel || updatingSelection)
+			return;
+
+		RunSelectionUpdate(() =>
+		{
+			UpdateSelectedValueFromSelectedItem();
+			WriteSelectionToModel();
+		});
+	}
+
+	private void RunSelectionUpdate(Action action)
+	{
+		if (updatingSelection)
+			return;
+
+		updatingSelection = true;
+
+		try
+		{
+			action();
+		}
+		finally
+		{
+			updatingSelection = false;
+		}
 	}
 
 	private void LoadItemsSourceFromModel()
@@ -231,7 +261,7 @@ public partial class FormPicker : Picker, IFormElement
 
 		var value = ReflectionHelper.GetValue(Model, ItemsSourceModelPath);
 
-		if (value is IList list)
+		if (value is IList list && !ReferenceEquals(ItemsSource, list))
 			ItemsSource = list;
 	}
 
@@ -245,13 +275,16 @@ public partial class FormPicker : Picker, IFormElement
 
 		var value = ReflectionHelper.GetValue(Model, DisplayMemberPathModelPath);
 
-		if (value is string path)
+		if (value is string path && DisplayMemberPath != path)
 			DisplayMemberPath = path;
 	}
 
 	private void ApplyDisplayMemberPath()
 	{
 		if (string.IsNullOrWhiteSpace(DisplayMemberPath))
+			return;
+
+		if (ItemDisplayBinding is Binding binding && binding.Path == DisplayMemberPath)
 			return;
 
 		ItemDisplayBinding = new Binding(DisplayMemberPath);
@@ -271,7 +304,7 @@ public partial class FormPicker : Picker, IFormElement
 			{
 				var value = ReflectionHelper.GetValue(Model, SelectedIndexModelPath);
 
-				if (value is int index)
+				if (value is int index && SelectedIndex != index)
 					SelectedIndex = index;
 			}
 
@@ -280,7 +313,7 @@ public partial class FormPicker : Picker, IFormElement
 			{
 				var value = ReflectionHelper.GetValue(Model, SelectedValueModelPath);
 
-				SelectedValue = value;
+				SetSelectedValueIfChanged(value);
 				SelectItemByValue(value);
 			}
 		}
@@ -292,40 +325,68 @@ public partial class FormPicker : Picker, IFormElement
 
 	private void WriteSelectionToModel()
 	{
-		if (syncingFromModel)
+		if (syncingFromModel || writingToModel)
 			return;
 
 		if (Model is null)
 			return;
 
-		if (CanWriteToModel(SelectedIndexModelBindingMode) &&
-			!string.IsNullOrWhiteSpace(SelectedIndexModelPath))
-		{
-			ReflectionHelper.SetValue(Model, SelectedIndexModelPath, SelectedIndex);
-		}
+		writingToModel = true;
 
-		if (CanWriteToModel(SelectedValueModelBindingMode) &&
-			!string.IsNullOrWhiteSpace(SelectedValueModelPath))
+		try
 		{
-			ReflectionHelper.SetValue(Model, SelectedValueModelPath, SelectedValue);
+			if (CanWriteToModel(SelectedIndexModelBindingMode) &&
+				!string.IsNullOrWhiteSpace(SelectedIndexModelPath))
+			{
+				SetModelValueIfChanged(SelectedIndexModelPath, SelectedIndex);
+			}
+
+			if (CanWriteToModel(SelectedValueModelBindingMode) &&
+				!string.IsNullOrWhiteSpace(SelectedValueModelPath))
+			{
+				SetModelValueIfChanged(SelectedValueModelPath, SelectedValue);
+			}
 		}
+		finally
+		{
+			writingToModel = false;
+		}
+	}
+
+	private void SetModelValueIfChanged(string path, object? value)
+	{
+		if (Model is null)
+			return;
+
+		var currentValue = ReflectionHelper.GetValue(Model, path);
+
+		if (Equals(currentValue, value))
+			return;
+
+		ReflectionHelper.SetValue(Model, path, value);
 	}
 
 	private void UpdateSelectedValueFromSelectedItem()
 	{
 		if (SelectedItem is null)
 		{
-			SelectedValue = null;
+			SetSelectedValueIfChanged(null);
 			return;
 		}
 
 		if (string.IsNullOrWhiteSpace(SelectedValueMemberPath))
 		{
-			SelectedValue = SelectedItem;
+			SetSelectedValueIfChanged(SelectedItem);
 			return;
 		}
 
-		SelectedValue = ReflectionHelper.GetValue(SelectedItem, SelectedValueMemberPath);
+		SetSelectedValueIfChanged(ReflectionHelper.GetValue(SelectedItem, SelectedValueMemberPath));
+	}
+
+	private void SetSelectedValueIfChanged(object? value)
+	{
+		if (!Equals(SelectedValue, value))
+			SelectedValue = value;
 	}
 
 	private void SelectItemByValue(object? value)
@@ -343,14 +404,21 @@ public partial class FormPicker : Picker, IFormElement
 
 			if (Equals(itemValue, value))
 			{
-				SelectedIndex = i;
-				SelectedItem = item;
+				if (SelectedIndex != i)
+					SelectedIndex = i;
+
+				if (!Equals(SelectedItem, item))
+					SelectedItem = item;
+
 				return;
 			}
 		}
 
-		SelectedIndex = -1;
-		SelectedItem = null;
+		if (SelectedIndex != -1)
+			SelectedIndex = -1;
+
+		if (SelectedItem is not null)
+			SelectedItem = null;
 	}
 
 	public bool Validate()

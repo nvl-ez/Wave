@@ -6,9 +6,8 @@ namespace Wave.Domain.Mods;
 
 public record class ModVersion
 {
-    public required string Name { get; set; }
+    public required string VersionName { get; set; }
     public string Version { get; set; } = "";
-    public required string ModId { get; set; }
     public required string VersionId { get; set; }
     public required List<ModArtifact> Artifacts { get; set; }
     public List<ModDependency>? Dependencies { get; set; }

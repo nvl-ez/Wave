@@ -106,6 +106,10 @@ public static class ReflectionHelper
             return;
 
         var convertedValue = ConvertValue(value, finalProperty.PropertyType);
+        var currentValue = finalProperty.GetValue(source);
+
+        if (Equals(currentValue, convertedValue))
+            return;
 
         finalProperty.SetValue(source, convertedValue);
     }
@@ -143,6 +147,9 @@ public static class ReflectionHelper
             var convertedKey = ConvertValue(key, keyType);
             var convertedValue = ConvertValue(value, valueType);
 
+            if (dictionary.Contains(convertedKey) && Equals(dictionary[convertedKey], convertedValue))
+                return;
+
             dictionary[convertedKey] = convertedValue;
             return;
         }
@@ -155,6 +162,21 @@ public static class ReflectionHelper
         var parameterType = indexer.GetIndexParameters()[0].ParameterType;
         var convertedIndexerKey = ConvertValue(key, parameterType);
         var convertedValueForIndexer = ConvertValue(value, indexer.PropertyType);
+
+        object? currentValue = null;
+        var hasCurrentValue = true;
+
+        try
+        {
+            currentValue = indexer.GetValue(source, new[] { convertedIndexerKey });
+        }
+        catch
+        {
+            hasCurrentValue = false;
+        }
+
+        if (hasCurrentValue && Equals(currentValue, convertedValueForIndexer))
+            return;
 
         indexer.SetValue(source, convertedValueForIndexer, new[] { convertedIndexerKey });
     }
@@ -300,7 +322,7 @@ public static class ReflectionHelper
             return value;
 
         if (realType.IsEnum)
-            return Enum.Parse(realType, value.ToString()!);
+            return Enum.Parse(realType, value.ToString()!, ignoreCase: true);
 
         return Convert.ChangeType(value, realType);
     }

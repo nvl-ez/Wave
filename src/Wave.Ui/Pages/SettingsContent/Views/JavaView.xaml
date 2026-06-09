@@ -6,16 +6,20 @@
              xmlns:views="clr-namespace:Wave.Ui.Pages.SettingsContent.Views"
              xmlns:domain="clr-namespace:Wave.Domain.Java;assembly=Wave.Domain"
              xmlns:out="clr-namespace:Wave.Application.Out.Java;assembly=Wave.Application"
+             xmlns:page="clr-namespace:Wave.Ui.Pages.ExecutionContent"
              x:Class="Wave.Ui.Pages.SettingsContent.Views.JavaView"
              x:DataType="viewModels:JavaViewModel"
              x:Name="Root">
 
-    <View.Behaviors>
+    <ContentView.Behaviors>
         <toolkit:EventToCommandBehavior
+            x:DataType="viewModels:JavaViewModel"
             EventName="Loaded"
-            BindingContext="{Binding Source={x:Reference Root}, Path=BindingContext}"
+            BindingContext="{Binding BindingContext,
+                                 Source={x:Reference Root},
+                                 x:DataType=views:JavaView}"
             Command="{Binding LoadCommand}"/>
-    </View.Behaviors>
+    </ContentView.Behaviors>
 
     <Grid>
         <Grid.RowDefinitions>

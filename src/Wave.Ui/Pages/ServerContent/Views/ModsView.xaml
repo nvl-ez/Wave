@@ -1,9 +1,68 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServerContent.ViewModels"
+             xmlns:form="clr-namespace:Wave.Ui.Views.FormComponents"
              x:Class="Wave.Ui.Pages.ServerContent.Views.ModsView"
-             x:DataType="viewModels:ServerViewModel">
-    <!-- Basic Info !-->
+             x:DataType="viewModels:ServerViewModel"
+             x:Name="Root">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Modloader Selector Section -->
+        <HorizontalStackLayout Grid.Row="0"
+                               Grid.ColumnSpan="2">
+            <form:Form HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       Model="{Binding ModloaderTypeQuery}"
+                       SubmitCommand="{Binding RequestModloaderVersionsCommand}">
+                <HorizontalStackLayout>
+                    <form:FormPicker ItemsSource="{Binding ModloaderTypes}"
+                                     ItemDisplayBinding="{Binding Value}"
+                                     SelectedValueModelPath="ModloaderType"
+                                     SelectedValueMemberPath="Key"/>
+                    <form:SubmitButton Text="Search"/>
+                </HorizontalStackLayout>
+            </form:Form>
+
+            <form:FormPicker IsVisible="{Binding ModloaderInfoIsVisible}"
+                             ItemsSource="{Binding ModloaderInfos}"
+                             ItemDisplayBinding="{Binding Version}"
+                             SelectedValueModelPath="Modloader"/>
+        </HorizontalStackLayout>
+
+        <!-- Mods Section -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Mods Header -->
+            <Label Text="Installed Mods"
+                   Grid.Row="0"
+                   Grid.Column="0"/>
+            <Button Text="Add Mods"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Command="{Binding OpenModsPopupCommand}"/>
+            <!-- Mod Versi List -->
+            <CollectionView Grid.Row="1"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2">
+
+            </CollectionView>
+        </Grid>
+
+    </Grid>
 
 </ContentView>

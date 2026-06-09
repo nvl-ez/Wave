@@ -73,7 +73,6 @@
                                                            ItemsSource="{Binding MinecraftVersionsInfos}"
                                                            ItemDisplayBinding="{Binding MinecraftVersion}"
                                                            SelectedValueModelPath="MinecraftVersionBase"
-                                                           SelectedIndex="{Binding MinecraftVersionIndex, Mode=OneWay}"
                                                            IsRequired="True"/>
 
                                           <BoxView toolkit:StateView.StateKey="Error"
@@ -89,8 +88,8 @@
                                             HeightRequest="50"/>
                             </VerticalStackLayout>
                             <Label Text="Include Snapshots:"/>
-                            <CheckBox IsChecked="{Binding IncludeSnapshots}"
-                                      Command="{Binding RequestMinecraftVersionsCommand}"/>
+                            <form:FormCheckBox IsChecked="{Binding IncludeSnapshots}"
+                                               Command="{Binding RequestMinecraftVersionsCommand}"/>
                      </HorizontalStackLayout>
 
                      <!-- Gamemode -->

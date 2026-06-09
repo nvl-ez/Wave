@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServersContent.ViewModels"
              xmlns:views="clr-namespace:Wave.Ui.Pages.ServersContent.Views"
              xmlns:serverManager="clr-namespace:Wave.Domain.ServerManager;assembly=Wave.Domain"
+             xmlns:page="clr-namespace:Wave.Ui.Pages.ServersContent"
              x:Class="Wave.Ui.Pages.ServersContent.ServersPage"
              Title="Servers Page"
              x:Name="Root"
@@ -12,8 +13,11 @@
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior
+            x:DataType="viewModels:ServersViewModel"
             EventName="Appearing"
-            BindingContext="{Binding Source={x:Reference Root}, Path=BindingContext}"
+            BindingContext="{Binding BindingContext,
+                                 Source={x:Reference Root},
+                                 x:DataType=page:ServersPage}"
             Command="{Binding LoadCommand}"/>
     </ContentPage.Behaviors>
 
