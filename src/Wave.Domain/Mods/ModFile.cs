@@ -3,7 +3,7 @@ using Wave.Domain.ServerManager.Modloader;
 
 namespace Wave.Domain.Mods;
 
-public record class ModFile
+public class ModFile : ModBase, IEquatable<ModFile>
 {
     public ModFile(ModInfo modInfo, ModVersion modVersion)
     {
@@ -23,16 +23,28 @@ public record class ModFile
         ModloaderType = modVersion.ModloaderType;
     }
 
-    public string ModId { get; set; }
-    public string Name { get; set; }
-    public string Summary { get; set; }
-    public string? IconUrl { get; set; }
-    public string Slug { get; set; }
-
     public string VersionId { get; set; }
     public string Version { get; set; }
-    public ModSupplierType ModSupplierType { get; set; }
     public string MinecraftVersion { get; set; }
     public ModVersionType ModVersionType { get; set; }
     public ModloaderType ModloaderType { get; set; }
+
+    public bool Equals(ModFile? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+
+        return ModId == other.ModId &&
+               VersionId == other.VersionId;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ModFile other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(GetType(), ModId, VersionId);
+    }
 }

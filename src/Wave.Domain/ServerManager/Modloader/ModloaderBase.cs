@@ -2,7 +2,7 @@ using System;
 
 namespace Wave.Domain.ServerManager.Modloader;
 
-public class ModloaderBase
+public abstract class ModloaderBase
 {
     public required ModloaderType ModloaderType { get; set; }
     public required string Version { get; set; }
