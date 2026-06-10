@@ -10,5 +10,5 @@ public class ModVersionSupplierQuery
     public required string MinecraftVersion { get; set; }
     public required ModloaderType ModloaderType { get; set; }
     public required ModSupplierType ModSupplierType { get; set; }
-    public required PaginationState PaginationState { get; set; }
+    public PaginationState? PaginationState { get; set; }
 }

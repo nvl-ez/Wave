@@ -113,8 +113,11 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
         queryParameters.Add("gameVersion", modVersionSupplierQuery.MinecraftVersion);
         ModloaderType loader = modVersionSupplierQuery.ModloaderType;
         queryParameters.Add("modLoaderType", Mapper.ToDtoModloaderType(loader).ToString());
-        queryParameters.Add("index", modVersionSupplierQuery.PaginationState.Index.ToString());
-        queryParameters.Add("pageSize", modVersionSupplierQuery.PaginationState.PageSize.ToString());
+
+
+        queryParameters.Add("index", "0");
+        queryParameters.Add("pageSize", "50");
+
         string queryString = string.Join("&", queryParameters.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(x.Value)}"));
 
         List<ModVersion> versions = new List<ModVersion>();

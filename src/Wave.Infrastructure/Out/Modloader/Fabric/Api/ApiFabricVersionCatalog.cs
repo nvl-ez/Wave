@@ -68,7 +68,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
         {
             ModloaderType = ModloaderType,
             InstallerPath = filePath,
-            InstallerVersion = latest.DownloadUrl,
+            InstallerVersion = latest.Version,
             Version = modloaderInfo.Version,
             MinecraftVersion = modloaderInfo.MinecraftVersion
         };
@@ -118,7 +118,7 @@ public class ApiFabricVersionCatalog : IModloaderVersionCatalog
         {
             ModloaderType = ModloaderType,
             MinecraftVersion = modloaderPackage.MinecraftVersion,
-            Version = modloaderPackage.InstallerVersion
+            Version = modloaderPackage.Version
         };
     }
 

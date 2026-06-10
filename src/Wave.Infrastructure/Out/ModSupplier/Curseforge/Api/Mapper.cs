@@ -64,7 +64,7 @@ public static class Mapper
             ModloaderType = modVersionSupplierQuery.ModloaderType,
             ModSupplierType = ModSupplierType.Curseforge,
             ModVersionType = ToDomainModVersionType(dto.ReleaseType),
-            Version = ""
+            Version = dto.DisplayName
         };
         return mod;
     }
