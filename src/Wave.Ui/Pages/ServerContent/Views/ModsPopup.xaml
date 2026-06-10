@@ -183,7 +183,9 @@
             <form:Form Grid.Row="2">
                 <HorizontalStackLayout>
                     <Label Text="Version:"/>
-                    <form:FormPicker IsRequired="True"/>
+                    <form:FormPicker IsRequired="True"
+                                     ItemsSource="{Binding ModVersions}"
+                                     ItemDisplayBinding="{Binding VersionName}"/>
                     <form:SubmitButton Text="Add Mod"/>
                 </HorizontalStackLayout>
             </form:Form>

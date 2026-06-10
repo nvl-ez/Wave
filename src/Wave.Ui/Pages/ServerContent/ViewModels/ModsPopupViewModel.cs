@@ -136,20 +136,36 @@ public partial class ModsPopupViewModel : ObservableObject
     {
         if (modInfo is null) return;
         SelectedModInfo = modInfo;
-        ModDetails = await modCatalogService.GetModDetailsAsync(modInfo.ModId, modInfo.ModSupplierType);
+
+        var query = new ModVersionSupplierQuery()
+        {
+            MinecraftVersion = Server.MinecraftVersionBase!.MinecraftVersion,
+            ModId = SelectedModInfo.ModId,
+            ModloaderType = Server.Modloader!.ModloaderType,
+            ModSupplierType = SelectedModInfo.ModSupplierType
+        };
+
+        await GetModDetailsAndVersions(query);
     }
 
     [RelayCommand]
     public async Task GetModDetailsWithModFileAsync(ModFile modFile)
     {
         if (modFile is null) return;
-        ModDetails = await modCatalogService.GetModDetailsAsync(modFile.ModId, modFile.ModSupplierType);
+        var query = new ModVersionSupplierQuery()
+        {
+            MinecraftVersion = Server.MinecraftVersionBase!.MinecraftVersion,
+            ModId = modFile.ModId,
+            ModloaderType = Server.Modloader!.ModloaderType,
+            ModSupplierType = modFile.ModSupplierType
+        };
+
+        await GetModDetailsAndVersions(query);
     }
 
-
-    private async Task GetModDetailsAndVersions(ModVersionSupplierQuery query, ModSupplierType modSupplierType)
+    private async Task GetModDetailsAndVersions(ModVersionSupplierQuery query)
     {
-        ModDetails = await modCatalogService.GetModDetailsAsync(query.ModId, modSupplierType);
+        ModDetails = await modCatalogService.GetModDetailsAsync(query.ModId, query.ModSupplierType);
 
         ModVersions.Clear();
 
