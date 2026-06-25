@@ -39,7 +39,7 @@ public class ModCatalogService : IModCatalogService
         return await target.SearchModsAsync(modInfoSupplierQuery);
     }
 
-    public async Task<ModDetails> GetModDetailsAsync(string modId, ModSupplierType modSupplierType, CancellationToken ct = default)
+    public async Task<ModDetails> GetModDetailsAsync(ModBase modBase, ModSupplierType modSupplierType, CancellationToken ct = default)
     {
         IModSupplierIntegration? target = null;
         foreach (var modSupplier in modSuppliers)
@@ -53,7 +53,7 @@ public class ModCatalogService : IModCatalogService
 
         if (target is null) throw new InvalidDataException($"There is no modsupplier that can handle the type {modSupplierType}.");
 
-        return await target.GetModDetailsAsync(modId);
+        return await target.GetModDetailsAsync(modBase);
     }
 
     public async Task<ModVersionSupplierResponse> GetModVersionsAsync(ModVersionSupplierQuery modVersionSupplierQuery, CancellationToken ct = default)

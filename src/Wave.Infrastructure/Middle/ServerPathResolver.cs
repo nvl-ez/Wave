@@ -67,12 +67,16 @@ public class ServerPathResolver : IServerPathResolver
 
     public string GetModsDirectory(Server server)
     {
-        throw new NotImplementedException();
+        string serverDirectory = GetServerRootDirectory(server);
+        return Path.Combine(serverDirectory, server.ServerPaths.ModDirectoryName);
     }
 
     public string CreateModsDirectory(Server server)
     {
-        throw new NotImplementedException();
+        string serverDirectory = GetServerRootDirectory(server);
+        string modsDirectory = Path.Combine(serverDirectory, server.ServerPaths.ModDirectoryName);
+        Directory.CreateDirectory(modsDirectory);
+        return modsDirectory;
     }
 
     private static string CleanseFileName(string FileName)

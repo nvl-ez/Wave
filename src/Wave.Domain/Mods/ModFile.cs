@@ -5,15 +5,17 @@ namespace Wave.Domain.Mods;
 
 public class ModFile : ModBase, IEquatable<ModFile>
 {
-    public ModFile(ModInfo modInfo, ModVersion modVersion)
+    public ModFile()
     {
-        if (modInfo.ModSupplierType != modVersion.ModSupplierType) throw new InvalidDataException("Mod info and version must be of the same supplier");
-
-        ModId = modInfo.ModId;
-        Name = modInfo.Name;
-        Summary = modInfo.Summary;
-        IconUrl = modInfo.IconUrl;
-        Slug = modInfo.Slug;
+        VersionName = string.Empty;
+        VersionId = string.Empty;
+        Version = string.Empty;
+        MinecraftVersion = string.Empty;
+        Artifacts = [];
+    }
+    public ModFile(ModBase modBase, ModVersion modVersion) : base(modBase.ModId, modBase.ModName, modBase.Slug, modBase.ModSupplierType, modBase.ModSummary, modBase.IconUrl)
+    {
+        if (modBase.ModSupplierType != modVersion.ModSupplierType) throw new InvalidDataException("Mod info and version must be of the same supplier");
 
         VersionId = modVersion.VersionId;
         Version = modVersion.Version;
@@ -21,11 +23,16 @@ public class ModFile : ModBase, IEquatable<ModFile>
         MinecraftVersion = modVersion.MinecraftVersion;
         ModVersionType = modVersion.ModVersionType;
         ModloaderType = modVersion.ModloaderType;
+        VersionName = modVersion.VersionName;
+        Artifacts = modVersion.Artifacts;
     }
 
+    public string VersionName { get; set; }
     public string VersionId { get; set; }
     public string Version { get; set; }
     public string MinecraftVersion { get; set; }
+    public IEnumerable<ModArtifact> Artifacts { get; set; }
+
     public ModVersionType ModVersionType { get; set; }
     public ModloaderType ModloaderType { get; set; }
 

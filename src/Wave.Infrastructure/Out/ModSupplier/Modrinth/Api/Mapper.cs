@@ -8,17 +8,9 @@ namespace Wave.Infrastructure.Out.ModSupplier.Modrinth.Api;
 
 public static class Mapper
 {
-    public static ModInfo ToDomain(ProjectDto dto, ModInfoSupplierQuery query)
+    public static ModInfo ToDomain(ProjectDto dto)
     {
-        return new()
-        {
-            Name = dto.Title,
-            ModId = dto.ProjectId,
-            ModSupplierType = ModSupplierType.Modrinth,
-            IconUrl = dto.IconUrl,
-            Slug = dto.Slug,
-            Summary = dto.Description
-        };
+        return new(dto.ProjectId, dto.Title, dto.Slug, ModSupplierType.Modrinth, dto.Description, dto.IconUrl);
     }
 
     public static PaginationState ToDomain(SearchModsResponseDto searchModsResponseDto)
@@ -40,7 +32,7 @@ public static class Mapper
             {
                 artifacts.Add(new ModArtifact()
                 {
-                    Filename = fileDto.Filename,
+                    FileName = fileDto.Filename,
                     DownloadUrl = fileDto.DownloadUrl
                 });
             }

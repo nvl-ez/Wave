@@ -17,6 +17,7 @@ public record class ServerQuery
         Properties = server.Properties;
         CreationDate = server.CreationDate;
         Modloader = server.Modloader;
+        Mods = server.Mods;
     }
     public Guid? Id { get; set; }
     public string? Name { get; set; }

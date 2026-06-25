@@ -67,7 +67,7 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
             SearchModsResponseDto dto = JsonSerializer.Deserialize<SearchModsResponseDto>(rootElement) ?? new SearchModsResponseDto();
             foreach (ProjectDto modDto in dto.Projects)
             {
-                mods.Add(Mapper.ToDomain(modDto, modSupplierQuery));
+                mods.Add(Mapper.ToDomain(modDto));
             }
             paginationState = Mapper.ToDomain(dto);
         }
@@ -82,20 +82,16 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
         };
     }
 
-    public async Task<ModDetails> GetModDetailsAsync(string modId, CancellationToken ct = default)
+    public async Task<ModDetails> GetModDetailsAsync(ModBase modBase, CancellationToken ct = default)
     {
 
-        string jsonResponse = await client.GetStringAsync($"/v2/project/{modId}", ct);
+        string jsonResponse = await client.GetStringAsync($"/v2/project/{modBase.ModId}", ct);
         JsonDocument doc = JsonDocument.Parse(jsonResponse);
         JsonElement rootElement = doc.RootElement;
 
         ProjectDetailsDto dto = JsonSerializer.Deserialize<ProjectDetailsDto>(rootElement) ?? new ProjectDetailsDto();
 
-        return new()
-        {
-            ModDescription = BuildHtml(dto.Body),
-            ModDescriptionType = ModDescriptionType.Html
-        };
+        return new(modBase, BuildHtml(dto.Body), ModDescriptionType.Html);
     }
 
     public async Task<ModVersionSupplierResponse> GetModVersionsAsync(ModVersionSupplierQuery modInfo, CancellationToken ct = default)
@@ -139,9 +135,24 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
         };
     }
 
-    public Task DownloadMod(ModVersion modVersion, string modsPath, CancellationToken ct = default)
+    public async Task DownloadMod(ModFile modFile, string modsPath, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        foreach (var modArtifact in modFile.Artifacts)
+        {
+            using (var response = await client.GetAsync(modArtifact.DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
+            {
+                response.EnsureSuccessStatusCode();
+
+                string filePath = Path.Combine(modsPath, modArtifact.FileName);
+                using (var fileStream = File.Create(filePath))
+                {
+                    using (var httpStream = await response.Content.ReadAsStreamAsync())
+                    {
+                        await httpStream.CopyToAsync(fileStream);
+                    }
+                }
+            }
+        }
     }
 
     private string BuildHtml(string body)

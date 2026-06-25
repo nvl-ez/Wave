@@ -6,6 +6,7 @@
              xmlns:views="clr-namespace:Wave.Ui.Pages.ServerContent.Views"
              xmlns:collectionComponents="clr-namespace:Wave.Ui.Views.CollectionComponents"
              xmlns:form="clr-namespace:Wave.Ui.Views.FormComponents"
+             xmlns:domain="clr-namespace:Wave.Domain.Mods;assembly=Wave.Domain"
              x:Class="Wave.Ui.Pages.ServerContent.Views.ModsPopup"
              x:DataType="viewModels:ModsPopupViewModel"
              x:Name="Root"
@@ -180,17 +181,40 @@
                          Color="Red"/>
             </Grid>
 
-            <form:Form Grid.Row="2">
-                <HorizontalStackLayout>
-                    <Label Text="Version:"/>
-                    <form:FormPicker IsRequired="True"
-                                     ItemsSource="{Binding ModVersions}"
-                                     ItemDisplayBinding="{Binding VersionName}"/>
-                    <form:SubmitButton Text="Add Mod"/>
-                </HorizontalStackLayout>
-            </form:Form>
+
+            <HorizontalStackLayout Grid.Row="2">
+                <Label Text="Version:"/>
+                <Picker ItemsSource="{Binding ModVersions}"
+                        ItemDisplayBinding="{Binding VersionName}"
+                        SelectedItem="{Binding CurrentModVersion}"/>
+                <Button Text="Add Mod"
+                        Command="{Binding AddModFileCommand}"/>
+            </HorizontalStackLayout>
         </Grid>
 
         <!-- Added Mods -->
+        <CollectionView Grid.Row="2"
+                        Grid.Column="2"
+                        x:Name="ModFilesCollection"
+                        ItemsSource="{Binding ModFiles}"
+                        Margin="20"
+                        SelectionMode="None">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical"
+                                   ItemSpacing="10"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="domain:ModFile">
+                    <HorizontalStackLayout>
+                        <Label Text="{Binding VersionName}"/>
+
+                        <Button Text="-"
+                                Command="{Binding BindingContext.RemoveModFileCommand, Source={x:Reference Root}}"
+                                CommandParameter="{Binding ModId}"/>
+                    </HorizontalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </Grid>
 </ContentView>

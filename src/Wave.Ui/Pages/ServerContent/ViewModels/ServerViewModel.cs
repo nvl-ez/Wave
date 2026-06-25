@@ -80,6 +80,9 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public partial ModloaderTypeQuery ModloaderTypeQuery { get; set; } = new();
     public ObservableCollection<ModloaderInfo> ModloaderInfos { get; set; } = [];
 
+    //Mods
+    public ObservableCollection<ModCardViewModel> Mods { get; set; } = new();
+
 
     /***************
     * CONSTRUCTORS *
@@ -143,6 +146,13 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         //Obtener versiones de modloader disponibles si hay modloader
         Server = server with { }; //Clonar para que pueda buscar las versiones. TODO: limpiar esto.
         if (server.Modloader is not null) await RequestModloaderVersionsAsync();
+
+        //Añadir mods
+        Mods.Clear();
+        foreach (var mod in server.Mods)
+        {
+            Mods.Add(new ModCardViewModel(mod));
+        }
 
         //Update al properties
         Server = new ServerQuery();
@@ -256,6 +266,13 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         finally
         {
             IsModalOpen = false;
+        }
+
+        Mods.Clear();
+
+        foreach (var mod in Server.Mods)
+        {
+            Mods.Add(new ModCardViewModel(mod));
         }
     }
 

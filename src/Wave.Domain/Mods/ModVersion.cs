@@ -9,8 +9,8 @@ public record class ModVersion
     public required string VersionName { get; set; }
     public string Version { get; set; } = "";
     public required string VersionId { get; set; }
-    public required List<ModArtifact> Artifacts { get; set; }
-    public List<ModDependency>? Dependencies { get; set; }
+    public required IEnumerable<ModArtifact> Artifacts { get; set; }
+    public IEnumerable<ModDependency>? Dependencies { get; set; }
     public string? Changelog { get; set; }
     public required string MinecraftVersion { get; set; }
     public required ModVersionType ModVersionType { get; set; }

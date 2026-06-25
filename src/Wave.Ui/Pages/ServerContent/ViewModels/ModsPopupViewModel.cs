@@ -20,20 +20,18 @@ public partial class ModsPopupViewModel : ObservableObject
 
     //MOD INFOS
     public ObservablePaginationState ObservablePaginationState { get; set; } = new ObservablePaginationState(new PaginationState() { Index = 0 });
-    public ObservableCollection<ModCardViewModel> ModInfos { get; set; } = new();
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ModName))]
-    [NotifyPropertyChangedFor(nameof(ModIconUrl))]
-    public partial ModInfo? SelectedModInfo { get; set; } = null;
+    public ObservableCollection<ModCardViewModel> ModInfos { get; } = [];
 
     //MOD DETAILS
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ModDescription))]
     [NotifyPropertyChangedFor(nameof(ModDescriptionType))]
+    [NotifyPropertyChangedFor(nameof(ModName))]
+    [NotifyPropertyChangedFor(nameof(ModIconUrl))]
     public partial ModDetails? ModDetails { get; set; } = null;
 
-    public string? ModName => SelectedModInfo?.Name;
-    public string? ModIconUrl => SelectedModInfo?.IconUrl;
+    public string? ModName => ModDetails?.ModName;
+    public string? ModIconUrl => ModDetails?.IconUrl;
     public string? ModDescription => ModDetails?.ModDescription;
     public string? ModDescriptionType
     {
@@ -47,13 +45,17 @@ public partial class ModsPopupViewModel : ObservableObject
 
 
     //MOD VERSIONS
-    public ObservableCollection<ModVersion> ModVersions { get; set; } = new();
+    public ObservableCollection<ModVersion> ModVersions { get; } = [];
 
     //MOD SUPPLIERS
-    [ObservableProperty]
-    public partial ObservableCollection<KeyValuePair<ModSupplierType, string>> ModSupplierTypes { get; set; } = [];
+    public ObservableCollection<KeyValuePair<ModSupplierType, string>> ModSupplierTypes { get; } = [];
 
     public ModInfoSupplierQuery ModInfoSupplierQuery { get; }
+
+    //MOD FIES
+    public ObservableCollection<ModFile> ModFiles { get; } = [];
+    public ModVersion? CurrentModVersion { get; set; } = null;
+    public ModBase? CurrentMod { get; set; } = null;
 
 
     public ModsPopupViewModel(ServerQuery server, IModCatalogService modCatalogService)
@@ -71,6 +73,11 @@ public partial class ModsPopupViewModel : ObservableObject
             TextQuery = "",
             Author = ""
         };
+
+        foreach (var modFile in server.Mods)
+        {
+            ModFiles.Add(modFile);
+        }
     }
 
     [RelayCommand]
@@ -135,14 +142,15 @@ public partial class ModsPopupViewModel : ObservableObject
     public async Task GetModDetailsWithModInfoAsync(ModInfo modInfo)
     {
         if (modInfo is null) return;
-        SelectedModInfo = modInfo;
+
+        CurrentMod = modInfo;
 
         var query = new ModVersionSupplierQuery()
         {
             MinecraftVersion = Server.MinecraftVersionBase!.MinecraftVersion,
-            ModId = SelectedModInfo.ModId,
+            ModId = modInfo.ModId,
             ModloaderType = Server.Modloader!.ModloaderType,
-            ModSupplierType = SelectedModInfo.ModSupplierType
+            ModSupplierType = modInfo.ModSupplierType
         };
 
         await GetModDetailsAndVersions(query);
@@ -152,6 +160,9 @@ public partial class ModsPopupViewModel : ObservableObject
     public async Task GetModDetailsWithModFileAsync(ModFile modFile)
     {
         if (modFile is null) return;
+
+        CurrentMod = modFile;
+
         var query = new ModVersionSupplierQuery()
         {
             MinecraftVersion = Server.MinecraftVersionBase!.MinecraftVersion,
@@ -165,7 +176,9 @@ public partial class ModsPopupViewModel : ObservableObject
 
     private async Task GetModDetailsAndVersions(ModVersionSupplierQuery query)
     {
-        ModDetails = await modCatalogService.GetModDetailsAsync(query.ModId, query.ModSupplierType);
+        if (CurrentMod is null) return;
+
+        ModDetails = await modCatalogService.GetModDetailsAsync(CurrentMod, query.ModSupplierType);
 
         ModVersions.Clear();
 
@@ -175,5 +188,29 @@ public partial class ModsPopupViewModel : ObservableObject
         {
             ModVersions.Add(modVersion);
         }
+    }
+
+    [RelayCommand]
+    public void AddModFile()
+    {
+        if (CurrentModVersion is null) return;
+        if (CurrentMod is null) return;
+
+        var modFile = new ModFile(CurrentMod, CurrentModVersion);
+
+        //Elimina si existe una version diferente del mod
+        RemoveModFile(modFile.ModId);
+
+        Server.Mods = Server.Mods.Append(modFile);
+        ModFiles.Add(modFile);
+    }
+
+    [RelayCommand]
+    public void RemoveModFile(string modId)
+    {
+        Server.Mods = Server.Mods.Where(m => m.ModId != modId);
+
+        var modFile = ModFiles.FirstOrDefault(m => m.ModId == modId);
+        if (modFile is not null) ModFiles.Remove(modFile);
     }
 }

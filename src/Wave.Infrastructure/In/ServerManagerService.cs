@@ -18,6 +18,7 @@ public class ServerManagerService : IServerManagerService
     private readonly IPropertiesManagerService propertiesManagerService;
     private readonly IEulaManagerService eulaManagerService;
     private readonly IModloaderManagerService modloaderManagerService;
+    private readonly IModManagerService modManagerService;
 
     public ServerManagerService(
         IServerPathResolver serverPathResolver,
@@ -25,7 +26,8 @@ public class ServerManagerService : IServerManagerService
         IVersionManagerService versionManagerService,
         IPropertiesManagerService propertiesManagerService,
         IEulaManagerService eulaManagerService,
-        IModloaderManagerService modloaderManagerService)
+        IModloaderManagerService modloaderManagerService,
+        IModManagerService modManagerService)
     {
         this.serverRepository = serverRepository;
         this.serverPathResolver = serverPathResolver;
@@ -33,6 +35,7 @@ public class ServerManagerService : IServerManagerService
         this.propertiesManagerService = propertiesManagerService;
         this.eulaManagerService = eulaManagerService;
         this.modloaderManagerService = modloaderManagerService;
+        this.modManagerService = modManagerService;
     }
 
     public async Task<ServerQuery> CreateServerAsync(ServerQuery query, CancellationToken ct = default)
@@ -59,6 +62,9 @@ public class ServerManagerService : IServerManagerService
 
         //Add modloader
         await modloaderManagerService.AddModloaderAsync(server, query);
+
+        //Add server
+        await modManagerService.SetModsAsync(server, query);
 
         // Save Server
         await serverRepository.SaveServerAsync(server);
@@ -95,12 +101,24 @@ public class ServerManagerService : IServerManagerService
         await eulaManagerService.SetEulaAsync(server, query);
 
         //Manage Modloader
-        if (server.Modloader != query.Modloader)
+        if (server.Modloader?.Equals(query.Modloader) != true)
         {
             if (server.Modloader is not null)
                 await modloaderManagerService.RemoveModloaderAsync(server);
             if (query.Modloader is not null)
                 await modloaderManagerService.AddModloaderAsync(server, query);
+        }
+
+        //Manage Mods
+        if (server.MinecraftVersionInstallation?.MinecraftVersion != query.MinecraftVersionBase?.MinecraftVersion)
+        { //Update mods
+        }
+        else
+        {
+            if (query.Mods.Count() == 0)
+                server.Mods = [];
+            else
+                await modManagerService.SetModsAsync(server, query);
         }
 
         // Save server

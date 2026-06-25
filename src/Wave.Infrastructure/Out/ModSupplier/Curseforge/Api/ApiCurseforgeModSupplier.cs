@@ -19,10 +19,7 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
 
     public ApiCurseforgeModSupplier()
     {
-        client = new HttpClient()
-        {
-            BaseAddress = new Uri("https://api.curseforge.com")
-        };
+        client = new HttpClient();
         client.DefaultRequestHeaders.Add("x-api-key", "$2a$10$BGG5jB6kIf.QgqGtFOKEWuscWzRGs.YsZ3YXp1YJ7.0PW9i4CzmAe");
     }
     public bool CanHandle(ModSupplierType modSupplierType)
@@ -66,14 +63,14 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
         PaginationState paginationState = new();
         try
         {
-            string jsonResponse = await client.GetStringAsync($"/v1/mods/search?{queryString}", ct);
+            string jsonResponse = await client.GetStringAsync($"https://api.curseforge.com/v1/mods/search?{queryString}", ct);
             JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement rootElement = doc.RootElement;
 
             SearchModsResponseDto dto = JsonSerializer.Deserialize<SearchModsResponseDto>(rootElement) ?? new SearchModsResponseDto();
             foreach (ModInfoDto modDto in dto.Mods)
             {
-                mods.Add(Mapper.ToDomain(modDto, modInfoSupplierQuery));
+                mods.Add(Mapper.ToDomain(modDto));
             }
             paginationState = Mapper.ToDomain(dto.Pagination);
         }
@@ -84,27 +81,22 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
         return new()
         {
             Mods = mods,
-            PaginationState = paginationState
+            PaginationState = paginationState,
+
         };
     }
 
-    public async Task<ModDetails> GetModDetailsAsync(string modId, CancellationToken ct = default)
+    public async Task<ModDetails> GetModDetailsAsync(ModBase modBase, CancellationToken ct = default)
     {
 
 
-        string jsonResponse = await client.GetStringAsync($"/v1/mods/{modId}/description", ct);
+        string jsonResponse = await client.GetStringAsync($"https://api.curseforge.com/v1/mods/{modBase.ModId}/description", ct);
         JsonDocument doc = JsonDocument.Parse(jsonResponse);
         JsonElement rootElement = doc.RootElement;
 
         ModDescriptionDto dto = JsonSerializer.Deserialize<ModDescriptionDto>(rootElement) ?? new ModDescriptionDto();
 
-        var htmlDescription = BuildHtml(dto.Data);
-
-        return new()
-        {
-            ModDescription = htmlDescription,
-            ModDescriptionType = ModDescriptionType.Html
-        };
+        return new(modBase, BuildHtml(dto.Data), ModDescriptionType.Html);
     }
 
     public async Task<ModVersionSupplierResponse> GetModVersionsAsync(ModVersionSupplierQuery modVersionSupplierQuery, CancellationToken ct = default)
@@ -124,7 +116,7 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
         PaginationState paginationState = new();
         try
         {
-            string jsonResponse = await client.GetStringAsync($"/v1/mods/{modVersionSupplierQuery.ModId}/files?{queryString}", ct);
+            string jsonResponse = await client.GetStringAsync($"https://api.curseforge.com/v1/mods/{modVersionSupplierQuery.ModId}/files?{queryString}", ct);
             JsonDocument doc = JsonDocument.Parse(jsonResponse);
             JsonElement rootElement = doc.RootElement;
 
@@ -146,9 +138,24 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
         };
     }
 
-    public Task DownloadMod(ModVersion modVersion, string modsPath, CancellationToken ct = default)
+    public async Task DownloadMod(ModFile modFile, string modsPath, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        foreach (var modArtifact in modFile.Artifacts)
+        {
+            using (var response = await client.GetAsync(modArtifact.DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
+            {
+                response.EnsureSuccessStatusCode();
+
+                string filePath = Path.Combine(modsPath, modArtifact.FileName);
+                using (var fileStream = File.Create(filePath))
+                {
+                    using (var httpStream = await response.Content.ReadAsStreamAsync())
+                    {
+                        await httpStream.CopyToAsync(fileStream);
+                    }
+                }
+            }
+        }
     }
 
     private string BuildHtml(string? html)

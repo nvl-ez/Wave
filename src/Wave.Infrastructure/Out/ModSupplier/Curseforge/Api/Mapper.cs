@@ -9,17 +9,9 @@ namespace Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
 
 public static class Mapper
 {
-    public static ModInfo ToDomain(ModInfoDto modInfoDto, ModInfoSupplierQuery modInfoSupplierQuery)
+    public static ModInfo ToDomain(ModInfoDto dto)
     {
-        return new()
-        {
-            ModId = modInfoDto.Id.ToString(),
-            Summary = modInfoDto.Summary,
-            ModSupplierType = ModSupplierType.Curseforge,
-            Name = modInfoDto.Name,
-            Slug = modInfoDto.Slug,
-            IconUrl = modInfoDto.Logo?.ThumbnailUrl
-        };
+        return new(dto.Id.ToString(), dto.Name, dto.Slug, ModSupplierType.Curseforge, dto.Summary, dto.Logo.ThumbnailUrl);
     }
     public static PaginationState ToDomain(PaginationDto paginationDto)
     {
@@ -36,7 +28,7 @@ public static class Mapper
         List<ModArtifact> artifacts = new List<ModArtifact>();
         ModArtifact artifact = new()
         {
-            Filename = dto.FileName,
+            FileName = dto.FileName,
             DownloadUrl = dto.DownloadUrl
         };
         artifacts.Add(artifact);

@@ -10,13 +10,16 @@ public partial class ModCardViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(Image))]
     [NotifyPropertyChangedFor(nameof(Name))]
     [NotifyPropertyChangedFor(nameof(Summary))]
-    public partial ModInfo ModInfo { get; set; }
+    public partial ModInfo? ModInfo { get; set; } = null;
     [ObservableProperty]
-    public partial ModVersion? ModVersion { get; set; }
+    [NotifyPropertyChangedFor(nameof(Image))]
+    [NotifyPropertyChangedFor(nameof(Name))]
+    [NotifyPropertyChangedFor(nameof(Summary))]
+    public partial ModFile? ModFile { get; set; } = null;
 
-    public string? Image => ModInfo.IconUrl;
-    public string? Name => ModInfo.Name;
-    public string? Summary => ModInfo.Summary;
+    public string? Image => ModFile is null ? ModInfo!.IconUrl : ModFile.IconUrl;
+    public string? Name => ModFile is null ? ModInfo!.ModName : ModFile.ModName;
+    public string? Summary => ModFile is null ? ModInfo!.ModSummary : ModFile.ModSummary;
 
     public bool IsSelected { get; set; } = false;
 
@@ -25,9 +28,8 @@ public partial class ModCardViewModel : ObservableObject
         ModInfo = modInfo;
     }
 
-    public ModCardViewModel(ModInfo modInfo, ModVersion modVersion)
+    public ModCardViewModel(ModFile modFile)
     {
-        ModInfo = modInfo;
-        ModVersion = modVersion;
+        ModFile = modFile;
     }
 }

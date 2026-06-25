@@ -67,6 +67,7 @@ public static class AppComposition
     private static readonly IServerPathResolver serverPathResolver;
     private static readonly IModloaderCatalogService modloaderCatalogService;
     private static readonly IModCatalogService modCatalogService;
+    private static readonly IModManagerService modManagerService;
 
     static AppComposition()
     {
@@ -108,10 +109,11 @@ public static class AppComposition
         modloaderManagerService = new ModloaderManagerService(serverPathResolver, [forgeVersionCatalog, fabricVersionCatalog], javaInstallRepository);
         modloaderCatalogService = new ModloaderCatalogService([forgeVersionCatalog, fabricVersionCatalog]);
         modCatalogService = new ModCatalogService([curseforgeModSupplier, modrinthModSupplier]);
+        modManagerService = new ModManagerService(serverPathResolver, [curseforgeModSupplier, modrinthModSupplier]);
 
 
         minecraftCatalogService = new MinecraftCatalogService(minecraftVersionRepository, serverPropertyDefinitionRepository);
-        serverHandlerService = new ServerManagerService(serverPathResolver, serverRepository, versionManagerService, propertiesManagerService, eulaManagerService, modloaderManagerService);
+        serverHandlerService = new ServerManagerService(serverPathResolver, serverRepository, versionManagerService, propertiesManagerService, eulaManagerService, modloaderManagerService, modManagerService);
         serverExecutorService = new ServerExecutorService(serverPathResolver, serverExecutor, serverRepository, javaInstallRepository);
         javaManagerService = new JavaManagerService(javaInstallRepository, [adoptiumJavaSupplier, mojangJavaSupplier], [compressedJavaInstaller, manifestJavaInstaller]);
         deviceInformationService = new DeviceInformationService(windowsDeviceInformationRepository);

@@ -4,12 +4,29 @@ namespace Wave.Domain.Mods;
 
 public abstract class ModBase : IEquatable<ModBase>
 {
-    public required ModSupplierType ModSupplierType { get; set; }
-    public required string Name { get; set; }
-    public required string Summary { get; set; }
+    protected ModBase()
+    {
+        ModId = string.Empty;
+        ModName = string.Empty;
+        Slug = string.Empty;
+        ModSummary = string.Empty;
+        IconUrl = string.Empty;
+    }
+    public ModBase(string modId, string name, string slug, ModSupplierType modSupplierType, string summary, string? iconUrl = null)
+    {
+        ModId = modId;
+        ModName = name;
+        Slug = slug;
+        ModSupplierType = modSupplierType;
+        ModSummary = summary;
+        IconUrl = iconUrl;
+    }
+    public ModSupplierType ModSupplierType { get; set; }
+    public string ModName { get; set; }
+    public string ModSummary { get; set; }
     public string? IconUrl { get; set; }
-    public required string ModId { get; set; }
-    public required string Slug { get; set; }
+    public string ModId { get; set; }
+    public string Slug { get; set; }
 
     public virtual bool Equals(ModBase? other)
     {
