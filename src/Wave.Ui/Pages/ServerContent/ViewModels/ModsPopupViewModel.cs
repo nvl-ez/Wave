@@ -73,11 +73,6 @@ public partial class ModsPopupViewModel : ObservableObject
             TextQuery = "",
             Author = ""
         };
-
-        foreach (var modFile in server.Mods)
-        {
-            ModFiles.Add(modFile);
-        }
     }
 
     [RelayCommand]

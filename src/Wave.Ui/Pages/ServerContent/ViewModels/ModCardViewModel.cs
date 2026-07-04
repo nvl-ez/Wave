@@ -1,4 +1,5 @@
 using System;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Wave.Domain.Mods;
 
@@ -16,6 +17,8 @@ public partial class ModCardViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(Name))]
     [NotifyPropertyChangedFor(nameof(Summary))]
     [NotifyPropertyChangedFor(nameof(Version))]
+    [NotifyPropertyChangedFor(nameof(HasModFile))]
+    [NotifyPropertyChangedFor(nameof(DeleteCommandParameter))]
     public partial ModFile? ModFile { get; set; } = null;
 
     public string? Image => ModFile is null ? ModInfo!.IconUrl : ModFile.IconUrl;
@@ -23,17 +26,20 @@ public partial class ModCardViewModel : ObservableObject
     public string? Summary => ModFile is null ? ModInfo!.ModSummary : ModFile.ModSummary;
     public string Version => ModFile is null ? "" : ModFile.Version;
     public string ModSupplier => ModFile is null ? "" : ModFile.ModSupplierType.ToString();
+    public bool HasModFile => ModFile is not null;
 
 
-    public bool IsSelected { get; set; } = false;
+    public ICommand? DeleteCommand { get; set; } = null;
+    public ModFile? DeleteCommandParameter => ModFile;
 
     public ModCardViewModel(ModInfo modInfo)
     {
         ModInfo = modInfo;
     }
 
-    public ModCardViewModel(ModFile modFile)
+    public ModCardViewModel(ModFile modFile, ICommand deleteCommand)
     {
         ModFile = modFile;
+        DeleteCommand = deleteCommand;
     }
 }

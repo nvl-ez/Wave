@@ -122,7 +122,9 @@ public class ModManagerService : IModManagerService
                 string modFile = Path.Combine(modsDirectory, modArtifact.FileName);
 
                 UninstallMod(modFile);
+
             }
+            server.Mods = server.Mods.Where(m => m.ModId != mod.ModId);
         }
     }
 

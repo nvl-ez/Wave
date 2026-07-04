@@ -78,6 +78,12 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public ObservableCollection<KeyValuePair<ModloaderType?, string>> ModloaderTypes { get; set; } = [];
     [ObservableProperty]
     public partial ModloaderTypeQuery ModloaderTypeQuery { get; set; } = new();
+    [ObservableProperty]
+    public partial ModloaderInfo? SelectedModloaderInfo { get; set; } = null;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InstalledModloaderIsVisible))]
+    public partial ModloaderBase? InstalledModloader { get; set; } = null;
+    public bool InstalledModloaderIsVisible => InstalledModloader is not null;
     public ObservableCollection<ModloaderInfo> ModloaderInfos { get; set; } = [];
 
     //Mods
@@ -139,24 +145,30 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
 
         //Obtener modloaders disponibles y setear variables
         await RequestModloadersAsync();
-        ModloaderInfoIsVisible = server.Modloader is not null;
-        ModloaderTypeQuery = new() { ModloaderType = server.Modloader?.ModloaderType };
-
-
-        //Obtener versiones de modloader disponibles si hay modloader
-        Server = server with { }; //Clonar para que pueda buscar las versiones. TODO: limpiar esto.
-        if (server.Modloader is not null) await RequestModloaderVersionsAsync();
+        ModloaderInfoIsVisible = false;
+        ModloaderInfos.Clear();
+        SelectedModloaderInfo = null;
+        ModloaderTypeQuery = new();
+        InstalledModloader = server.Modloader;
 
         //Añadir mods
         Mods.Clear();
         foreach (var mod in server.Mods)
         {
-            Mods.Add(new ModCardViewModel(mod));
+            Mods.Add(new ModCardViewModel(mod, RemoveModFileCommand));
         }
 
         //Update al properties
         Server = new ServerQuery();
         Server = server;
+    }
+
+    partial void OnSelectedModloaderInfoChanged(ModloaderInfo? value)
+    {
+        if (value is null) return;
+
+        Server.Modloader = value;
+        InstalledModloader = value;
     }
 
     [RelayCommand]
@@ -199,24 +211,19 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         {
             ModloaderTypes.Add(new KeyValuePair<ModloaderType?, string>(modloader.Key, modloader.Value));
         }
-
-        ModloaderTypes.Add(new KeyValuePair<ModloaderType?, string>(null, "None"));
     }
 
     [RelayCommand]
     private async Task RequestModloaderVersionsAsync()
     {
         ModloaderInfoIsVisible = false;
+        ModloaderInfos.Clear();
+        SelectedModloaderInfo = null;
 
         string? minecraftVersion = Server.MinecraftVersionBase?.MinecraftVersion;
         if (minecraftVersion is null) return;
-        if (ModloaderTypeQuery.ModloaderType is null)
-        {
-            Server.Modloader = null;
-            return;
-        }
+        if (ModloaderTypeQuery.ModloaderType is null) return;
 
-        ModloaderInfos.Clear();
         var modloaderInfos = await modloaderCatalogService.GetModloaderVersionsAsync(
                 (ModloaderType)ModloaderTypeQuery.ModloaderType,
                 minecraftVersion
@@ -227,6 +234,24 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
             ModloaderInfos.Add(modloaderInfo);
         }
         ModloaderInfoIsVisible = true;
+    }
+
+    [RelayCommand]
+    private void RemoveModloader()
+    {
+        Server.Modloader = null;
+        InstalledModloader = null;
+    }
+
+    [RelayCommand]
+    private void RemoveModFile(ModFile modFile)
+    {
+        if (modFile is null) return;
+
+        Server.Mods = Server.Mods.Where(mod => !mod.Equals(modFile));
+
+        var modCard = Mods.FirstOrDefault(mod => mod.ModFile?.Equals(modFile) == true);
+        if (modCard is not null) Mods.Remove(modCard);
     }
 
     //Server
@@ -272,7 +297,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
 
         foreach (var mod in Server.Mods)
         {
-            Mods.Add(new ModCardViewModel(mod));
+            Mods.Add(new ModCardViewModel(mod, RemoveModFileCommand));
         }
     }
 
