@@ -1,11 +1,12 @@
 using System;
 using Wave.Domain.Mods;
+using Wave.Domain.ServerManager.Modloader;
 
 namespace Wave.Domain.ServerManager;
 
 public class ServerChanges
 {
-    public IEnumerable<ModFile>? DeletedMods { get; set; }
+    public IEnumerable<ModFile>? DeletedMods { get; set; } = null;
 
-    public bool? MigratedModloader { get; set; } = null; //True if migrated. False if deleted. Null if nothing.
+    public ModloaderBase? DeletedModloader { get; set; } = null;
 }

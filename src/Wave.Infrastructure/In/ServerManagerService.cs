@@ -93,7 +93,7 @@ public class ServerManagerService : IServerManagerService
         ************/
         Server server = await GetServerAsync((Guid)query.Id);
         string originalVersion = server.MinecraftVersionInstallation!.MinecraftVersion;
-        ModloaderType? originalModloader = server.Modloader?.ModloaderType;
+        ModloaderBase? originalModloader = server.Modloader;
 
         //Version
         await versionManagerService.SetVersionAsync(server, query);
@@ -115,7 +115,10 @@ public class ServerManagerService : IServerManagerService
 
         if (server.Modloader is not null && server.Modloader.ModloaderType == query.Modloader?.ModloaderType && server.Modloader.MinecraftVersion != originalVersion)
         {
-            changes.MigratedModloader = await modloaderManagerService.MigrateModloaderAsync(server);
+            if (!await modloaderManagerService.MigrateModloaderAsync(server))
+            {
+                changes.DeletedModloader = originalModloader;
+            }
         }
 
         //Eliminar mods si no hay modloader.
@@ -126,7 +129,7 @@ public class ServerManagerService : IServerManagerService
         }
 
         //Manage Mods
-        if (query.Modloader is not null && (originalVersion != query.MinecraftVersionBase?.MinecraftVersion || originalModloader != query.Modloader.ModloaderType))
+        if (query.Modloader is not null && (originalVersion != query.MinecraftVersionBase?.MinecraftVersion || originalModloader?.ModloaderType != query.Modloader.ModloaderType))
         { //Update mods
             await modManagerService.SetModsAsync(server, query);
             changes.DeletedMods = await modManagerService.MigrateModsAsync(server);
@@ -142,7 +145,7 @@ public class ServerManagerService : IServerManagerService
         // Save server
         await serverRepository.SaveServerAsync(server);
 
-        return changes.DeletedMods is not null || changes.MigratedModloader is not null ? changes : null;
+        return changes.DeletedMods is not null || changes.DeletedModloader is not null ? changes : null;
     }
 
     public Server GetServer(Guid id)
