@@ -113,7 +113,11 @@ public class ServerManagerService : IServerManagerService
                 await modloaderManagerService.AddModloaderAsync(server, query);
         }
 
-        if (server.Modloader is not null && server.Modloader.ModloaderType == query.Modloader?.ModloaderType && server.Modloader.MinecraftVersion != originalVersion)
+        if (
+            server.Modloader is not null &&
+            server.Modloader.ModloaderType == query.Modloader?.ModloaderType &&
+            (server.Modloader.MinecraftVersion != originalVersion || server.Modloader.MinecraftVersion != query.MinecraftVersionBase!.MinecraftVersion)
+        )
         {
             if (!await modloaderManagerService.MigrateModloaderAsync(server))
             {
@@ -145,7 +149,7 @@ public class ServerManagerService : IServerManagerService
         // Save server
         await serverRepository.SaveServerAsync(server);
 
-        return changes.DeletedMods is not null || changes.DeletedModloader is not null ? changes : null;
+        return (changes.DeletedMods is not null && changes.DeletedMods.Count() > 0) || changes.DeletedModloader is not null ? changes : null;
     }
 
     public Server GetServer(Guid id)

@@ -259,9 +259,25 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public async Task SaveAsync()
     {
         if (Server.Id is not null)
-            await serverHandlerService.EditServerAsync(Server);
-        else
-            await serverHandlerService.CreateServerAsync(Server);
+        {
+            ServerChanges? changes = await serverHandlerService.EditServerAsync(Server);
+            if (changes is not null)
+            {
+                IsModalOpen = true;
+                try
+                {
+                    var popup = new ChangesPopup(changes);
+                    await Shell.Current.ShowPopupAsync(popup);
+                }
+                finally
+                {
+                    IsModalOpen = false;
+                }
+
+                return;
+            }
+        }
+        else await serverHandlerService.CreateServerAsync(Server);
 
         await Shell.Current.GoToAsync("..");
     }

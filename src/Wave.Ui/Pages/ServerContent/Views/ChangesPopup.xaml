@@ -1,13 +1,147 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Wave.Ui.Pages.ServerContent.Views.ChangesPopup">
-    <VerticalStackLayout>
-        <Label
-            Text="Your Minecraft Version has changed!"
-                FontAttributes="Bold"
-                FontSize="15"/>
-        <Label
-            Text="And some elements could not be automatically migrated. The elements below were removed given that there wasn't a compatible alternative:"/>
-    </VerticalStackLayout>
+             xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServerContent.ViewModels"
+             xmlns:views="clr-namespace:Wave.Ui.Pages.ServerContent.Views"
+             xmlns:modloader="clr-namespace:Wave.Domain.ServerManager.Modloader;assembly=Wave.Domain"
+             x:Class="Wave.Ui.Pages.ServerContent.Views.ChangesPopup"
+             x:DataType="viewModels:ChangesPopupViewModel">
+    <ContentView.Resources>
+        <Style TargetType="Label" x:Key="SectionTitle">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
+        </Style>
+    </ContentView.Resources>
+
+    <Border Stroke="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 8"
+            BackgroundColor="{AppThemeBinding Light=White, Dark=#20242C}"
+            Padding="20"
+            MaximumWidthRequest="720">
+        <Grid RowSpacing="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <VerticalStackLayout Grid.Row="0"
+                                 Spacing="6">
+                <Label Text="Server configuration changed"
+                       FontAttributes="Bold"
+                       FontSize="22"
+                       TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
+                <Label Text="The selected server configuration required the mods and/or modloader to be migrated. The following items could not be migrated, so they were removed."
+                       FontSize="14"
+                       TextColor="{AppThemeBinding Light=#667085, Dark=#A8B0BF}"/>
+            </VerticalStackLayout>
+
+            <Border Grid.Row="1"
+                    IsVisible="{Binding HasDeletedModloader}"
+                    Stroke="{AppThemeBinding Light=#BFD1EA, Dark=#38455A}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8"
+                    BackgroundColor="{AppThemeBinding Light=#F8FBFF, Dark=#202A38}"
+                    Padding="14">
+                <Grid ColumnSpacing="14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="60"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Grid.Column="0"
+                            WidthRequest="70"
+                            HeightRequest="70"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 8"
+                            BackgroundColor="{AppThemeBinding Light=#DCE8FA, Dark=#324158}"
+                            Padding="8">
+                        <Image Source="forge.png"
+                               Aspect="AspectFit"
+                               SemanticProperties.Description="Removed modloader">
+                            <Image.Triggers>
+                                <DataTrigger TargetType="Image"
+                                             Binding="{Binding DeletedModloader.ModloaderType}"
+                                             Value="{x:Static modloader:ModloaderType.Forge}">
+                                    <Setter Property="Source" Value="forge.png"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Image"
+                                             Binding="{Binding DeletedModloader.ModloaderType}"
+                                             Value="{x:Static modloader:ModloaderType.Fabric}">
+                                    <Setter Property="Source" Value="fabric.png"/>
+                                </DataTrigger>
+                            </Image.Triggers>
+                        </Image>
+                    </Border>
+
+                    <Label Grid.Row="0"
+                           Grid.Column="1"
+                           Text="{Binding DeletedModloader.ModloaderType, StringFormat='{0} Modloader'}"
+                           FontAttributes="Bold"
+                           FontSize="21"
+                           TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
+
+                    <Label Grid.Row="1"
+                           Grid.Column="1"
+                           Grid.ColumnSpan="2"
+                           Text="{Binding DeletedModloader.MinecraftVersion, StringFormat='Minecraft {0}'}"
+                           FontSize="14"
+                           TextColor="{AppThemeBinding Light=#667085, Dark=#A8B0BF}"/>
+
+                    <Label Grid.Row="0"
+                           Grid.Column="2"
+                           Text="{Binding DeletedModloader.Version}"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#2563EB, Dark=#9DBBFF}"
+                           HorizontalOptions="End"/>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="2"
+                  IsVisible="{Binding HasDeletedMods}"
+                  RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0"
+                       Text="Removed Mods"
+                       Style="{StaticResource SectionTitle}"/>
+
+                <CollectionView Grid.Row="1"
+                                ItemsSource="{Binding DeletedMods}"
+                                SelectionMode="None"
+                                MaximumHeightRequest="360">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical"
+                                           ItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:ModCardViewModel">
+                            <views:ModCardView/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+            <Button Grid.Row="3"
+                    Text="Ok"
+                    Command="{Binding ConfirmCommand}"
+                    HorizontalOptions="End"
+                    WidthRequest="110"/>
+        </Grid>
+    </Border>
 </ContentView>

@@ -81,6 +81,7 @@ public class ModManagerService : IModManagerService
             // If no alternative return
             if (versions is null || versions.Count() == 0)
             {
+                server.Mods = server.Mods.Where(m => m.ModId != mod.ModId);
                 removedMods.Add(mod);
                 continue;
             }

@@ -27,6 +27,7 @@ public partial class ModCardViewModel : ObservableObject
     public string Version => ModFile is null ? "" : ModFile.Version;
     public string ModSupplier => ModFile is null ? "" : ModFile.ModSupplierType.ToString();
     public bool HasModFile => ModFile is not null;
+    public bool CanDelete => ModFile is not null && DeleteCommand is not null;
 
 
     public ICommand? DeleteCommand { get; set; } = null;
@@ -41,5 +42,10 @@ public partial class ModCardViewModel : ObservableObject
     {
         ModFile = modFile;
         DeleteCommand = deleteCommand;
+    }
+
+    public ModCardViewModel(ModFile modFile)
+    {
+        ModFile = modFile;
     }
 }
