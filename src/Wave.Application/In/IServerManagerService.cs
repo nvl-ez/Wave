@@ -6,7 +6,7 @@ namespace Wave.Application.In;
 public interface IServerManagerService
 {
     public Task<ServerQuery> CreateServerAsync(ServerQuery serverCreationQuery, CancellationToken ct = default);
-    public Task EditServerAsync(ServerQuery server, CancellationToken ct = default);
+    public Task<ServerChanges?> EditServerAsync(ServerQuery server, CancellationToken ct = default);
     public Task DeleteServerAsync(Guid id, CancellationToken ct = default);
 
     public Task<ServerQuery> GetServerQueryAsync(Guid id, CancellationToken ct = default);

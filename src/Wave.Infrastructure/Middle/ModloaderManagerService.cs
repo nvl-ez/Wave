@@ -37,41 +37,39 @@ public class ModloaderManagerService : IModloaderManagerService
 
         if (target is null) throw new InvalidDataException($"The type {modloaderInfo.ModloaderType} is not supported by any modloader.");
 
-        string filePath = Path.Combine(serverPathResolver.GetTmpDirectory(), "modloaderInstaller.jar");
+        await InstallModloaderAsync(server, target, modloaderInfo);
 
-        //Obtener el paquete
-        ModloaderPackage modloaderPackage = await target.DownloadModloaderAsync(modloaderInfo, filePath);
+        return server;
+    }
 
-        //Obtener la verion de java mas nueva
-        JavaInstallation javaInstallation = (await javaInstallRepository.GetAllAsync()).OrderByDescending(j => j.Version).First();
+    public async Task<bool> MigrateModloaderAsync(Server server, CancellationToken ct = default)
+    {
+        if (server.Modloader is null) throw new InvalidDataException($"The server does not have an installed modloader.");
 
-        //Instalar el modloader
-        server.Modloader = await target.InstallModloaderAsync(
-            serverPathResolver.GetServerRootDirectory(server),
-            modloaderPackage,
-            javaInstallation
-        );
-
-        var modloaderNames = new[] { "forge", "fabric", "modloader" };
-
-        //Rename the installed modloader accordingly
-        string? modloaderJar = Directory.GetFiles(serverPathResolver.GetServerRootDirectory(server), "*.jar")
-        .FirstOrDefault(file => modloaderNames.Any(c => Path.GetFileName(file).Contains(c, StringComparison.OrdinalIgnoreCase)));
-
-        if (modloaderJar is null) throw new IOException($"The installed modloader '.jar' of type {modloaderInfo.ModloaderType} could not be found.");
-        File.Move(modloaderJar, serverPathResolver.GetModloaderJarPath(server)!, true);
-
-        //Clear tmp folder
-        string[] allFiles = Directory.GetFiles(serverPathResolver.GetTmpDirectory());
-        foreach (string file in allFiles)
+        IModloaderVersionCatalog? target = null;
+        foreach (var modloader in modloaders)
         {
-            if (modloaderNames.Any(c => Path.GetFileName(file).Contains(c, StringComparison.OrdinalIgnoreCase)))
+            if (modloader.CanHandleType(server.Modloader.ModloaderType))
             {
-                File.Delete(file);
+                target = modloader;
+                break;
             }
         }
 
-        return server;
+        if (target is null) throw new InvalidDataException($"The type {server.Modloader.ModloaderType} is not supported by any modloader.");
+
+        var versions = await target.GetModloaderVersionsAsync(server.MinecraftVersionInstallation!.MinecraftVersion);
+
+        if (versions is null || versions.Count() == 0)
+        {
+            server.Modloader = null;
+            return false;
+        }
+
+        await RemoveModloaderAsync(server);
+        await InstallModloaderAsync(server, target, versions.First());
+
+        return true;
     }
 
     public async Task<Server> RemoveModloaderAsync(Server server, CancellationToken ct = default)
@@ -109,5 +107,42 @@ public class ModloaderManagerService : IModloaderManagerService
 
         server.Modloader = null;
         return server;
+    }
+
+    private async Task InstallModloaderAsync(Server server, IModloaderVersionCatalog target, ModloaderInfo modloaderInfo)
+    {
+        string filePath = Path.Combine(serverPathResolver.GetTmpDirectory(), "modloaderInstaller.jar");
+
+        //Obtener el paquete
+        ModloaderPackage modloaderPackage = await target.DownloadModloaderAsync(modloaderInfo, filePath);
+
+        //Obtener la verion de java mas nueva
+        JavaInstallation javaInstallation = (await javaInstallRepository.GetAllAsync()).OrderByDescending(j => j.Version).First();
+
+        //Instalar el modloader
+        server.Modloader = await target.InstallModloaderAsync(
+            serverPathResolver.GetServerRootDirectory(server),
+            modloaderPackage,
+            javaInstallation
+        );
+
+        var modloaderNames = new[] { "forge", "fabric", "modloader" };
+
+        //Rename the installed modloader accordingly
+        string? modloaderJar = Directory.GetFiles(serverPathResolver.GetServerRootDirectory(server), "*.jar")
+        .FirstOrDefault(file => modloaderNames.Any(c => Path.GetFileName(file).Contains(c, StringComparison.OrdinalIgnoreCase)));
+
+        if (modloaderJar is null) throw new IOException($"The installed modloader '.jar' of type {modloaderInfo.ModloaderType} could not be found.");
+        File.Move(modloaderJar, serverPathResolver.GetModloaderJarPath(server)!, true);
+
+        //Clear tmp folder
+        string[] allFiles = Directory.GetFiles(serverPathResolver.GetTmpDirectory());
+        foreach (string file in allFiles)
+        {
+            if (modloaderNames.Any(c => Path.GetFileName(file).Contains(c, StringComparison.OrdinalIgnoreCase)))
+            {
+                File.Delete(file);
+            }
+        }
     }
 }

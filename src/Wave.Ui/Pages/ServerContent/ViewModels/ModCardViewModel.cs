@@ -15,11 +15,15 @@ public partial class ModCardViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(Image))]
     [NotifyPropertyChangedFor(nameof(Name))]
     [NotifyPropertyChangedFor(nameof(Summary))]
+    [NotifyPropertyChangedFor(nameof(Version))]
     public partial ModFile? ModFile { get; set; } = null;
 
     public string? Image => ModFile is null ? ModInfo!.IconUrl : ModFile.IconUrl;
     public string? Name => ModFile is null ? ModInfo!.ModName : ModFile.ModName;
     public string? Summary => ModFile is null ? ModInfo!.ModSummary : ModFile.ModSummary;
+    public string Version => ModFile is null ? "" : ModFile.Version;
+    public string ModSupplier => ModFile is null ? "" : ModFile.ModSupplierType.ToString();
+
 
     public bool IsSelected { get; set; } = false;
 

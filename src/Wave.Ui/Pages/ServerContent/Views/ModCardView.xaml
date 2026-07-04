@@ -18,7 +18,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <!-- Mod Selection -->
+        <!-- Mod Delete -->
         <Border Grid.Row="0"
                 Grid.RowSpan="2"
                 Grid.Column="0"
@@ -59,5 +59,13 @@
                Grid.Column="2"
                Grid.ColumnSpan="4"
                FontSize="16"/>
+        <!-- Mod Version -->
+        <Label Text="{Binding Version}"
+               Grid.Row="0"
+               Grid.Column="3"/>
+        <!-- Mod Supplier -->
+        <Label Text="{Binding ModSupplier}"
+               Grid.Row="0"
+               Grid.Column="4"/>
     </Grid>
 </ContentView>

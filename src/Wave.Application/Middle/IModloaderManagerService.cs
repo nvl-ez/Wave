@@ -10,4 +10,5 @@ public interface IModloaderManagerService
 {
     public Task<Server> AddModloaderAsync(Server server, ServerQuery query, CancellationToken ct = default);
     public Task<Server> RemoveModloaderAsync(Server server, CancellationToken ct = default);
+    public Task<bool> MigrateModloaderAsync(Server server, CancellationToken ct = default);
 }

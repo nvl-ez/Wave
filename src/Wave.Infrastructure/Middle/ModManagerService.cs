@@ -3,6 +3,7 @@ using Wave.Application.Middle;
 using Wave.Application.Out.ModSupplier;
 using Wave.Domain.Mods;
 using Wave.Domain.ServerManager;
+using System.Collections.Generic;
 
 namespace Wave.Infrastructure.Middle;
 
@@ -16,6 +17,8 @@ public class ModManagerService : IModManagerService
         this.modSupplierIntegrations = modSupplierIntegrations;
         this.serverPathResolver = serverPathResolver;
     }
+
+
 
     public async Task SetModsAsync(Server server, ServerQuery query)
     {
@@ -34,15 +37,26 @@ public class ModManagerService : IModManagerService
         await RemoveModsAsync(server, removed);
     }
 
-    private async Task AddModsAsync(Server server, IEnumerable<ModFile> mods)
+    public async Task<IEnumerable<ModFile>> MigrateModsAsync(Server server)
     {
-        string modsDirectory = serverPathResolver.CreateModsDirectory(server);
+        List<ModFile> removedMods = new();
 
-        foreach (ModFile mod in mods)
+        string modsDirectory = serverPathResolver.GetModsDirectory(server);
+
+        string serverMinecraftVersion = server.MinecraftVersionInstallation!.MinecraftVersion;
+        foreach (var mod in server.Mods)
         {
-            if (mod is null) continue;
+            if (mod.MinecraftVersion == serverMinecraftVersion) continue;
 
-            //Find target mod supplier
+            //Uninstall and unlist mod
+            foreach (var modArtifact in mod.Artifacts)
+            {
+                string modFileName = Path.Combine(modsDirectory, modArtifact.FileName);
+                UninstallMod(modFileName);
+            }
+            server.Mods = server.Mods.Where(m => m.ModId != mod.ModId);
+
+            //Search for new versions
             IModSupplierIntegration? target = null;
             foreach (var modSupplier in modSupplierIntegrations)
             {
@@ -54,8 +68,43 @@ public class ModManagerService : IModManagerService
             }
             if (target is null) throw new InvalidDataException($"There is no supported mod supplier of type {mod.ModSupplierType}");
 
-            //Download and store the mod
-            await target.DownloadMod(mod, modsDirectory);
+            ModVersionSupplierQuery query = new()
+            {
+                MinecraftVersion = serverMinecraftVersion,
+                ModId = mod.ModId,
+                ModloaderType = mod.ModloaderType,
+                ModSupplierType = mod.ModSupplierType
+            };
+
+            var versions = (await target.GetModVersionsAsync(query)).Versions;
+
+            // If no alternative return
+            if (versions is null || versions.Count() == 0)
+            {
+                removedMods.Add(mod);
+                continue;
+            }
+
+            //Download the latest version
+            ModFile modFile = new(mod, versions.First());
+
+            await DownloadMod(modFile, modsDirectory);
+
+            server.Mods = server.Mods.Append(modFile);
+        }
+
+        return removedMods;
+    }
+
+    private async Task AddModsAsync(Server server, IEnumerable<ModFile> mods)
+    {
+        string modsDirectory = serverPathResolver.CreateModsDirectory(server);
+
+        foreach (ModFile mod in mods)
+        {
+            if (mod is null) continue;
+
+            await DownloadMod(mod, modsDirectory);
 
             server.Mods = server.Mods.Append(mod);
         }
@@ -72,8 +121,31 @@ public class ModManagerService : IModManagerService
             {
                 string modFile = Path.Combine(modsDirectory, modArtifact.FileName);
 
-                if (File.Exists(modFile)) File.Delete(modFile);
+                UninstallMod(modFile);
             }
         }
+    }
+
+    private void UninstallMod(string modFIle)
+    {
+        if (File.Exists(modFIle)) File.Delete(modFIle);
+    }
+
+    private async Task DownloadMod(ModFile mod, string modsDirectory)
+    {
+        //Find target mod supplier
+        IModSupplierIntegration? target = null;
+        foreach (var modSupplier in modSupplierIntegrations)
+        {
+            if (modSupplier.CanHandle(mod.ModSupplierType))
+            {
+                target = modSupplier;
+                break;
+            }
+        }
+        if (target is null) throw new InvalidDataException($"There is no supported mod supplier of type {mod.ModSupplierType}");
+
+        //Download and store the mod
+        await target.DownloadMod(mod, modsDirectory);
     }
 }

@@ -84,12 +84,14 @@ public class ServerManagerService : IServerManagerService
         await serverRepository.DeleteServerAsync(server.Id);
     }
 
-    public async Task EditServerAsync(ServerQuery query, CancellationToken ct = default)
+    public async Task<ServerChanges?> EditServerAsync(ServerQuery query, CancellationToken ct = default)
     {
+        ServerChanges changes = new();
         /************
         * DIFFERING *
         ************/
         Server server = await GetServerAsync((Guid)query.Id);
+        string originalVersion = server.MinecraftVersionInstallation!.MinecraftVersion;
 
         //Version
         await versionManagerService.SetVersionAsync(server, query);
@@ -109,9 +111,16 @@ public class ServerManagerService : IServerManagerService
                 await modloaderManagerService.AddModloaderAsync(server, query);
         }
 
+        if (server.Modloader is not null && server.Modloader.MinecraftVersion != originalVersion)
+        {
+            changes.MigratedModloader = await modloaderManagerService.MigrateModloaderAsync(server);
+        }
+
         //Manage Mods
-        if (server.MinecraftVersionInstallation?.MinecraftVersion != query.MinecraftVersionBase?.MinecraftVersion)
+        if (originalVersion != query.MinecraftVersionBase?.MinecraftVersion)
         { //Update mods
+            await modManagerService.SetModsAsync(server, query);
+            changes.DeletedMods = await modManagerService.MigrateModsAsync(server);
         }
         else
         {
@@ -123,6 +132,8 @@ public class ServerManagerService : IServerManagerService
 
         // Save server
         await serverRepository.SaveServerAsync(server);
+
+        return changes.DeletedMods is not null || changes.MigratedModloader is not null ? changes : null;
     }
 
     public Server GetServer(Guid id)
