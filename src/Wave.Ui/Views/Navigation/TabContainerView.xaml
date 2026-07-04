@@ -5,7 +5,15 @@
              x:Name="Root">
 
     <ContentView.Content>
-        <StackLayout x:Name="RootLayout"/>
+        <Border Stroke="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 8"
+                BackgroundColor="{AppThemeBinding Light=White, Dark=#20242C}"
+                Padding="6">
+            <StackLayout x:Name="RootLayout"
+                         Orientation="Horizontal"
+                         Spacing="6"/>
+        </Border>
     </ContentView.Content>
 
 </ContentView>

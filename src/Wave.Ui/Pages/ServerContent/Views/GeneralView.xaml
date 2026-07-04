@@ -7,29 +7,59 @@
              xmlns:form="clr-namespace:Wave.Ui.Views.FormComponents"
              x:Class="Wave.Ui.Pages.ServerContent.Views.GeneralView"
              x:DataType="viewModels:ServerViewModel">
-       <VerticalStackLayout>
+       <ContentView.Resources>
+              <Style TargetType="Label" x:Key="FieldLabel">
+                     <Setter Property="FontSize" Value="13"/>
+                     <Setter Property="FontAttributes" Value="Bold"/>
+                     <Setter Property="TextColor" Value="{AppThemeBinding Light=#475467, Dark=#BAC3D1}"/>
+                     <Setter Property="VerticalOptions" Value="Center"/>
+                     <Setter Property="Margin" Value="0,0,8,0"/>
+              </Style>
+              <Style TargetType="Border" x:Key="SectionCard">
+                     <Setter Property="Stroke" Value="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"/>
+                     <Setter Property="StrokeThickness" Value="1"/>
+                     <Setter Property="StrokeShape" Value="RoundRectangle 8"/>
+                     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#20242C}"/>
+                     <Setter Property="Padding" Value="18"/>
+              </Style>
+       </ContentView.Resources>
+
+       <VerticalStackLayout Spacing="18">
               <!-- Icon, Name and MOTD !-->
-              <Grid>
+              <Border Style="{StaticResource SectionCard}">
+              <Grid ColumnSpacing="16"
+                    RowSpacing="12">
                      <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                      </Grid.RowDefinitions>
                      <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                      </Grid.ColumnDefinitions>
 
-                     <BoxView Grid.Column="0"
-                              Grid.RowSpan="2"
-                              Grid.Row="0"
-                              WidthRequest="100"
-                              HeightRequest="100"/>
+                     <Border Grid.Column="0"
+                             Grid.RowSpan="2"
+                             Grid.Row="0"
+                             WidthRequest="104"
+                             HeightRequest="104"
+                             StrokeThickness="0"
+                             StrokeShape="RoundRectangle 8"
+                             BackgroundColor="{AppThemeBinding Light=#EAF1FF, Dark=#29344A}">
+                            <Label Text="W"
+                                   FontAttributes="Bold"
+                                   FontSize="42"
+                                   TextColor="{AppThemeBinding Light=#2563EB, Dark=#9DBBFF}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+                     </Border>
 
                      <!-- Name -->
                      <Label Grid.Column="1"
                             Grid.Row="0"
-                            Text="Server name: "/>
+                            Style="{StaticResource FieldLabel}"
+                            Text="Server name"/>
                      <form:FormEntry Grid.Column="2"
                                      Grid.Row="0"
                                      TextModelPath="Name"
@@ -38,34 +68,41 @@
                      <!-- Motd -->
                      <Label Grid.Column="1"
                             Grid.Row="1"
-                            Text="Motd: "/>
+                            Style="{StaticResource FieldLabel}"
+                            Text="Motd"/>
                      <views:ServerPropertyInputView Grid.Column="2"
                                                     Grid.Row="1"
                                                     ServerPropertyKey="motd"
                                                     PropertyDictionaryModelPath="Properties"
                                                     ServerPropertyDefinition="{Binding MotdServerProperty}"/>
               </Grid>
+              </Border>
 
               <!-- General Properties !-->
-              <Grid>
+              <Border Style="{StaticResource SectionCard}">
+              <Grid ColumnSpacing="16"
+                    RowSpacing="14">
                      <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                      </Grid.RowDefinitions>
                      <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                      </Grid.ColumnDefinitions>
 
                      <!-- Versions -->
                      <Label Grid.Column="0"
                             Grid.Row="0"
+                            Style="{StaticResource FieldLabel}"
                             Text="Versions:"/>
                      <HorizontalStackLayout Grid.Row="0"
-                                            Grid.Column="1">
+                                            Grid.Column="1"
+                                            Spacing="10"
+                                            VerticalOptions="Center">
                             <VerticalStackLayout
                                    toolkit:StateContainer.CurrentState="{Binding MinecraftVersionsStatus}">
                                    <toolkit:StateContainer.StateViews>
@@ -87,7 +124,8 @@
                                    <BoxView WidthRequest="200"
                                             HeightRequest="50"/>
                             </VerticalStackLayout>
-                            <Label Text="Include Snapshots:"/>
+                            <Label Text="Include Snapshots"
+                                   Style="{StaticResource FieldLabel}"/>
                             <form:FormCheckBox IsChecked="{Binding IncludeSnapshots}"
                                                Command="{Binding RequestMinecraftVersionsCommand}"/>
                      </HorizontalStackLayout>
@@ -95,6 +133,7 @@
                      <!-- Gamemode -->
                      <Label Grid.Column="2"
                             Grid.Row="0"
+                            Style="{StaticResource FieldLabel}"
                             Text="Gamemode:"/>
                      <views:ServerPropertyInputView Grid.Column="3"
                                                     Grid.Row="0"
@@ -104,6 +143,7 @@
                      <!-- Server IP -->
                      <Label Grid.Column="0"
                             Grid.Row="1"
+                            Style="{StaticResource FieldLabel}"
                             Text="Server IP:"/>
                      <views:ServerPropertyInputView Grid.Column="1"
                                                     Grid.Row="1"
@@ -113,6 +153,7 @@
                      <!-- Max Players -->
                      <Label Grid.Column="2"
                             Grid.Row="1"
+                            Style="{StaticResource FieldLabel}"
                             Text="Max Players:"/>
                      <views:ServerPropertyInputView Grid.Column="3"
                                                     Grid.Row="1"
@@ -122,6 +163,7 @@
                      <!-- Difficulty -->
                      <Label Grid.Column="0"
                             Grid.Row="2"
+                            Style="{StaticResource FieldLabel}"
                             Text="Difficulty:"/>
                      <views:ServerPropertyInputView Grid.Column="1"
                                                     Grid.Row="2"
@@ -131,6 +173,7 @@
                      <!-- Eula -->
                      <Label Grid.Column="2"
                             Grid.Row="2"
+                            Style="{StaticResource FieldLabel}"
                             Text="Eula:"/>
                      <form:FormPicker Grid.Column="3"
                                       Grid.Row="2"
@@ -139,6 +182,7 @@
                                       SelectedValueMemberPath="Key"
                                       SelectedValueModelPath="Eula"/>
               </Grid>
+              </Border>
 
        </VerticalStackLayout>
 </ContentView>

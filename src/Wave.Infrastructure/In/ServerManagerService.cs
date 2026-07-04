@@ -4,6 +4,7 @@ using Wave.Application.In;
 using Wave.Application.Middle;
 using Wave.Application.Out.Minecraft;
 using Wave.Application.Out.ServerManager;
+using Wave.Domain.Mods;
 using Wave.Domain.ServerManager;
 using Wave.Domain.ServerManager.Modloader;
 using Wave.Infrastructure.Middle;
@@ -92,6 +93,7 @@ public class ServerManagerService : IServerManagerService
         ************/
         Server server = await GetServerAsync((Guid)query.Id);
         string originalVersion = server.MinecraftVersionInstallation!.MinecraftVersion;
+        ModloaderType? originalModloader = server.Modloader?.ModloaderType;
 
         //Version
         await versionManagerService.SetVersionAsync(server, query);
@@ -111,13 +113,20 @@ public class ServerManagerService : IServerManagerService
                 await modloaderManagerService.AddModloaderAsync(server, query);
         }
 
-        if (server.Modloader is not null && server.Modloader.MinecraftVersion != originalVersion)
+        if (server.Modloader is not null && server.Modloader.ModloaderType == query.Modloader?.ModloaderType && server.Modloader.MinecraftVersion != originalVersion)
         {
             changes.MigratedModloader = await modloaderManagerService.MigrateModloaderAsync(server);
         }
 
+        //Eliminar mods si no hay modloader.
+        if (query.Modloader is null && query.Mods.Count() > 0)
+        {
+            changes.DeletedMods = query.Mods;
+            query.Mods = [];
+        }
+
         //Manage Mods
-        if (originalVersion != query.MinecraftVersionBase?.MinecraftVersion)
+        if (query.Modloader is not null && (originalVersion != query.MinecraftVersionBase?.MinecraftVersion || originalModloader != query.Modloader.ModloaderType))
         { //Update mods
             await modManagerService.SetModsAsync(server, query);
             changes.DeletedMods = await modManagerService.MigrateModsAsync(server);

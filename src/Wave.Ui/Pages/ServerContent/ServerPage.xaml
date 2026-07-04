@@ -10,7 +10,17 @@
              x:Class="Wave.Ui.Pages.ServerContent.ServerPage"
              x:DataType="viewModels:ServerViewModel"
              x:Name="Root"
-             Title="{Binding TitleName, StringFormat='Server: {0}'}">
+             Title="{Binding TitleName, StringFormat='Server: {0}'}"
+             BackgroundColor="{AppThemeBinding Light=#F5F7FB, Dark=#15171C}">
+
+    <ContentPage.Resources>
+        <Style TargetType="Button">
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="18,10"/>
+        </Style>
+    </ContentPage.Resources>
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior
@@ -24,7 +34,8 @@
 
     <form:Form Model="{Binding Server}"
                SubmitCommand="{Binding SaveCommand}">
-        <Grid>
+        <Grid Padding="28,22"
+              RowSpacing="18">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -49,16 +60,26 @@
             </navigation:KeepAliveTabHost>
 
 
-            <HorizontalStackLayout Grid.Row="2"
+            <Border Grid.Row="2"
+                    Stroke="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#20242C}"
+                    Padding="14"
+                    HorizontalOptions="Center">
+                <HorizontalStackLayout
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center"
-                                   Margin="20">
+                                   Spacing="12">
 
                 <form:SubmitButton Text="Save"/>
 
                 <Button Text="Delete"
+                        BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#4A2225}"
+                        TextColor="{AppThemeBinding Light=#B91C1C, Dark=#FCA5A5}"
                         Command="{Binding DeleteCommand}"/>
-            </HorizontalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
 
         </Grid>
     </form:Form>

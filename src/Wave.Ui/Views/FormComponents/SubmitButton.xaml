@@ -2,6 +2,12 @@
 <Button xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
         x:Class="Wave.Ui.Views.FormComponents.SubmitButton"
+        BackgroundColor="{AppThemeBinding Light=#2563EB, Dark=#7CA6FF}"
+        TextColor="{AppThemeBinding Light=White, Dark=#111827}"
+        FontAttributes="Bold"
+        FontSize="14"
+        CornerRadius="8"
+        Padding="18,10"
         Clicked="OnClicked"
         ParentChanged="OnParentChanged"
         Loaded="Button_Loaded">

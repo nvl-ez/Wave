@@ -10,10 +10,25 @@
              x:Class="Wave.Ui.Pages.ServerContent.Views.ModsPopup"
              x:DataType="viewModels:ModsPopupViewModel"
              x:Name="Root"
-             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}"
+             BackgroundColor="{AppThemeBinding Light=#F5F7FB, Dark=#15171C}"
              MinimumWidthRequest="1000"
              MinimumHeightRequest="700"
              WidthRequest="1500">
+
+    <ContentView.Resources>
+        <Style TargetType="Label" x:Key="PopupFieldLabel">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#667085, Dark=#A8B0BF}"/>
+        </Style>
+        <Style TargetType="Border" x:Key="PopupPanel">
+            <Setter Property="Stroke" Value="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Setter Property="StrokeShape" Value="RoundRectangle 8"/>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#20242C}"/>
+            <Setter Property="Padding" Value="14"/>
+        </Style>
+    </ContentView.Resources>
 
     <ContentView.Behaviors>
         <toolkit:EventToCommandBehavior
@@ -25,7 +40,9 @@
             Command="{Binding LoadCommand}"/>
     </ContentView.Behaviors>
 
-    <Grid>
+    <Grid Padding="22"
+          RowSpacing="16"
+          ColumnSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -40,7 +57,8 @@
         <!-- Header -->
         <Grid Grid.Row="0"
               Grid.Column="0"
-              Grid.ColumnSpan="3">
+              Grid.ColumnSpan="3"
+              ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="5*"/>
                 <ColumnDefinition Width="*"/>
@@ -48,19 +66,30 @@
             <Label Grid.Column="0"
                    Text="Mod Browser"
                    FontAttributes="Bold"
-                   FontSize="24"/>
+                   FontSize="28"
+                   TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
             <Button Grid.Column="1"
                     Text="X"
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    Padding="0"
+                    BackgroundColor="{AppThemeBinding Light=#EAF1FF, Dark=#29344A}"
+                    TextColor="{AppThemeBinding Light=#2563EB, Dark=#CFE0FF}"
                     Command="{Binding ClosePopupCommand}"/>
         </Grid>
 
         <!-- Searcher -->
+        <Border Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Style="{StaticResource PopupPanel}">
         <form:Form Grid.Row="1"
                    Grid.Column="0"
                    Grid.ColumnSpan="3"
                    Model="{Binding ModInfoSupplierQuery}"
                    SubmitCommand="{Binding SearchModsCommand}">
-            <Grid>
+            <Grid ColumnSpacing="12"
+                  RowSpacing="6">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -76,7 +105,8 @@
                 <!-- Mod Supplier Query -->
                 <Label Text="Mod Supplier:"
                        Grid.Row="0"
-                       Grid.Column="0"/>
+                       Grid.Column="0"
+                       Style="{StaticResource PopupFieldLabel}"/>
 
                 <form:FormPicker Grid.Row="1"
                                  Grid.Column="0"
@@ -89,7 +119,8 @@
                 <!-- Text Query -->
                 <Label Text="Text:"
                        Grid.Row="0"
-                       Grid.Column="1"/>
+                       Grid.Column="1"
+                       Style="{StaticResource PopupFieldLabel}"/>
                 <form:FormEntry Grid.Row="1"
                                 Grid.Column="1"
                                 TextModelPath="TextQuery"/>
@@ -97,7 +128,8 @@
                 <!-- Author Query -->
                 <Label Text="Author:"
                        Grid.Row="0"
-                       Grid.Column="2"/>
+                       Grid.Column="2"
+                       Style="{StaticResource PopupFieldLabel}"/>
                 <form:FormEntry Grid.Row="1"
                                 Grid.Column="2"
                                 TextModelPath="Author"/>
@@ -108,8 +140,12 @@
                                    Grid.Column="3"/>
             </Grid>
         </form:Form>
+        </Border>
 
         <!-- Returned Mods -->
+        <Border Grid.Row="2"
+                Grid.Column="0"
+                Style="{StaticResource PopupPanel}">
         <collectionComponents:PaginatedCollectionView Grid.Row="2"
                                                       Grid.Column="0"
                                                       x:Name="ModsCollection"
@@ -132,25 +168,44 @@
             </collectionComponents:PaginatedCollectionView.ItemTemplate>
 
         </collectionComponents:PaginatedCollectionView>
+        </Border>
 
         <!-- Mod Details -->
+        <Border Grid.Row="2"
+                Grid.Column="1"
+                Style="{StaticResource PopupPanel}">
         <Grid Grid.Row="2"
-              Grid.Column="1">
+              Grid.Column="1"
+              RowSpacing="14">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <HorizontalStackLayout Grid.Row="0">
+            <HorizontalStackLayout Grid.Row="0"
+                                   Spacing="14"
+                                   VerticalOptions="Center">
                 <Image Source="{Binding ModIconUrl}"
                        SemanticProperties.Description="Mod Image"
                        WidthRequest="120"
-                       HeightRequest="120"/>
-                <Label Text="{Binding ModName}"/>
+                       HeightRequest="120"
+                       Aspect="AspectFill"/>
+                <Label Text="{Binding ModName}"
+                       FontAttributes="Bold"
+                       FontSize="24"
+                       LineBreakMode="TailTruncation"
+                       VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
             </HorizontalStackLayout>
 
-            <Grid Grid.Row="1"
+            <Border Grid.Row="1"
+                    Stroke="{AppThemeBinding Light=#E6ECF5, Dark=#313844}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8"
+                    BackgroundColor="{AppThemeBinding Light=#FBFCFF, Dark=#171B22}"
+                    Padding="8">
+            <Grid
                   HorizontalOptions="Fill"
                   VerticalOptions="Fill"
                   toolkit:StateContainer.CurrentState="{Binding ModDescriptionType}">
@@ -167,7 +222,8 @@
                     <!-- Mostrar Texto -->
                     <Editor toolkit:StateView.StateKey="Text"
                             IsReadOnly="True"
-                            Text="{Binding ModDescription}"/>
+                            Text="{Binding ModDescription}"
+                            FontSize="14"/>
 
                     <!-- Loader -->
                     <BoxView toolkit:StateView.StateKey="Loading"
@@ -180,10 +236,15 @@
                          HeightRequest="50"
                          Color="Red"/>
             </Grid>
+            </Border>
 
 
-            <HorizontalStackLayout Grid.Row="2">
-                <Label Text="Version:"/>
+            <HorizontalStackLayout Grid.Row="2"
+                                   Spacing="10"
+                                   VerticalOptions="Center">
+                <Label Text="Version:"
+                       Style="{StaticResource PopupFieldLabel}"
+                       VerticalOptions="Center"/>
                 <Picker ItemsSource="{Binding ModVersions}"
                         ItemDisplayBinding="{Binding VersionName}"
                         SelectedItem="{Binding CurrentModVersion}"/>
@@ -191,13 +252,25 @@
                         Command="{Binding AddModFileCommand}"/>
             </HorizontalStackLayout>
         </Grid>
+        </Border>
 
         <!-- Added Mods -->
-        <CollectionView Grid.Row="2"
-                        Grid.Column="2"
+        <Border Grid.Row="2"
+                Grid.Column="2"
+                Style="{StaticResource PopupPanel}">
+        <Grid RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Label Text="Added Mods"
+                   FontAttributes="Bold"
+                   FontSize="18"
+                   TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
+        <CollectionView Grid.Row="1"
                         x:Name="ModFilesCollection"
                         ItemsSource="{Binding ModFiles}"
-                        Margin="20"
+                        Margin="0"
                         SelectionMode="None">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical"
@@ -206,15 +279,31 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="domain:ModFile">
-                    <HorizontalStackLayout>
-                        <Label Text="{Binding VersionName}"/>
+                    <Border Stroke="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 8"
+                            BackgroundColor="{AppThemeBinding Light=#FBFCFF, Dark=#252A33}"
+                            Padding="10">
+                    <HorizontalStackLayout Spacing="8">
+                        <Label Text="{Binding VersionName}"
+                               LineBreakMode="TailTruncation"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
 
                         <Button Text="-"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                Padding="0"
+                                BackgroundColor="{AppThemeBinding Light=#FEF2F2, Dark=#4A2225}"
+                                TextColor="{AppThemeBinding Light=#B91C1C, Dark=#FCA5A5}"
                                 Command="{Binding BindingContext.RemoveModFileCommand, Source={x:Reference Root}}"
                                 CommandParameter="{Binding ModId}"/>
                     </HorizontalStackLayout>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        </Grid>
+        </Border>
     </Grid>
 </ContentView>

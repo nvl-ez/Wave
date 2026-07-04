@@ -18,33 +18,64 @@
             Command="{Binding LoadCommand}"/>
     </ContentView.Behaviors>
 
-    <Border>
-        <Grid>
+    <Border Stroke="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 8"
+            BackgroundColor="{AppThemeBinding Light=White, Dark=#20242C}"
+            Padding="18,14">
+        <Border.Shadow>
+            <Shadow Brush="{AppThemeBinding Light=#B7C2D4, Dark=Black}"
+                    Offset="0,6"
+                    Radius="16"
+                    Opacity="0.18"/>
+        </Border.Shadow>
+        <Grid ColumnSpacing="18">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <!-- LEFT SICE -->
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0"
+                  ColumnSpacing="14"
+                  VerticalOptions="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Image -->
-                <BoxView Grid.Column="0"
-                         WidthRequest="40"
-                         HeightRequest="40"/>
+                <Border Grid.Column="0"
+                        WidthRequest="48"
+                        HeightRequest="48"
+                        StrokeShape="RoundRectangle 8"
+                        StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light=#EAF1FF, Dark=#29344A}">
+                    <Label Text="W"
+                           FontAttributes="Bold"
+                           FontSize="22"
+                           TextColor="{AppThemeBinding Light=#2563EB, Dark=#9DBBFF}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Border>
 
                 <!-- Text Info -->
-                <VerticalStackLayout Grid.Column="1">
+                <VerticalStackLayout Grid.Column="1"
+                                     Spacing="2"
+                                     VerticalOptions="Center">
                     <Label Text="{Binding Name}"
-                           TextColor="Red"/>
+                           FontAttributes="Bold"
+                           FontSize="18"
+                           LineBreakMode="TailTruncation"
+                           TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
+                    <Label Text="Minecraft server"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light=#667085, Dark=#A8B0BF}"/>
                 </VerticalStackLayout>
             </Grid>
 
             <!-- RIGHT SIDE-->
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="1"
+                  VerticalOptions="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -52,26 +83,37 @@
 
                 <!-- Buttons -->
                 <HorizontalStackLayout Grid.Column="0"
+                                       Spacing="8"
                                        toolkit:StateContainer.CurrentState="{Binding RunningState}">
                     <toolkit:StateContainer.StateViews>
                         <!-- State Running -->
-                        <HorizontalStackLayout toolkit:StateView.StateKey="Running">
+                        <HorizontalStackLayout toolkit:StateView.StateKey="Running"
+                                               Spacing="8">
                             <Button Text="Stop"
                                     Command="{Binding StopServerCommand}"
-                                    BackgroundColor="Red"/>
+                                    FontAttributes="Bold"
+                                    BackgroundColor="#DC2626"
+                                    TextColor="White"/>
                             <Button Text="Console"
                                     Command="{Binding OpenServerCommand}"
-                                    Background="DarkBlue"/>
+                                    FontAttributes="Bold"
+                                    BackgroundColor="{AppThemeBinding Light=#334155, Dark=#94A3B8}"
+                                    TextColor="{AppThemeBinding Light=White, Dark=#111827}"/>
                         </HorizontalStackLayout>
 
                         <!-- State Stopped -->
-                        <HorizontalStackLayout toolkit:StateView.StateKey="Stopped">
+                        <HorizontalStackLayout toolkit:StateView.StateKey="Stopped"
+                                               Spacing="8">
                             <Button Text="Start"
                                     Command="{Binding StartServerCommand}"
-                                    BackgroundColor="SeaGreen"/>
+                                    FontAttributes="Bold"
+                                    BackgroundColor="#16A34A"
+                                    TextColor="White"/>
                             <Button Text="Edit"
                                     Command="{Binding EditServerCommand}"
-                                    Background="SteelBlue"/>
+                                    FontAttributes="Bold"
+                                    BackgroundColor="{AppThemeBinding Light=#2563EB, Dark=#7CA6FF}"
+                                    TextColor="{AppThemeBinding Light=White, Dark=#111827}"/>
                         </HorizontalStackLayout>
                     </toolkit:StateContainer.StateViews>
                 </HorizontalStackLayout>

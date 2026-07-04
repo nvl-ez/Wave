@@ -46,7 +46,7 @@ public class ModManagerService : IModManagerService
         string serverMinecraftVersion = server.MinecraftVersionInstallation!.MinecraftVersion;
         foreach (var mod in server.Mods)
         {
-            if (mod.MinecraftVersion == serverMinecraftVersion) continue;
+            if (mod.MinecraftVersion == serverMinecraftVersion && mod.ModloaderType == server.Modloader?.ModloaderType) continue;
 
             //Uninstall and unlist mod
             foreach (var modArtifact in mod.Artifacts)
@@ -72,7 +72,7 @@ public class ModManagerService : IModManagerService
             {
                 MinecraftVersion = serverMinecraftVersion,
                 ModId = mod.ModId,
-                ModloaderType = mod.ModloaderType,
+                ModloaderType = server.Modloader!.ModloaderType,
                 ModSupplierType = mod.ModSupplierType
             };
 
