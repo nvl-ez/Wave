@@ -7,26 +7,10 @@
              xmlns:form="clr-namespace:Wave.Ui.Views.FormComponents"
              x:Class="Wave.Ui.Pages.ServerContent.Views.GeneralView"
              x:DataType="viewModels:ServerViewModel">
-       <ContentView.Resources>
-              <Style TargetType="Label" x:Key="FieldLabel">
-                     <Setter Property="FontSize" Value="13"/>
-                     <Setter Property="FontAttributes" Value="Bold"/>
-                     <Setter Property="TextColor" Value="{AppThemeBinding Light=#475467, Dark=#BAC3D1}"/>
-                     <Setter Property="VerticalOptions" Value="Center"/>
-                     <Setter Property="Margin" Value="0,0,8,0"/>
-              </Style>
-              <Style TargetType="Border" x:Key="SectionCard">
-                     <Setter Property="Stroke" Value="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"/>
-                     <Setter Property="StrokeThickness" Value="1"/>
-                     <Setter Property="StrokeShape" Value="RoundRectangle 8"/>
-                     <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#20242C}"/>
-                     <Setter Property="Padding" Value="18"/>
-              </Style>
-       </ContentView.Resources>
-
        <VerticalStackLayout Spacing="18">
               <!-- Icon, Name and MOTD !-->
-              <Border Style="{StaticResource SectionCard}">
+              <Border Style="{StaticResource WaveSectionCard}"
+                      Padding="18">
               <Grid ColumnSpacing="16"
                     RowSpacing="12">
                      <Grid.RowDefinitions>
@@ -44,9 +28,7 @@
                              Grid.Row="0"
                              WidthRequest="104"
                              HeightRequest="104"
-                             StrokeThickness="0"
-                             StrokeShape="RoundRectangle 8"
-                             BackgroundColor="{AppThemeBinding Light=#EAF1FF, Dark=#29344A}"
+                             Style="{StaticResource WaveIconWell}"
                              ToolTipProperties.Text="Preferred image size: 64 x 64 pixels">
                             <Border.GestureRecognizers>
                                    <TapGestureRecognizer Command="{Binding SelectServerIconCommand}"/>
@@ -57,7 +39,7 @@
                                    <Image Source="{Binding ServerIcon}"
                                           Aspect="AspectFill"/>
                                    <Border StrokeThickness="0"
-                                           BackgroundColor="#80000000"
+                                           BackgroundColor="{StaticResource WaveOverlay}"
                                            IsVisible="{Binding ServerIconIsPointerOver}">
                                           <Label Text="+"
                                                  FontAttributes="Bold"
@@ -72,7 +54,7 @@
                      <!-- Name -->
                      <Label Grid.Column="1"
                             Grid.Row="0"
-                            Style="{StaticResource FieldLabel}"
+                            Style="{StaticResource WaveFieldLabel}"
                             Text="Server name"/>
                      <form:FormEntry Grid.Column="2"
                                      Grid.Row="0"
@@ -82,7 +64,7 @@
                      <!-- Motd -->
                      <Label Grid.Column="1"
                             Grid.Row="1"
-                            Style="{StaticResource FieldLabel}"
+                            Style="{StaticResource WaveFieldLabel}"
                             Text="Motd"/>
                      <views:ServerPropertyInputView Grid.Column="2"
                                                     Grid.Row="1"
@@ -93,7 +75,8 @@
               </Border>
 
               <!-- General Properties !-->
-              <Border Style="{StaticResource SectionCard}">
+              <Border Style="{StaticResource WaveSectionCard}"
+                      Padding="18">
               <Grid ColumnSpacing="16"
                     RowSpacing="14">
                      <Grid.RowDefinitions>
@@ -111,7 +94,7 @@
                      <!-- Versions -->
                      <Label Grid.Column="0"
                             Grid.Row="0"
-                            Style="{StaticResource FieldLabel}"
+                            Style="{StaticResource WaveFieldLabel}"
                             Text="Versions:"/>
                      <HorizontalStackLayout Grid.Row="0"
                                             Grid.Column="1"
@@ -139,7 +122,7 @@
                                             HeightRequest="50"/>
                             </VerticalStackLayout>
                             <Label Text="Include Snapshots"
-                                   Style="{StaticResource FieldLabel}"/>
+                                   Style="{StaticResource WaveFieldLabel}"/>
                             <form:FormCheckBox IsChecked="{Binding IncludeSnapshots}"
                                                Command="{Binding RequestMinecraftVersionsCommand}"/>
                      </HorizontalStackLayout>
@@ -147,7 +130,7 @@
                      <!-- Gamemode -->
                      <Label Grid.Column="2"
                             Grid.Row="0"
-                            Style="{StaticResource FieldLabel}"
+                            Style="{StaticResource WaveFieldLabel}"
                             Text="Gamemode:"/>
                      <views:ServerPropertyInputView Grid.Column="3"
                                                     Grid.Row="0"
@@ -157,7 +140,7 @@
                      <!-- Server IP -->
                      <Label Grid.Column="0"
                             Grid.Row="1"
-                            Style="{StaticResource FieldLabel}"
+                            Style="{StaticResource WaveFieldLabel}"
                             Text="Server IP:"/>
                      <views:ServerPropertyInputView Grid.Column="1"
                                                     Grid.Row="1"
@@ -167,7 +150,7 @@
                      <!-- Max Players -->
                      <Label Grid.Column="2"
                             Grid.Row="1"
-                            Style="{StaticResource FieldLabel}"
+                            Style="{StaticResource WaveFieldLabel}"
                             Text="Max Players:"/>
                      <views:ServerPropertyInputView Grid.Column="3"
                                                     Grid.Row="1"
@@ -177,7 +160,7 @@
                      <!-- Difficulty -->
                      <Label Grid.Column="0"
                             Grid.Row="2"
-                            Style="{StaticResource FieldLabel}"
+                            Style="{StaticResource WaveFieldLabel}"
                             Text="Difficulty:"/>
                      <views:ServerPropertyInputView Grid.Column="1"
                                                     Grid.Row="2"
@@ -187,7 +170,7 @@
                      <!-- Eula -->
                      <Label Grid.Column="2"
                             Grid.Row="2"
-                            Style="{StaticResource FieldLabel}"
+                            Style="{StaticResource WaveFieldLabel}"
                             Text="Eula:"/>
                      <form:FormPicker Grid.Column="3"
                                       Grid.Row="2"
@@ -199,9 +182,9 @@
               </Border>
 
               <!-- Execution flags -->
-              <Border Style="{StaticResource SectionCard}">
+              <Border Style="{StaticResource WaveSectionCard}">
                      <VerticalStackLayout Spacing="10">
-                            <Label Style="{StaticResource FieldLabel}"
+                            <Label Style="{StaticResource WaveFieldLabel}"
                                    Text="Execution flags"/>
                             <form:FormEntry TextModelPath="ExecutionFlags"
                                             HorizontalOptions="Fill"

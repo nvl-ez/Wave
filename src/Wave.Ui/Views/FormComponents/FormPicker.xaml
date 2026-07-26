@@ -2,9 +2,5 @@
 <Picker xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
         x:Class="Wave.Ui.Views.FormComponents.FormPicker"
-        BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#171B22}"
-        TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"
-        TitleColor="{AppThemeBinding Light=#667085, Dark=#A8B0BF}"
-        FontSize="14"
-        MinimumHeightRequest="42">
+        Style="{StaticResource WaveInputPicker}">
 </Picker>

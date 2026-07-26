@@ -5,10 +5,34 @@
              x:Class="Wave.Ui.Pages.SettingsContent.Views.JavaInstallationCardView"
              x:DataType="domain:JavaInstallation">
 
-    <VerticalStackLayout>
-        <Label
-            Text="{Binding Name}"
-            VerticalOptions="Center"
-            HorizontalOptions="Center"/>
-    </VerticalStackLayout>
+    <Border Style="{StaticResource WaveRaisedCard}"
+            Padding="14">
+        <Grid ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    Style="{StaticResource WaveIconWell}">
+                <Label Text="J"
+                       FontAttributes="Bold"
+                       FontSize="20"
+                       TextColor="{AppThemeBinding Light={StaticResource WaveAccentLight}, Dark={StaticResource WaveAccentMutedDark}}"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Border>
+
+            <VerticalStackLayout Grid.Column="1"
+                                 Spacing="2"
+                                 VerticalOptions="Center">
+                <Label Text="{Binding Name}"
+                       Style="{StaticResource WaveCardTitle}"/>
+                <Label Text="Installed runtime"
+                       Style="{StaticResource WaveCardSubtitle}"/>
+            </VerticalStackLayout>
+        </Grid>
+    </Border>
 </ContentView>

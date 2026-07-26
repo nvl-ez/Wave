@@ -9,19 +9,7 @@
              x:Class="Wave.Ui.Pages.ServersContent.ServersPage"
              Title="Servers Page"
              x:Name="Root"
-             x:DataType="viewModels:ServersViewModel"
-             BackgroundColor="{AppThemeBinding Light=#F5F7FB, Dark=#15171C}">
-
-    <ContentPage.Resources>
-        <Style TargetType="Button">
-            <Setter Property="FontAttributes" Value="Bold"/>
-            <Setter Property="FontSize" Value="15"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="24,12"/>
-            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#2563EB, Dark=#7CA6FF}"/>
-            <Setter Property="TextColor" Value="{AppThemeBinding Light=White, Dark=#111827}"/>
-        </Style>
-    </ContentPage.Resources>
+             x:DataType="viewModels:ServersViewModel">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior
@@ -33,8 +21,7 @@
             Command="{Binding LoadCommand}"/>
     </ContentPage.Behaviors>
 
-    <Grid Padding="28,24"
-          RowSpacing="18">
+    <Grid Style="{StaticResource WavePageGrid}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -69,6 +56,7 @@
 
         <Button
             Text="New Server"
+            Style="{StaticResource WaveLargePrimaryButton}"
             Grid.Row="1"
             VerticalOptions="Center"
             HorizontalOptions="Center"

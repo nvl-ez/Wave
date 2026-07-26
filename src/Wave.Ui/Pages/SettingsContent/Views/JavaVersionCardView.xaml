@@ -4,9 +4,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Wave.Ui.Pages.SettingsContent.Views.JavaVersionCardView"
              x:DataType="domain:JavaVersion">
-    <VerticalStackLayout>
+    <Border Style="{StaticResource WaveRaisedCard}">
+    <VerticalStackLayout Spacing="2">
         <Label Text="{Binding Name}"
-               FontSize="20"/>
-        <Label Text="{Binding Version, StringFormat='Major Version: {0}'}"/>
+               Style="{StaticResource WaveCardTitle}"/>
+        <Label Text="{Binding Version, StringFormat='Major Version: {0}'}"
+               Style="{StaticResource WaveCardSubtitle}"/>
     </VerticalStackLayout>
+    </Border>
 </ContentView>

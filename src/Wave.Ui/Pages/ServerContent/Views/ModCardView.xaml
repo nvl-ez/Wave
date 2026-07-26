@@ -4,11 +4,7 @@
              xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServerContent.ViewModels"
              x:Class="Wave.Ui.Pages.ServerContent.Views.ModCardView"
              x:DataType="viewModels:ModCardViewModel">
-    <Border Stroke="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"
-            StrokeThickness="1"
-            StrokeShape="RoundRectangle 8"
-            BackgroundColor="{AppThemeBinding Light=#FBFCFF, Dark=#252A33}"
-            Padding="12">
+    <Border Style="{StaticResource WaveRaisedCard}">
     <Grid ColumnSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -36,10 +32,7 @@
         <Label Text="{Binding Name}"
                Grid.Row="0"
                Grid.Column="1"
-               FontAttributes="Bold"
-               FontSize="18"
-               LineBreakMode="TailTruncation"
-               TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
+               Style="{StaticResource WaveCardTitle}"/>
         <!-- Mod Description -->
         <Label Text="{Binding Summary}"
                Grid.Row="1"
@@ -48,34 +41,30 @@
                FontSize="13"
                LineBreakMode="TailTruncation"
                MaxLines="2"
-               TextColor="{AppThemeBinding Light=#667085, Dark=#A8B0BF}"/>
+               Style="{StaticResource WaveCardSubtitle}"/>
         <!-- Mod Version -->
         <Label Text="{Binding Version}"
                Grid.Row="0"
                Grid.Column="2"
                FontSize="12"
                FontAttributes="Bold"
-               TextColor="{AppThemeBinding Light=#2563EB, Dark=#9DBBFF}"/>
+               TextColor="{AppThemeBinding Light={StaticResource WaveAccentLight}, Dark={StaticResource WaveAccentDark}}"/>
         <!-- Mod Supplier -->
         <Label Text="{Binding ModSupplier}"
                Grid.Row="0"
                Grid.Column="3"
-               FontSize="12"
-               TextColor="{AppThemeBinding Light=#667085, Dark=#A8B0BF}"
+               Style="{StaticResource WaveCardSubtitle}"
                HorizontalOptions="End"/>
         <!-- Mod Delete -->
         <Border Grid.Row="0"
                 Grid.RowSpan="2"
                 Grid.Column="4"
                 IsVisible="{Binding CanDelete}"
-                Stroke="{AppThemeBinding Light=#FECACA, Dark=#6B2A2F}"
-                StrokeThickness="1"
+                Style="{StaticResource WaveDangerFrame}"
                 StrokeShape="RoundRectangle 0,10,0,10"
-                Padding="5"
                 Margin="10,0,0,0">
             <Button Text="Delete"
-                    TextColor="{AppThemeBinding Light=#B91C1C, Dark=#FCA5A5}"
-                    BackgroundColor="{AppThemeBinding Light=#FEF2F2, Dark=#4A2225}"
+                    Style="{StaticResource WaveDangerButton}"
                     Command="{Binding DeleteCommand}"
                     CommandParameter="{Binding DeleteCommandParameter}"/>
         </Border>

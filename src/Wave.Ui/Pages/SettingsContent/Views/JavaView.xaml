@@ -21,7 +21,8 @@
             Command="{Binding LoadCommand}"/>
     </ContentView.Behaviors>
 
-    <Grid>
+    <Grid RowSpacing="16"
+          ColumnSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -35,14 +36,18 @@
         <Label Grid.Row="0"
                Grid.Column="0"
                Grid.ColumnSpan="2"
-               Text="Java Installation Manager"/>
+               Text="Java Installation Manager"
+               Style="{StaticResource WavePageTitle}"/>
 
         <!-- Java Installations -->
-        <VerticalStackLayout Grid.Row="1"
-                             Grid.Column="0">
-            <Label Text="Installed Java Versions"/>
+        <Border Grid.Row="1"
+                Grid.Column="0"
+                Style="{StaticResource WaveSectionCard}">
+        <VerticalStackLayout Spacing="14">
+            <Label Text="Installed Java Versions"
+                   Style="{StaticResource WaveSectionTitle}"/>
             <CollectionView ItemsSource="{Binding JavaInstallations}"
-                            Margin="20"
+                            Margin="0"
                             SelectionMode="None">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Vertical"
@@ -56,18 +61,23 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </VerticalStackLayout>
+        </Border>
 
         <!-- Add Installation -->
 
-        <VerticalStackLayout Grid.Row="1"
-                             Grid.Column="1">
-            <Label Text="Find and Download Java"/>
+        <Border Grid.Row="1"
+                Grid.Column="1"
+                Style="{StaticResource WaveSectionCard}">
+        <VerticalStackLayout Spacing="12">
+            <Label Text="Find and Download Java"
+                   Style="{StaticResource WaveSectionTitle}"/>
             <!-- 1. Select Supplier -->
-            <Border>
-                <VerticalStackLayout>
-                    <Label Text="1. Select Supplier"/>
+            <Border Style="{StaticResource WavePanelCard}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="1. Select Supplier"
+                           Style="{StaticResource WaveFieldLabel}"/>
                     <CollectionView ItemsSource="{Binding JavaSuppliers}"
-                                    Margin="5"
+                                    Margin="0"
                                     SelectionMode="Single"
                                     SelectedItem="{Binding SelectedJavaSupplier}"
                                     SelectionChangedCommand="{Binding JavaSupplierSelectedCommand}">
@@ -80,7 +90,12 @@
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="out:IJavaSupplier">
-                                <Label Text="{Binding Name}"/>
+                                <Border Style="{StaticResource WaveRaisedCard}"
+                                        Padding="10">
+                                    <Label Text="{Binding Name}"
+                                           Style="{StaticResource WaveCardSubtitle}"
+                                           HorizontalTextAlignment="Center"/>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
@@ -88,19 +103,25 @@
             </Border>
 
             <!-- 2. Query Version -->
-            <Border IsVisible="{Binding QuerySectionIsVisible}">
-                <VerticalStackLayout>
-                    <Label Text="2. Select Major Version"/>
+            <Border IsVisible="{Binding QuerySectionIsVisible}"
+                    Style="{StaticResource WavePanelCard}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="2. Select Major Version"
+                           Style="{StaticResource WaveFieldLabel}"/>
                     <VerticalStackLayout toolkit:StateContainer.CurrentState="{Binding QuerySectionState}">
                         <toolkit:StateContainer.StateViews>
                             <!-- Loading -->
                             <Label toolkit:StateView.StateKey="Loading"
-                                   Text="Loading"/>
+                                   Text="Loading"
+                                   Style="{StaticResource WaveCardSubtitle}"/>
                             <!-- Loaded -->
-                            <VerticalStackLayout toolkit:StateView.StateKey="Loaded">
+                            <VerticalStackLayout toolkit:StateView.StateKey="Loaded"
+                                                 Spacing="10">
                                 <Picker ItemsSource="{Binding JavaVersionNumbers}"
-                                        SelectedItem="{Binding SelectedJavaVersionNumber}"/>
+                                        SelectedItem="{Binding SelectedJavaVersionNumber}"
+                                        Style="{StaticResource WaveInputPicker}"/>
                                 <Button Text="Search"
+                                        Style="{StaticResource WavePrimaryButton}"
                                         Command="{Binding QueryVersionsCommand}"/>
                             </VerticalStackLayout>
                         </toolkit:StateContainer.StateViews>
@@ -109,20 +130,23 @@
             </Border>
 
             <!-- 3. Display Versions -->
-            <Border IsVisible="{Binding VersionsSectionIsVisible}">
-                <VerticalStackLayout>
-                    <Label Text="3. Select Version"/>
+            <Border IsVisible="{Binding VersionsSectionIsVisible}"
+                    Style="{StaticResource WavePanelCard}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="3. Select Version"
+                           Style="{StaticResource WaveFieldLabel}"/>
 
                     <VerticalStackLayout toolkit:StateContainer.CurrentState="{Binding VersionsSectionState}">
                         <toolkit:StateContainer.StateViews>
                             <!-- Loading -->
                             <Label toolkit:StateView.StateKey="Loading"
-                                   Text="Loading"/>
+                                   Text="Loading"
+                                   Style="{StaticResource WaveCardSubtitle}"/>
 
                             <!-- Loaded -->
                             <VerticalStackLayout toolkit:StateView.StateKey="Loaded">
                                 <CollectionView ItemsSource="{Binding JavaVersions}"
-                                                Margin="5"
+                                                Margin="0"
                                                 SelectionMode="Single"
                                                 SelectedItem="{Binding SelectedJavaVersion}"
                                                 SelectionChangedCommand="{Binding JavaVersionSelectedCommand}">
@@ -144,11 +168,13 @@
             </Border>
 
             <!-- 4. Select a Download Option -->
-            <Border IsVisible="{Binding ArtifactsSectionIsVisible}">
-                <VerticalStackLayout>
-                    <Label Text="4. Select Download Option"/>
+            <Border IsVisible="{Binding ArtifactsSectionIsVisible}"
+                    Style="{StaticResource WavePanelCard}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="4. Select Download Option"
+                           Style="{StaticResource WaveFieldLabel}"/>
                     <CollectionView ItemsSource="{Binding JavaArtifacts}"
-                                    Margin="5"
+                                    Margin="0"
                                     SelectionMode="Single"
                                     SelectedItem="{Binding SelectedJavaArtifact}"
                                     SelectionChangedCommand="{Binding JavaArtifactSelectedCommand}">
@@ -159,7 +185,11 @@
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="domain:JavaArtifact">
-                                <Label Text="{Binding Name}"/>
+                                <Border Style="{StaticResource WaveRaisedCard}"
+                                        Padding="10">
+                                    <Label Text="{Binding Name}"
+                                           Style="{StaticResource WaveCardSubtitle}"/>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
@@ -167,15 +197,18 @@
             </Border>
 
             <!-- 5. Download and Install -->
-            <Border IsVisible="{Binding InstallSectionIsVisible}">
-                <VerticalStackLayout>
-                    <Label Text="5. Download and Install"/>
+            <Border IsVisible="{Binding InstallSectionIsVisible}"
+                    Style="{StaticResource WavePanelCard}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="5. Download and Install"
+                           Style="{StaticResource WaveFieldLabel}"/>
                     <Button Text="GO"
-                            BackgroundColor="Green"
+                            Style="{StaticResource WaveSuccessButton}"
                             Command="{Binding DownloadAndInstallCommand}"
                             IsEnabled="{Binding IsInstallButtonEnabled}"/>
                 </VerticalStackLayout>
             </Border>
         </VerticalStackLayout>
+        </Border>
     </Grid>
 </ContentView>

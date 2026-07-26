@@ -18,13 +18,10 @@
             Command="{Binding LoadCommand}"/>
     </ContentView.Behaviors>
 
-    <Border Stroke="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"
-            StrokeThickness="1"
-            StrokeShape="RoundRectangle 8"
-            BackgroundColor="{AppThemeBinding Light=White, Dark=#20242C}"
+    <Border Style="{StaticResource WaveSectionCard}"
             Padding="18,14">
         <Border.Shadow>
-            <Shadow Brush="{AppThemeBinding Light=#B7C2D4, Dark=Black}"
+            <Shadow Brush="{AppThemeBinding Light={StaticResource WaveShadowLight}, Dark={StaticResource Black}}"
                     Offset="0,6"
                     Radius="16"
                     Opacity="0.18"/>
@@ -47,9 +44,7 @@
                 <Border Grid.Column="0"
                         WidthRequest="48"
                         HeightRequest="48"
-                        StrokeShape="RoundRectangle 8"
-                        StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light=#EAF1FF, Dark=#29344A}">
+                        Style="{StaticResource WaveIconWell}">
                     <Image Source="{Binding ServerIcon}"
                            Aspect="AspectFill"/>
                 </Border>
@@ -59,13 +54,9 @@
                                      Spacing="2"
                                      VerticalOptions="Center">
                     <Label Text="{Binding Name}"
-                           FontAttributes="Bold"
-                           FontSize="18"
-                           LineBreakMode="TailTruncation"
-                           TextColor="{AppThemeBinding Light=#172033, Dark=#F8FAFC}"/>
+                           Style="{StaticResource WaveCardTitle}"/>
                     <Label Text="Minecraft server"
-                           FontSize="12"
-                           TextColor="{AppThemeBinding Light=#667085, Dark=#A8B0BF}"/>
+                           Style="{StaticResource WaveCardSubtitle}"/>
                 </VerticalStackLayout>
             </Grid>
 
@@ -87,14 +78,10 @@
                                                Spacing="8">
                             <Button Text="Stop"
                                     Command="{Binding StopServerCommand}"
-                                    FontAttributes="Bold"
-                                    BackgroundColor="#DC2626"
-                                    TextColor="White"/>
+                                    Style="{StaticResource WaveStopButton}"/>
                             <Button Text="Console"
                                     Command="{Binding OpenServerCommand}"
-                                    FontAttributes="Bold"
-                                    BackgroundColor="{AppThemeBinding Light=#334155, Dark=#94A3B8}"
-                                    TextColor="{AppThemeBinding Light=White, Dark=#111827}"/>
+                                    Style="{StaticResource WaveSecondaryButton}"/>
                         </HorizontalStackLayout>
 
                         <!-- State Stopped -->
@@ -102,14 +89,10 @@
                                                Spacing="8">
                             <Button Text="Start"
                                     Command="{Binding StartServerCommand}"
-                                    FontAttributes="Bold"
-                                    BackgroundColor="#16A34A"
-                                    TextColor="White"/>
+                                    Style="{StaticResource WaveSuccessButton}"/>
                             <Button Text="Edit"
                                     Command="{Binding EditServerCommand}"
-                                    FontAttributes="Bold"
-                                    BackgroundColor="{AppThemeBinding Light=#2563EB, Dark=#7CA6FF}"
-                                    TextColor="{AppThemeBinding Light=White, Dark=#111827}"/>
+                                    Style="{StaticResource WavePrimaryButton}"/>
                         </HorizontalStackLayout>
                     </toolkit:StateContainer.StateViews>
                 </HorizontalStackLayout>

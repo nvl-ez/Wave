@@ -27,6 +27,43 @@
     <Color x:Key="Gray900">#212121</Color>
     <Color x:Key="Gray950">#141414</Color>
 
+    <Color x:Key="WavePageBackgroundLight">#F5F7FB</Color>
+    <Color x:Key="WavePageBackgroundDark">#15171C</Color>
+    <Color x:Key="WaveSurfaceLight">#FFFFFF</Color>
+    <Color x:Key="WaveSurfaceDark">#20242C</Color>
+    <Color x:Key="WaveRaisedSurfaceLight">#FBFCFF</Color>
+    <Color x:Key="WaveRaisedSurfaceDark">#252A33</Color>
+    <Color x:Key="WaveSoftSurfaceLight">#F8FBFF</Color>
+    <Color x:Key="WaveSoftSurfaceDark">#202A38</Color>
+    <Color x:Key="WaveInputLight">#F8FAFC</Color>
+    <Color x:Key="WaveInputDark">#171B22</Color>
+    <Color x:Key="WaveTextLight">#172033</Color>
+    <Color x:Key="WaveTextDark">#F8FAFC</Color>
+    <Color x:Key="WaveMutedTextLight">#667085</Color>
+    <Color x:Key="WaveMutedTextDark">#A8B0BF</Color>
+    <Color x:Key="WaveFieldTextLight">#475467</Color>
+    <Color x:Key="WaveFieldTextDark">#BAC3D1</Color>
+    <Color x:Key="WaveBorderLight">#DEE6F3</Color>
+    <Color x:Key="WaveBorderDark">#313844</Color>
+    <Color x:Key="WaveAccentLight">#2563EB</Color>
+    <Color x:Key="WaveAccentDark">#7CA6FF</Color>
+    <Color x:Key="WaveAccentTextLight">#FFFFFF</Color>
+    <Color x:Key="WaveAccentTextDark">#111827</Color>
+    <Color x:Key="WaveAccentSoftLight">#EAF1FF</Color>
+    <Color x:Key="WaveAccentSoftDark">#29344A</Color>
+    <Color x:Key="WaveAccentMutedLight">#1E3A8A</Color>
+    <Color x:Key="WaveAccentMutedDark">#CFE0FF</Color>
+    <Color x:Key="WaveSuccess">#16A34A</Color>
+    <Color x:Key="WaveDanger">#DC2626</Color>
+    <Color x:Key="WaveDangerSurfaceLight">#FEF2F2</Color>
+    <Color x:Key="WaveDangerSurfaceDark">#4A2225</Color>
+    <Color x:Key="WaveDangerBorderLight">#FECACA</Color>
+    <Color x:Key="WaveDangerBorderDark">#6B2A2F</Color>
+    <Color x:Key="WaveDangerTextLight">#B91C1C</Color>
+    <Color x:Key="WaveDangerTextDark">#FCA5A5</Color>
+    <Color x:Key="WaveShadowLight">#B7C2D4</Color>
+    <Color x:Key="WaveOverlay">#80000000</Color>
+
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>
@@ -41,4 +78,5 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+    <SolidColorBrush x:Key="WaveShadowLightBrush" Color="{StaticResource WaveShadowLight}"/>
 </ResourceDictionary>

@@ -5,10 +5,7 @@
              x:Name="Root">
 
     <ContentView.Content>
-        <Border Stroke="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"
-                StrokeThickness="1"
-                StrokeShape="RoundRectangle 8"
-                BackgroundColor="{AppThemeBinding Light=White, Dark=#20242C}"
+        <Border Style="{StaticResource WaveSectionCard}"
                 Padding="6">
             <StackLayout x:Name="RootLayout"
                          Orientation="Horizontal"
