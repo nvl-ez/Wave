@@ -16,7 +16,8 @@ public class ServerExecutorService : IServerExecutorService
     private readonly IJavaInstallRepository javaInstallRepository;
     private readonly IServerRepository serverRepository;
 
-    private Dictionary<Guid, IServerSession> runningServers = new(); //TODO abstract dictionary in an out port
+    private readonly Dictionary<Guid, IServerSession> runningServers = new(); //TODO abstract dictionary in an out port
+    private readonly Lock runningServersLock = new();
 
     public ServerExecutorService(IServerPathResolver serverPathResolver, IServerExecutor serverExecutor, IServerRepository serverRepository, IJavaInstallRepository javaInstallRepository)
     {
@@ -28,8 +29,11 @@ public class ServerExecutorService : IServerExecutorService
 
     public IServerSession? TryGetSession(Guid id)
     {
-        if (!runningServers.ContainsKey(id)) return null;
-        return runningServers[id];
+        lock (runningServersLock)
+        {
+            if (!runningServers.ContainsKey(id)) return null;
+            return runningServers[id];
+        }
     }
 
     public async Task<IServerSession> Start(Guid id, CancellationToken ct = default)
@@ -47,29 +51,42 @@ public class ServerExecutorService : IServerExecutorService
 
         if (javaInstallation is null) throw new JavaInstallationNotFoundException($"No available Java installation was found for version {serverJavaVersion}.");
 
-        if (runningServers.ContainsKey(server.Id)) throw new ServerAlreadyRunningException($"Server '{server.Name}' is already running.");
+        lock (runningServersLock)
+        {
+            if (runningServers.ContainsKey(server.Id)) throw new ServerAlreadyRunningException($"Server '{server.Name}' is already running.");
 
-        IServerSession serverSession = serverExecutor.Start(
-            server.Id,
-            serverPathResolver.GetServerRootDirectory(server),
-            serverPathResolver.GetServerJarPath(server),
-            javaInstallation
-            );
+            IServerSession serverSession = serverExecutor.Start(
+                server.Id,
+                serverPathResolver.GetServerRootDirectory(server),
+                serverPathResolver.GetServerJarPath(server),
+                javaInstallation
+                );
 
-        runningServers.Add(server.Id, serverSession);
-        serverSession.ServerDisposed += ServerDisposed;
+            runningServers.Add(server.Id, serverSession);
+            serverSession.ServerDisposed += ServerDisposed;
 
-        return serverSession;
+            return serverSession;
+        }
+    }
+
+    public async Task StopAll()
+    {
+        IServerSession[] serverSessions;
+
+        lock (runningServersLock)
+        {
+            serverSessions = runningServers.Values.ToArray();
+        }
+
+        await Task.WhenAll(serverSessions.Select(session => session.DisposeAsync().AsTask()));
     }
 
     private void ServerDisposed(object? sender, Guid id)
     {
-        if (!runningServers.ContainsKey(id)) throw new ServerNotRunningException("Attempted to find a server that is not running.");
-
-        IServerSession serverSession = runningServers[id];
-        serverSession.ServerDisposed -= ServerDisposed;
-        runningServers.Remove(id);
+        lock (runningServersLock)
+        {
+            if (!runningServers.Remove(id, out IServerSession? serverSession)) return;
+            serverSession.ServerDisposed -= ServerDisposed;
+        }
     }
-
-    //TODO: Kill all servers running on exit
 }

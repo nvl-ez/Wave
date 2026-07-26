@@ -7,4 +7,5 @@ public interface IServerExecutorService
 {
     public Task<IServerSession> Start(Guid id, CancellationToken ct = default);
     public IServerSession? TryGetSession(Guid id);
+    public Task StopAll();
 }

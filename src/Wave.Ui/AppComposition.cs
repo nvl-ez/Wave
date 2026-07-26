@@ -125,4 +125,6 @@ public static class AppComposition
     public static ExecutionViewModel CreateExecutionViewModel() => new ExecutionViewModel(serverExecutorService);
     public static JavaViewModel CreateJavaViewModel() => new JavaViewModel(deviceInformationService, javaManagerService);
     public static SettingsViewModel CreateSettingsViewModel() => new SettingsViewModel();
+
+    public static IServerExecutorService GetServerExecutorService() => serverExecutorService;
 }
