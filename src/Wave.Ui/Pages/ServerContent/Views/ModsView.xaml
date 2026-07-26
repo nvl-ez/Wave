@@ -30,14 +30,16 @@
                        Style="{StaticResource WaveSectionTitle}"/>
 
                 <HorizontalStackLayout Grid.Row="1"
-                                       Spacing="12"
+                                       Spacing="32"
                                        VerticalOptions="Center">
                     <form:Form HorizontalOptions="Fill"
                                VerticalOptions="Fill"
                                Model="{Binding ModloaderTypeQuery}"
                                SubmitCommand="{Binding RequestModloaderVersionsCommand}">
                         <HorizontalStackLayout Spacing="10">
-                            <form:FormPicker ItemsSource="{Binding ModloaderTypes}"
+                            <form:FormPicker WidthRequest="180"
+                                             HeightRequest="44"
+                                             ItemsSource="{Binding ModloaderTypes}"
                                              ItemDisplayBinding="{Binding Value}"
                                              SelectedValueModelPath="ModloaderType"
                                              SelectedValueMemberPath="Key"/>
@@ -45,10 +47,17 @@
                         </HorizontalStackLayout>
                     </form:Form>
 
-                    <form:FormPicker IsVisible="{Binding ModloaderInfoIsVisible}"
-                                     ItemsSource="{Binding ModloaderInfos}"
-                                     ItemDisplayBinding="{Binding Version}"
-                                     SelectedValue="{Binding SelectedModloaderInfo}"/>
+                    <HorizontalStackLayout IsVisible="{Binding ModloaderInfoIsVisible}"
+                                           Spacing="8"
+                                           VerticalOptions="Center">
+                        <Label Text="Version:"
+                               VerticalOptions="Center"/>
+                        <form:FormPicker WidthRequest="280"
+                                         HeightRequest="44"
+                                         ItemsSource="{Binding ModloaderInfos}"
+                                         ItemDisplayBinding="{Binding Version}"
+                                         SelectedValue="{Binding SelectedModloaderInfo}"/>
+                    </HorizontalStackLayout>
                 </HorizontalStackLayout>
 
                 <!-- Installed Modloader Card -->
@@ -64,7 +73,7 @@
                     <Grid ColumnSpacing="14">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="60"/>
+                            <RowDefinition Height="40"/>
                         </Grid.RowDefinitions>
 
                         <Grid.ColumnDefinitions>
@@ -80,7 +89,7 @@
                                 WidthRequest="70"
                                 HeightRequest="70"
                                 Style="{StaticResource WaveIconWell}"
-                                Padding="8">
+                                Padding="4">
                             <Image Source="forge.png"
                                    Aspect="AspectFit"
                                    SemanticProperties.Description="Installed modloader">
@@ -88,22 +97,32 @@
                                     <DataTrigger TargetType="Image"
                                                  Binding="{Binding InstalledModloader.ModloaderType}"
                                                  Value="{x:Static modloader:ModloaderType.Forge}">
-                                        <Setter Property="Source" Value="forge.png"/>
+                                        <Setter Property="Source"
+                                                Value="forge.png"/>
                                     </DataTrigger>
                                     <DataTrigger TargetType="Image"
                                                  Binding="{Binding InstalledModloader.ModloaderType}"
                                                  Value="{x:Static modloader:ModloaderType.Fabric}">
-                                        <Setter Property="Source" Value="fabric.png"/>
+                                        <Setter Property="Source"
+                                                Value="fabric.png"/>
                                     </DataTrigger>
                                 </Image.Triggers>
                             </Image>
                         </Border>
 
-                        <Label Grid.Row="0"
-                               Grid.Column="1"
-                               Text="{Binding InstalledModloader.ModloaderType, StringFormat='{0} Modloader'}"
-                               FontSize="21"
-                               Style="{StaticResource WaveCardTitle}"/>
+                        <HorizontalStackLayout Grid.Row="0"
+                                               Grid.Column="1"
+                                               Grid.ColumnSpan="2"
+                                               Spacing="12"
+                                               VerticalOptions="Center">
+                            <Label Text="{Binding InstalledModloader.ModloaderType, StringFormat='{0} Modloader'}"
+                                   FontSize="21"
+                                   Style="{StaticResource WaveCardTitle}"/>
+                            <Label Text="{Binding InstalledModloader.Version}"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource WaveAccentLight}, Dark={StaticResource WaveAccentDark}}"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
 
                         <Label Grid.Row="1"
                                Grid.Column="1"
@@ -112,23 +131,13 @@
                                FontSize="14"
                                Style="{StaticResource WaveCardSubtitle}"/>
 
-                        <Label Grid.Row="0"
-                               Grid.Column="2"
-                               Text="{Binding InstalledModloader.Version}"
-                               FontAttributes="Bold"
-                               TextColor="{AppThemeBinding Light={StaticResource WaveAccentLight}, Dark={StaticResource WaveAccentDark}}"
-                               HorizontalOptions="End"/>
-
-                        <Border Grid.Row="0"
+                        <Button Grid.Row="0"
                                 Grid.RowSpan="2"
                                 Grid.Column="3"
-                                Style="{StaticResource WaveDangerFrame}"
-                                StrokeShape="RoundRectangle 0,10,0,10"
-                                Margin="10,0,0,0">
-                            <Button Text="Remove"
-                                    Style="{StaticResource WaveDangerButton}"
-                                    Command="{Binding RemoveModloaderCommand}"/>
-                        </Border>
+                                Text="Remove"
+                                Margin="10,0,0,0"
+                                Style="{StaticResource WaveDangerButton}"
+                                Command="{Binding RemoveModloaderCommand}"/>
                     </Grid>
                 </Border>
             </Grid>
@@ -136,46 +145,103 @@
 
         <!-- Mods Section -->
         <Border Grid.Row="1"
+                IsVisible="{Binding InstalledModloaderIsVisible}"
                 Style="{StaticResource WaveSectionCard}">
-        <Grid RowSpacing="14"
-              ColumnSpacing="12">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <Grid RowSpacing="14"
+                  ColumnSpacing="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Mods Header -->
-            <Label Text="Installed Mods"
-                   Grid.Row="0"
-                   Grid.Column="0"
-                   Style="{StaticResource WaveSectionTitle}"/>
-            <Button Text="Add Mods"
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Command="{Binding OpenModsPopupCommand}"/>
-            <!-- Mod Versi List -->
-            <CollectionView Grid.Row="1"
-                            Grid.Column="0"
-                            Grid.ColumnSpan="2"
-                            ItemsSource="{Binding Mods}"
-                            SelectionMode="None">
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Vertical"
-                                       ItemSpacing="10"/>
-                </CollectionView.ItemsLayout>
+                <!-- Mods Header -->
+                <Label Text="Installed Mods"
+                       Grid.Row="0"
+                       Grid.Column="0"
+                       Style="{StaticResource WaveSectionTitle}"/>
+                <Button Text="Add Mods"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Command="{Binding OpenModsPopupCommand}"/>
+                <!-- Mod Version List -->
+                <CollectionView Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                ItemsSource="{Binding Mods}"
+                                SelectionMode="None">
+                    <CollectionView.Triggers>
+                        <DataTrigger TargetType="CollectionView"
+                                     Binding="{Binding Mods.Count}"
+                                     Value="0">
+                            <Setter Property="IsVisible"
+                                    Value="False"/>
+                        </DataTrigger>
+                    </CollectionView.Triggers>
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical"
+                                           ItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="viewModels:ModCardViewModel">
-                        <views:ModCardView/>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </Grid>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:ModCardViewModel">
+                            <views:ModCardView/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <VerticalStackLayout Grid.Row="1"
+                                     Grid.Column="0"
+                                     Grid.ColumnSpan="2"
+                                     Spacing="8"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     IsVisible="False">
+                    <VerticalStackLayout.Triggers>
+                        <DataTrigger TargetType="VerticalStackLayout"
+                                     Binding="{Binding Mods.Count}"
+                                     Value="0">
+                            <Setter Property="IsVisible"
+                                    Value="True"/>
+                        </DataTrigger>
+                    </VerticalStackLayout.Triggers>
+
+                    <Label Text="No mods added"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource WaveSectionTitle}"/>
+                    <Label Text="Added mods will appear here."
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource WaveCardSubtitle}"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Mods Unavailable Placeholder -->
+        <Border Grid.Row="1"
+                Style="{StaticResource WaveSectionCard}">
+            <Border.Triggers>
+                <DataTrigger TargetType="Border"
+                             Binding="{Binding InstalledModloaderIsVisible}"
+                             Value="True">
+                    <Setter Property="IsVisible"
+                            Value="False"/>
+                </DataTrigger>
+            </Border.Triggers>
+
+            <VerticalStackLayout Spacing="8"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center">
+                <Label Text="Mods unavailable"
+                       HorizontalTextAlignment="Center"
+                       Style="{StaticResource WaveSectionTitle}"/>
+                <Label Text="A modloader is required before you can add mods."
+                       HorizontalTextAlignment="Center"
+                       Style="{StaticResource WaveCardSubtitle}"/>
+            </VerticalStackLayout>
         </Border>
 
     </Grid>
