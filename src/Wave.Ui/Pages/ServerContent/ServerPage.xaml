@@ -35,9 +35,29 @@
                 <navigation:TabView Text="General"
                                     Command="{Binding ShowGeneralViewCommand}"/>
                 <navigation:TabView Text="Mods"
-                                    Command="{Binding ShowModsViewCommand}"/>
+                                    Command="{Binding ShowModsViewCommand}"
+                                    IsAvailable="{Binding IsServerCreated}">
+                    <navigation:TabView.Triggers>
+                        <DataTrigger TargetType="navigation:TabView"
+                                     Binding="{Binding IsServerCreated}"
+                                     Value="False">
+                            <Setter Property="ToolTipProperties.Text"
+                                    Value="This option will be available after the server is created."/>
+                        </DataTrigger>
+                    </navigation:TabView.Triggers>
+                </navigation:TabView>
                 <navigation:TabView Text="Properties"
-                                    Command="{Binding ShowPropertiesViewCommand}"/>
+                                    Command="{Binding ShowPropertiesViewCommand}"
+                                    IsAvailable="{Binding IsServerCreated}">
+                    <navigation:TabView.Triggers>
+                        <DataTrigger TargetType="navigation:TabView"
+                                     Binding="{Binding IsServerCreated}"
+                                     Value="False">
+                            <Setter Property="ToolTipProperties.Text"
+                                    Value="This option will be available after the server is created."/>
+                        </DataTrigger>
+                    </navigation:TabView.Triggers>
+                </navigation:TabView>
             </navigation:TabContainerView>
 
 

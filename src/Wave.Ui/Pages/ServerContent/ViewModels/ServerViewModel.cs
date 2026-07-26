@@ -49,9 +49,11 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     //Server
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TitleName))]
+    [NotifyPropertyChangedFor(nameof(IsServerCreated))]
     public partial ServerQuery Server { get; set; } = new();
 
     public string TitleName => Server.Id is null ? "New Server" : Server.Name!;
+    public bool IsServerCreated => Server.Id is not null;
     public DateTime? CreationDate => Server is null ? null : Server.CreationDate;
     [ObservableProperty]
     public partial ImageSource ServerIcon { get; set; } = ImageSource.FromFile("pack.png");
