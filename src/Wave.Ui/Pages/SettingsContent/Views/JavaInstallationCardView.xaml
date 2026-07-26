@@ -2,6 +2,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:domain="clr-namespace:Wave.Domain.Java;assembly=Wave.Domain"
+             xmlns:viewModels="clr-namespace:Wave.Ui.Pages.SettingsContent.ViewModels"
              x:Class="Wave.Ui.Pages.SettingsContent.Views.JavaInstallationCardView"
              x:DataType="domain:JavaInstallation">
 
@@ -11,6 +12,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0"
@@ -47,6 +49,14 @@
                 <Label Text="Installed runtime"
                        Style="{StaticResource WaveCardSubtitle}"/>
             </VerticalStackLayout>
+
+            <Button Grid.Column="2"
+                    Text="Uninstall"
+                    Style="{StaticResource WaveDangerButton}"
+                    VerticalOptions="Center"
+                    Command="{Binding UninstallJavaCommand,
+                                      Source={RelativeSource AncestorType={x:Type viewModels:JavaViewModel}}}"
+                    CommandParameter="{Binding .}"/>
         </Grid>
     </Border>
 </ContentView>

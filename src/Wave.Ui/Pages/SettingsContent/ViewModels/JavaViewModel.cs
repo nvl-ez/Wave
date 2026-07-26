@@ -32,6 +32,8 @@ public partial class JavaViewModel : ObservableObject
     public partial bool InstallSectionIsVisible { get; set; } = false;
     [ObservableProperty]
     public partial bool IsInstallButtonEnabled { get; set; } = true;
+    [ObservableProperty]
+    public partial bool IsInstalling { get; set; } = false;
 
     //Lists
     [ObservableProperty]
@@ -140,7 +142,7 @@ public partial class JavaViewModel : ObservableObject
     [RelayCommand]
     public async Task DownloadAndInstall()
     {
-        if (SelectedJavaVersionNumber is null || SelectedJavaSupplier is null || SelectedJavaVersion is null || SelectedJavaArtifact is null) return;
+        if (IsInstalling || SelectedJavaVersionNumber is null || SelectedJavaSupplier is null || SelectedJavaVersion is null || SelectedJavaArtifact is null) return;
 
         bool isAlreadyInstalled = JavaInstallations.Any(javaInstallation =>
             javaInstallation.JavaSupplierType == SelectedJavaVersion.JavaSupplierType &&
@@ -155,10 +157,27 @@ public partial class JavaViewModel : ObservableObject
             return;
         }
 
-        IsInstallButtonEnabled = true;
-        JavaInstallation javaInstallation = await javaManagerService.InstallJavaVersionAsync(SelectedJavaVersion!, SelectedJavaArtifact!);
-        ResetPage();
-        JavaInstallations.Add(javaInstallation);
+        IsInstalling = true;
+        IsInstallButtonEnabled = false;
+
+        try
+        {
+            JavaInstallation javaInstallation = await javaManagerService.InstallJavaVersionAsync(SelectedJavaVersion, SelectedJavaArtifact);
+            ResetPage();
+            JavaInstallations.Add(javaInstallation);
+        }
+        finally
+        {
+            IsInstalling = false;
+            IsInstallButtonEnabled = true;
+        }
+    }
+
+    [RelayCommand]
+    public async Task UninstallJavaAsync(JavaInstallation javaInstallation)
+    {
+        await javaManagerService.UninstallJavaArtifactAsync(javaInstallation);
+        JavaInstallations.Remove(javaInstallation);
     }
 
     private void ResetPage()

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Wave.Ui.Views.Feedback.BusyOverlay"
+             x:Name="Root"
+             IsVisible="{Binding IsBusy, Source={x:Reference Root}}"
+             InputTransparent="False"
+             BackgroundColor="#99000000"
+             ZIndex="1000">
+
+    <Grid>
+        <Border Style="{StaticResource WaveSectionCard}"
+                Padding="28"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+            <VerticalStackLayout Spacing="14"
+                                 HorizontalOptions="Center">
+                <ActivityIndicator IsRunning="{Binding IsBusy, Source={x:Reference Root}}"
+                                   HeightRequest="48"
+                                   WidthRequest="48"/>
+                <Label Text="{Binding Message, Source={x:Reference Root}}"
+                       Style="{StaticResource WaveCardTitle}"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentView>
