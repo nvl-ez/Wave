@@ -1,13 +1,68 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServerContent.ViewModels"
+             xmlns:classes="clr-namespace:Wave.Ui.Pages.ServerContent.Classes"
+             xmlns:views="clr-namespace:Wave.Ui.Pages.ServerContent.Views"
              x:Class="Wave.Ui.Pages.ServerContent.Views.PropertiesView"
              x:DataType="viewModels:ServerViewModel">
-    <VerticalStackLayout>
-        <Label
-            Text="PROPERTIES VIEW"
-            VerticalOptions="Center"
-            HorizontalOptions="Center"/>
-    </VerticalStackLayout>
+    <ContentView.Resources>
+        <Style TargetType="Label" x:Key="FieldLabel">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="TextColor" Value="{AppThemeBinding Light=#475467, Dark=#BAC3D1}"/>
+        </Style>
+        <Style TargetType="Border" x:Key="SectionCard">
+            <Setter Property="Stroke" Value="{AppThemeBinding Light=#DEE6F3, Dark=#313844}"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Setter Property="StrokeShape" Value="RoundRectangle 8"/>
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#20242C}"/>
+            <Setter Property="Padding" Value="18"/>
+        </Style>
+    </ContentView.Resources>
+
+    <Grid toolkit:StateContainer.CurrentState="{Binding ServerPropertiesStatus}">
+        <toolkit:StateContainer.StateViews>
+            <CollectionView toolkit:StateView.StateKey="Done"
+                            ItemsSource="{Binding ServerProperties}"
+                            VerticalOptions="Fill">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical"
+                                     Span="2"
+                                     HorizontalItemSpacing="18"
+                                     VerticalItemSpacing="18"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="classes:ServerPropertyQuery">
+                        <Border Style="{StaticResource SectionCard}">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Style="{StaticResource FieldLabel}"
+                                       Text="{Binding Definition.DisplayName}"/>
+                                <views:ServerPropertyInputView
+                                    Model="{Binding Server}"
+                                    ServerPropertyDefinition="{Binding Definition}"
+                                    PropertyDictionaryModelPath="Properties"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <ActivityIndicator toolkit:StateView.StateKey="Loading"
+                               IsRunning="True"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+
+            <Label toolkit:StateView.StateKey="Error"
+                   Text="Server properties could not be loaded."
+                   TextColor="{AppThemeBinding Light=#B91C1C, Dark=#FCA5A5}"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+        </toolkit:StateContainer.StateViews>
+
+        <ActivityIndicator IsRunning="True"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+    </Grid>
 </ContentView>

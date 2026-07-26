@@ -45,6 +45,13 @@ public partial class ServerPropertyInputView : ContentView, IFormElement
 			typeof(ServerPropertyInputView),
 			false);
 
+	public static readonly BindableProperty ModelProperty =
+		BindableProperty.Create(
+			nameof(Model),
+			typeof(object),
+			typeof(ServerPropertyInputView),
+			propertyChanged: OnModelChanged);
+
 	public PropertyDefinition? ServerPropertyDefinition
 	{
 		get => (PropertyDefinition?)GetValue(ServerPropertyDefinitionProperty);
@@ -84,7 +91,11 @@ public partial class ServerPropertyInputView : ContentView, IFormElement
 		set => SetValue(IsRequiredProperty, value);
 	}
 
-	public object? Model { get; private set; }
+	public object? Model
+	{
+		get => GetValue(ModelProperty);
+		set => SetValue(ModelProperty, value);
+	}
 
 	public string? ServerPropertyType => ServerPropertyDefinition?.Type.ToString();
 
@@ -161,7 +172,6 @@ public partial class ServerPropertyInputView : ContentView, IFormElement
 	public void SetModel(object? model)
 	{
 		Model = model;
-		LoadValueFromModel();
 	}
 
 	public bool Validate()
@@ -257,5 +267,10 @@ public partial class ServerPropertyInputView : ContentView, IFormElement
 		view.OnPropertyChanged(nameof(ValueModelPath));
 
 		view.LoadValueFromModel();
+	}
+
+	private static void OnModelChanged(BindableObject bindable, object oldValue, object newValue)
+	{
+		((ServerPropertyInputView)bindable).LoadValueFromModel();
 	}
 }

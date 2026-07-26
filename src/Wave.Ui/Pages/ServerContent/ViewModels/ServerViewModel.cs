@@ -70,6 +70,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     public partial PropertyDefinition? ServerIpServerProperty { get; set; } = null;
     [ObservableProperty]
     public partial PropertyDefinition? MaxPlayersServerProperty { get; set; } = null;
+    public ObservableCollection<ServerPropertyQuery> ServerProperties { get; set; } = [];
 
     //Eula
     public List<KeyValuePair<bool, string>> EulaOptions { get; set; } = [new KeyValuePair<bool, string>(true, "Agree"), new KeyValuePair<bool, string>(false, "Disagree")]; //TODO: Arreglar eula
@@ -141,7 +142,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         await RequestMinecraftVersionsAsync();
 
         //Obtener server.property definitions
-        await RequestServerPropertiesAsync();
+        await RequestServerPropertiesAsync(server);
 
         //Obtener modloaders disponibles y setear variables
         await RequestModloadersAsync();
@@ -191,15 +192,31 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         else MinecraftVersionsStatus = "Error";
     }
 
-    private async Task RequestServerPropertiesAsync()
+    private async Task RequestServerPropertiesAsync(ServerQuery server)
     {
         ServerPropertiesStatus = "Loading";
 
-        GamemodeServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("gamemode");
-        DifficultyServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("difficulty");
-        MotdServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("motd");
-        ServerIpServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("server-ip");
-        MaxPlayersServerProperty = await minecraftCatalogService.GetServerPropertyDefinitionAsync("max-players");
+        var definitions = (await minecraftCatalogService.GetServerPropertyDefinitionsAsync())
+            .ToDictionary(definition => definition.Key);
+
+        GamemodeServerProperty = definitions["gamemode"];
+        DifficultyServerProperty = definitions["difficulty"];
+        MotdServerProperty = definitions["motd"];
+        ServerIpServerProperty = definitions["server-ip"];
+        MaxPlayersServerProperty = definitions["max-players"];
+
+        ServerProperties.Clear();
+        foreach (var property in server.Properties)
+        {
+            if (!definitions.TryGetValue(property.Key, out var definition))
+                continue;
+
+            ServerProperties.Add(new ServerPropertyQuery
+            {
+                Server = server,
+                Definition = definition
+            });
+        }
 
         ServerPropertiesStatus = "Done";
     }
