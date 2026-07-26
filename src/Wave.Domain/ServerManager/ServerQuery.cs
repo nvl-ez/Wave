@@ -12,6 +12,7 @@ public record class ServerQuery
     {
         Id = server.Id;
         Name = server.Name;
+        ExecutionFlags = server.ExecutionFlags;
         MinecraftVersionBase = server.MinecraftVersionInstallation;
         Eula = server.Eula;
         Properties = server.Properties;
@@ -21,6 +22,7 @@ public record class ServerQuery
     }
     public Guid? Id { get; set; }
     public string? Name { get; set; }
+    public string ExecutionFlags { get; set; } = string.Empty;
     public MinecraftVersionBase? MinecraftVersionBase { get; set; }
     public bool Eula { get; set; } = false;
     public Dictionary<string, string> Properties { get; set; } = new()

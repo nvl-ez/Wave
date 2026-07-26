@@ -59,7 +59,9 @@ public class ServerExecutorService : IServerExecutorService
                 server.Id,
                 serverPathResolver.GetServerRootDirectory(server),
                 serverPathResolver.GetServerJarPath(server),
-                javaInstallation
+                javaInstallation,
+                server.ExecutionFlags,
+                ct
                 );
 
             runningServers.Add(server.Id, serverSession);

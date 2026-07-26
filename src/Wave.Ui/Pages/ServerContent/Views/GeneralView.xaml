@@ -184,5 +184,16 @@
               </Grid>
               </Border>
 
+              <!-- Execution flags -->
+              <Border Style="{StaticResource SectionCard}">
+                     <VerticalStackLayout Spacing="10">
+                            <Label Style="{StaticResource FieldLabel}"
+                                   Text="Execution flags"/>
+                            <form:FormEntry TextModelPath="ExecutionFlags"
+                                            HorizontalOptions="Fill"
+                                            Placeholder="-Xms1G -Xmx2G"/>
+                     </VerticalStackLayout>
+              </Border>
+
        </VerticalStackLayout>
 </ContentView>

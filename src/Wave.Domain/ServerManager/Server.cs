@@ -9,6 +9,7 @@ public sealed class Server
 {
     public Guid Id { get; init; } = Guid.NewGuid();
     public required string Name { get; set; }
+    public string ExecutionFlags { get; set; } = string.Empty;
     public DateTime CreationDate { get; init; } = DateTime.Now;
     public ServerPaths ServerPaths = new();
 
