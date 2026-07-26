@@ -78,6 +78,17 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [ObservableProperty]
     public partial PropertyDefinition? MaxPlayersServerProperty { get; set; } = null;
     public ObservableCollection<ServerPropertyQuery> ServerProperties { get; set; } = [];
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FilteredServerProperties))]
+    public partial string PropertySearchText { get; set; } = string.Empty;
+    public IReadOnlyList<ServerPropertyQuery> FilteredServerProperties =>
+        string.IsNullOrWhiteSpace(PropertySearchText)
+            ? ServerProperties
+            : ServerProperties
+                .Where(property =>
+                    property.Definition.Key.Contains(PropertySearchText.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                    property.Definition.DisplayName.Contains(PropertySearchText.Trim(), StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
     //Eula
     public List<KeyValuePair<bool, string>> EulaOptions { get; set; } = [new KeyValuePair<bool, string>(true, "Agree"), new KeyValuePair<bool, string>(false, "Disagree")]; //TODO: Arreglar eula
@@ -96,6 +107,21 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
 
     //Mods
     public ObservableCollection<ModCardViewModel> Mods { get; set; } = new();
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FilteredMods))]
+    [NotifyPropertyChangedFor(nameof(ModEmptyTitle))]
+    [NotifyPropertyChangedFor(nameof(ModEmptyMessage))]
+    public partial string ModSearchText { get; set; } = string.Empty;
+    public string ModEmptyTitle => string.IsNullOrWhiteSpace(ModSearchText) ? "No mods added" : "No matching mods";
+    public string ModEmptyMessage => string.IsNullOrWhiteSpace(ModSearchText)
+        ? "Added mods will appear here."
+        : "Try a different mod name.";
+    public IReadOnlyList<ModCardViewModel> FilteredMods =>
+        string.IsNullOrWhiteSpace(ModSearchText)
+            ? Mods
+            : Mods
+                .Where(mod => mod.Name?.Contains(ModSearchText.Trim(), StringComparison.OrdinalIgnoreCase) == true)
+                .ToList();
 
 
     /***************
@@ -107,6 +133,9 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         this.serverHandlerService = serverHandlerService;
         this.modloaderCatalogService = modloaderCatalogService;
         this.modCatalogService = modCatalogService;
+
+        ServerProperties.CollectionChanged += (_, _) => OnPropertyChanged(nameof(FilteredServerProperties));
+        Mods.CollectionChanged += (_, _) => OnPropertyChanged(nameof(FilteredMods));
     }
 
     /**********

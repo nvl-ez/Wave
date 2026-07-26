@@ -9,31 +9,47 @@
              x:DataType="viewModels:ServerViewModel">
     <Grid toolkit:StateContainer.CurrentState="{Binding ServerPropertiesStatus}">
         <toolkit:StateContainer.StateViews>
-            <CollectionView toolkit:StateView.StateKey="Done"
-                            ItemsSource="{Binding ServerProperties}"
-                            VerticalOptions="Fill">
-                <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical"
-                                     Span="2"
-                                     HorizontalItemSpacing="18"
-                                     VerticalItemSpacing="18"/>
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="classes:ServerPropertyQuery">
-                        <Border Style="{StaticResource WaveSectionCard}"
-                                Padding="18">
-                            <VerticalStackLayout Spacing="8">
-                                <Label Style="{StaticResource WaveFieldLabel}"
-                                       Text="{Binding Definition.DisplayName}"/>
-                                <views:ServerPropertyInputView
-                                    Model="{Binding Server}"
-                                    ServerPropertyDefinition="{Binding Definition}"
-                                    PropertyDictionaryModelPath="Properties"/>
-                            </VerticalStackLayout>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+            <Grid toolkit:StateView.StateKey="Done"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="12">
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="Auto,*"
+                      ColumnSpacing="12">
+                    <Label Grid.Column="0"
+                           Text="Search"
+                           VerticalOptions="Center"
+                           Style="{StaticResource WaveFieldLabel}"/>
+                    <SearchBar Grid.Column="1"
+                               Placeholder="Search properties"
+                               Text="{Binding PropertySearchText}"/>
+                </Grid>
+
+                <CollectionView Grid.Row="1"
+                                ItemsSource="{Binding FilteredServerProperties}"
+                                VerticalOptions="Fill">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical"
+                                         Span="2"
+                                         HorizontalItemSpacing="18"
+                                         VerticalItemSpacing="18"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="classes:ServerPropertyQuery">
+                            <Border Style="{StaticResource WaveSectionCard}"
+                                    Padding="18">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Style="{StaticResource WaveFieldLabel}"
+                                           Text="{Binding Definition.DisplayName}"/>
+                                    <views:ServerPropertyInputView
+                                        Model="{Binding Server}"
+                                        ServerPropertyDefinition="{Binding Definition}"
+                                        PropertyDictionaryModelPath="Properties"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
 
             <ActivityIndicator toolkit:StateView.StateKey="Loading"
                                IsRunning="True"

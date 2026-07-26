@@ -151,6 +151,7 @@
                   ColumnSpacing="12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -168,15 +169,30 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         Command="{Binding OpenModsPopupCommand}"/>
+
+                <Grid Grid.Row="1"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="2"
+                      ColumnDefinitions="Auto,*"
+                      ColumnSpacing="12">
+                    <Label Grid.Column="0"
+                           Text="Search"
+                           VerticalOptions="Center"
+                           Style="{StaticResource WaveFieldLabel}"/>
+                    <SearchBar Grid.Column="1"
+                               Placeholder="Search mods"
+                               Text="{Binding ModSearchText}"/>
+                </Grid>
+
                 <!-- Mod Version List -->
-                <CollectionView Grid.Row="1"
+                <CollectionView Grid.Row="2"
                                 Grid.Column="0"
                                 Grid.ColumnSpan="2"
-                                ItemsSource="{Binding Mods}"
+                                ItemsSource="{Binding FilteredMods}"
                                 SelectionMode="None">
                     <CollectionView.Triggers>
                         <DataTrigger TargetType="CollectionView"
-                                     Binding="{Binding Mods.Count}"
+                                     Binding="{Binding FilteredMods.Count}"
                                      Value="0">
                             <Setter Property="IsVisible"
                                     Value="False"/>
@@ -194,7 +210,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <VerticalStackLayout Grid.Row="1"
+                <VerticalStackLayout Grid.Row="2"
                                      Grid.Column="0"
                                      Grid.ColumnSpan="2"
                                      Spacing="8"
@@ -203,17 +219,17 @@
                                      IsVisible="False">
                     <VerticalStackLayout.Triggers>
                         <DataTrigger TargetType="VerticalStackLayout"
-                                     Binding="{Binding Mods.Count}"
+                                     Binding="{Binding FilteredMods.Count}"
                                      Value="0">
                             <Setter Property="IsVisible"
                                     Value="True"/>
                         </DataTrigger>
                     </VerticalStackLayout.Triggers>
 
-                    <Label Text="No mods added"
+                    <Label Text="{Binding ModEmptyTitle}"
                            HorizontalTextAlignment="Center"
                            Style="{StaticResource WaveSectionTitle}"/>
-                    <Label Text="Added mods will appear here."
+                    <Label Text="{Binding ModEmptyMessage}"
                            HorizontalTextAlignment="Center"
                            Style="{StaticResource WaveCardSubtitle}"/>
                 </VerticalStackLayout>
