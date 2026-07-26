@@ -18,7 +18,8 @@ public class ServerSession : IServerSession
     private CancellationTokenSource cts = new();
     private TaskCompletionSource<bool> signal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly Lock disposeLock = new();
-    private Task? disposeTask;
+    private readonly TaskCompletionSource disposeCompletion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private bool disposeStarted;
     private long bufferIndex = 0;
     private int activePumps = 0;
     private bool completed = false;
@@ -89,7 +90,15 @@ public class ServerSession : IServerSession
             {
                 waitForValues = currentIndex >= bufferIndex;
             }
-            if (waitForValues) await waitProduced;
+            if (waitForValues)
+            {
+                var completedTask = await Task.WhenAny(
+                    waitProduced,
+                    Task.Delay(Timeout.InfiniteTimeSpan, ct));
+
+                if (completedTask != waitProduced)
+                    yield break;
+            }
         }
     }
 
@@ -104,15 +113,36 @@ public class ServerSession : IServerSession
 
     public ValueTask DisposeAsync()
     {
-        Task task;
+        bool shouldStart;
 
         lock (disposeLock)
         {
-            disposeTask ??= DisposeCoreAsync();
-            task = disposeTask;
+            shouldStart = !disposeStarted;
+            if (shouldStart)
+            {
+                disposeStarted = true;
+            }
         }
 
-        return new ValueTask(task);
+        if (shouldStart)
+        {
+            _ = CompleteDisposeAsync();
+        }
+
+        return new ValueTask(disposeCompletion.Task);
+    }
+
+    private async Task CompleteDisposeAsync()
+    {
+        try
+        {
+            await DisposeCoreAsync();
+            disposeCompletion.TrySetResult();
+        }
+        catch (Exception ex)
+        {
+            disposeCompletion.TrySetException(ex);
+        }
     }
 
     private async Task PumpAsync(StreamReader reader, CancellationToken ct)

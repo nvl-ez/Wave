@@ -197,18 +197,18 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
         try
         {
             var session = ServerSession;
+
+            if (session is null)
+                return;
+
+            session.ServerDisposed -= StopServer;
             ServerSession = null;
 
             // Stop reading first
             await StopReadLoopAsync();
 
             // Then actually stop the server
-            if (CanStopServer)
-            {
-                session!.ServerDisposed -= StopServer;
-                await session!.DisposeAsync();
-
-            }
+            await session.DisposeAsync();
         }
         finally
         {
