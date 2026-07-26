@@ -68,6 +68,7 @@
         <Border Grid.Row="1"
                 Grid.Column="1"
                 Style="{StaticResource WaveSectionCard}">
+        <ScrollView VerticalScrollBarVisibility="Default">
         <VerticalStackLayout Spacing="12">
             <Label Text="Find and Download Java"
                    Style="{StaticResource WaveSectionTitle}"/>
@@ -92,9 +93,42 @@
                             <DataTemplate x:DataType="out:IJavaSupplier">
                                 <Border Style="{StaticResource WaveRaisedCard}"
                                         Padding="10">
-                                    <Label Text="{Binding Name}"
-                                           Style="{StaticResource WaveCardSubtitle}"
-                                           HorizontalTextAlignment="Center"/>
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0"
+                                                HeightRequest="32"
+                                                WidthRequest="32"
+                                                Padding="0"
+                                                StrokeThickness="0"
+                                                VerticalOptions="Center">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="6"/>
+                                            </Border.StrokeShape>
+                                            <Image Aspect="AspectFill">
+                                                <Image.Triggers>
+                                                    <DataTrigger TargetType="Image"
+                                                                 Binding="{Binding Name}"
+                                                                 Value="Mojang">
+                                                        <Setter Property="Source"
+                                                                Value="mojang.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Image"
+                                                                 Binding="{Binding Name}"
+                                                                 Value="Adoptium">
+                                                        <Setter Property="Source"
+                                                                Value="adoptium.png"/>
+                                                    </DataTrigger>
+                                                </Image.Triggers>
+                                            </Image>
+                                        </Border>
+                                        <Label Grid.Column="1"
+                                               Text="{Binding Name}"
+                                               Style="{StaticResource WaveCardSubtitle}"
+                                               VerticalOptions="Center"/>
+                                    </Grid>
                                 </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -147,6 +181,8 @@
                             <VerticalStackLayout toolkit:StateView.StateKey="Loaded">
                                 <CollectionView ItemsSource="{Binding JavaVersions}"
                                                 Margin="0"
+                                                MaximumHeightRequest="194"
+                                                VerticalScrollBarVisibility="Default"
                                                 SelectionMode="Single"
                                                 SelectedItem="{Binding SelectedJavaVersion}"
                                                 SelectionChangedCommand="{Binding JavaVersionSelectedCommand}">
@@ -157,7 +193,7 @@
 
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate x:DataType="domain:JavaVersion">
-                                            <views:JavaVersionCardView/>
+                                            <views:JavaVersionCardView MinimumHeightRequest="62"/>
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>
                                 </CollectionView>
@@ -209,6 +245,7 @@
                 </VerticalStackLayout>
             </Border>
         </VerticalStackLayout>
+        </ScrollView>
         </Border>
     </Grid>
 </ContentView>

@@ -16,13 +16,27 @@
             <Border Grid.Column="0"
                     WidthRequest="44"
                     HeightRequest="44"
-                    Style="{StaticResource WaveIconWell}">
-                <Label Text="J"
-                       FontAttributes="Bold"
-                       FontSize="20"
-                       TextColor="{AppThemeBinding Light={StaticResource WaveAccentLight}, Dark={StaticResource WaveAccentMutedDark}}"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"/>
+                    Padding="0"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Image Aspect="AspectFill">
+                    <Image.Triggers>
+                        <DataTrigger TargetType="Image"
+                                     Binding="{Binding JavaSupplierType}"
+                                     Value="{x:Static domain:JavaSupplierType.Mojang}">
+                            <Setter Property="Source"
+                                    Value="mojang.png"/>
+                        </DataTrigger>
+                        <DataTrigger TargetType="Image"
+                                     Binding="{Binding JavaSupplierType}"
+                                     Value="{x:Static domain:JavaSupplierType.Adoptium}">
+                            <Setter Property="Source"
+                                    Value="adoptium.png"/>
+                        </DataTrigger>
+                    </Image.Triggers>
+                </Image>
             </Border>
 
             <VerticalStackLayout Grid.Column="1"
