@@ -10,12 +10,14 @@
 
 
     <ShellContent
+        Route="servers"
         Title="Servers"
         ContentTemplate="{DataTemplate servers:ServersPage}"
         Icon="icon_server.png">
     </ShellContent>
 
     <ShellContent
+        Route="settings"
         Title="Settings"
         ContentTemplate="{DataTemplate settings:SettingsPage}"
         Icon="icon_settings.png"/>

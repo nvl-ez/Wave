@@ -122,7 +122,8 @@ public static class AppComposition
     }
 
     // VIEW MODELS
-    public static ServersViewModel CreateServersViewModel() => new ServersViewModel(serverHandlerService, serverExecutorService);
+    public static ServersViewModel CreateServersViewModel() =>
+        new ServersViewModel(serverHandlerService, serverExecutorService, javaInstallRepository);
     public static ServerViewModel CreateServerViewModel() => new ServerViewModel(minecraftCatalogService, serverHandlerService, modloaderCatalogService, modCatalogService);
     public static ExecutionViewModel CreateExecutionViewModel() => new ExecutionViewModel(serverExecutorService);
     public static JavaViewModel CreateJavaViewModel() => new JavaViewModel(deviceInformationService, javaManagerService);

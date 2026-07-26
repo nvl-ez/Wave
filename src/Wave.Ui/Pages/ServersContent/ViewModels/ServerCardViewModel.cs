@@ -2,6 +2,7 @@ using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Wave.Application.In;
+using Wave.Application.Out.Java;
 using Wave.Domain.ServerManager;
 using Wave.Ui.Pages.ExecutionContent;
 using Wave.Ui.Pages.ServerContent;
@@ -13,6 +14,7 @@ public partial class ServerCardViewModel : ObservableObject
     //SERVICES
     private readonly IServerManagerService serverManagerService;
     private readonly IServerExecutorService serverExecutorService;
+    private readonly IJavaInstallRepository javaInstallRepository;
 
     //STATES
     public string RunningState => IsRunning ? "Running" : "Stopped";
@@ -32,11 +34,16 @@ public partial class ServerCardViewModel : ObservableObject
     [ObservableProperty]
     public partial ImageSource ServerIcon { get; set; } = ImageSource.FromFile("pack.png");
 
-    public ServerCardViewModel(ServerQuery server, IServerManagerService serverManagerService, IServerExecutorService serverExecutorService)
+    public ServerCardViewModel(
+        ServerQuery server,
+        IServerManagerService serverManagerService,
+        IServerExecutorService serverExecutorService,
+        IJavaInstallRepository javaInstallRepository)
     {
         Server = server;
         this.serverManagerService = serverManagerService;
         this.serverExecutorService = serverExecutorService;
+        this.javaInstallRepository = javaInstallRepository;
     }
 
     [RelayCommand]
@@ -51,6 +58,11 @@ public partial class ServerCardViewModel : ObservableObject
     [RelayCommand]
     public async Task EditServerAsync()
     {
+        if (!await JavaInstallationGuard.CanContinueAsync(javaInstallRepository))
+        {
+            return;
+        }
+
         var parameters = new ShellNavigationQueryParameters
         {
             { "server", Server.Id!}
@@ -61,6 +73,11 @@ public partial class ServerCardViewModel : ObservableObject
     [RelayCommand]
     public async Task StartServerAsync()
     {
+        if (!await JavaInstallationGuard.CanContinueAsync(javaInstallRepository))
+        {
+            return;
+        }
+
         if (!IsRunning)
         {
             ServerSession = await serverExecutorService.Start((Guid)Server.Id!);
