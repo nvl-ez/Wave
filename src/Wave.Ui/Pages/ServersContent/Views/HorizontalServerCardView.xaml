@@ -50,12 +50,8 @@
                         StrokeShape="RoundRectangle 8"
                         StrokeThickness="0"
                         BackgroundColor="{AppThemeBinding Light=#EAF1FF, Dark=#29344A}">
-                    <Label Text="W"
-                           FontAttributes="Bold"
-                           FontSize="22"
-                           TextColor="{AppThemeBinding Light=#2563EB, Dark=#9DBBFF}"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                    <Image Source="{Binding ServerIcon}"
+                           Aspect="AspectFill"/>
                 </Border>
 
                 <!-- Text Info -->

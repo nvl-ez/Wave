@@ -46,13 +46,27 @@
                              HeightRequest="104"
                              StrokeThickness="0"
                              StrokeShape="RoundRectangle 8"
-                             BackgroundColor="{AppThemeBinding Light=#EAF1FF, Dark=#29344A}">
-                            <Label Text="W"
-                                   FontAttributes="Bold"
-                                   FontSize="42"
-                                   TextColor="{AppThemeBinding Light=#2563EB, Dark=#9DBBFF}"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"/>
+                             BackgroundColor="{AppThemeBinding Light=#EAF1FF, Dark=#29344A}"
+                             ToolTipProperties.Text="Preferred image size: 64 x 64 pixels">
+                            <Border.GestureRecognizers>
+                                   <TapGestureRecognizer Command="{Binding SelectServerIconCommand}"/>
+                                   <PointerGestureRecognizer PointerEnteredCommand="{Binding ShowServerIconOverlayCommand}"
+                                                             PointerExitedCommand="{Binding HideServerIconOverlayCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Grid>
+                                   <Image Source="{Binding ServerIcon}"
+                                          Aspect="AspectFill"/>
+                                   <Border StrokeThickness="0"
+                                           BackgroundColor="#80000000"
+                                           IsVisible="{Binding ServerIconIsPointerOver}">
+                                          <Label Text="+"
+                                                 FontAttributes="Bold"
+                                                 FontSize="42"
+                                                 TextColor="White"
+                                                 HorizontalOptions="Center"
+                                                 VerticalOptions="Center"/>
+                                   </Border>
+                            </Grid>
                      </Border>
 
                      <!-- Name -->

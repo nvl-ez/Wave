@@ -33,7 +33,7 @@ public partial class ServersViewModel : ObservableObject, IQueryAttributable
 
         AllServers.Clear();
 
-        var serverCardViewModels = (await serverManagerService.GetAllServerQueriesAsync()).Select(s => new ServerCardViewModel(s, serverExecutorService));
+        var serverCardViewModels = (await serverManagerService.GetAllServerQueriesAsync()).Select(s => new ServerCardViewModel(s, serverManagerService, serverExecutorService));
         foreach (var ServerCardViewModel in serverCardViewModels)
         {
             AllServers.Add(ServerCardViewModel);

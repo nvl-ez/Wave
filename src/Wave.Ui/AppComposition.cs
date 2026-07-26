@@ -53,6 +53,7 @@ public static class AppComposition
     private static readonly IModloaderVersionCatalog fabricVersionCatalog;
     private static readonly IModSupplierIntegration curseforgeModSupplier;
     private static readonly IModSupplierIntegration modrinthModSupplier;
+    private static readonly IImageTransformer imageTransformer;
 
     //SERVICES
     private static readonly IMinecraftCatalogService minecraftCatalogService;
@@ -98,6 +99,7 @@ public static class AppComposition
         fabricVersionCatalog = new ApiFabricVersionCatalog();
         curseforgeModSupplier = new ApiCurseforgeModSupplier();
         modrinthModSupplier = new ApiModrinthModSupplier();
+        imageTransformer = new ImageSharpImageTransformer();
 
 
 
@@ -113,7 +115,7 @@ public static class AppComposition
 
 
         minecraftCatalogService = new MinecraftCatalogService(minecraftVersionRepository, serverPropertyDefinitionRepository);
-        serverHandlerService = new ServerManagerService(serverPathResolver, serverRepository, versionManagerService, propertiesManagerService, eulaManagerService, modloaderManagerService, modManagerService);
+        serverHandlerService = new ServerManagerService(serverPathResolver, serverRepository, versionManagerService, propertiesManagerService, eulaManagerService, modloaderManagerService, modManagerService, imageTransformer);
         serverExecutorService = new ServerExecutorService(serverPathResolver, serverExecutor, serverRepository, javaInstallRepository);
         javaManagerService = new JavaManagerService(javaInstallRepository, [adoptiumJavaSupplier, mojangJavaSupplier], [compressedJavaInstaller, manifestJavaInstaller]);
         deviceInformationService = new DeviceInformationService(windowsDeviceInformationRepository);

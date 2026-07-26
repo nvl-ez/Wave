@@ -79,6 +79,11 @@ public class ServerPathResolver : IServerPathResolver
         return modsDirectory;
     }
 
+    public string GetServerIconPath(Server server)
+    {
+        return Path.Combine(GetServerRootDirectory(server), server.ServerPaths.ImageFilename);
+    }
+
     private static string CleanseFileName(string FileName)
     {
         var invalids = System.IO.Path.GetInvalidFileNameChars();

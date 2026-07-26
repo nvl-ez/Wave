@@ -44,6 +44,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [ObservableProperty]
     public partial bool ModloaderInfoIsVisible { get; set; } = false;
     private bool IsModalOpen { get; set; } = false;
+    private byte[]? pendingServerIcon;
 
     //Server
     [ObservableProperty]
@@ -52,6 +53,10 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
 
     public string TitleName => Server.Id is null ? "New Server" : Server.Name!;
     public DateTime? CreationDate => Server is null ? null : Server.CreationDate;
+    [ObservableProperty]
+    public partial ImageSource ServerIcon { get; set; } = ImageSource.FromFile("pack.png");
+    [ObservableProperty]
+    public partial bool ServerIconIsPointerOver { get; set; } = false;
 
     //Versions
     [ObservableProperty]
@@ -162,6 +167,10 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         //Update al properties
         Server = new ServerQuery();
         Server = server;
+        pendingServerIcon = null;
+        ServerIcon = server.Id is Guid serverId && serverHandlerService.GetServerIconPath(serverId) is string iconPath
+            ? ImageSource.FromStream(() => File.OpenRead(iconPath))
+            : ImageSource.FromFile("pack.png");
     }
 
     partial void OnSelectedModloaderInfoChanged(ModloaderInfo? value)
@@ -275,11 +284,14 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     public async Task SaveAsync()
     {
+        Guid serverId;
+        bool changesPopupWasShown = false;
         if (Server.Id is not null)
         {
             ServerChanges? changes = await serverHandlerService.EditServerAsync(Server);
             if (changes is not null)
             {
+                changesPopupWasShown = true;
                 IsModalOpen = true;
                 try
                 {
@@ -291,12 +303,53 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
                     IsModalOpen = false;
                 }
 
-                return;
+                if (pendingServerIcon is null) return;
             }
+            serverId = (Guid)Server.Id;
         }
-        else await serverHandlerService.CreateServerAsync(Server);
+        else
+        {
+            ServerQuery createdServer = await serverHandlerService.CreateServerAsync(Server);
+            serverId = (Guid)createdServer.Id!;
+        }
 
+        if (pendingServerIcon is not null)
+        {
+            using MemoryStream image = new(pendingServerIcon);
+            await serverHandlerService.SetServerIconAsync(serverId, image);
+        }
+
+        if (changesPopupWasShown) return;
         await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private async Task SelectServerIconAsync()
+    {
+        FileResult? result = await FilePicker.Default.PickAsync(new PickOptions
+        {
+            PickerTitle = "Select a server icon",
+            FileTypes = FilePickerFileType.Images
+        });
+        if (result is null) return;
+
+        await using Stream image = await result.OpenReadAsync();
+        using MemoryStream buffer = new();
+        await image.CopyToAsync(buffer);
+        pendingServerIcon = buffer.ToArray();
+        ServerIcon = ImageSource.FromStream(() => new MemoryStream(pendingServerIcon));
+    }
+
+    [RelayCommand]
+    private void ShowServerIconOverlay()
+    {
+        ServerIconIsPointerOver = true;
+    }
+
+    [RelayCommand]
+    private void HideServerIconOverlay()
+    {
+        ServerIconIsPointerOver = false;
     }
 
     [RelayCommand]

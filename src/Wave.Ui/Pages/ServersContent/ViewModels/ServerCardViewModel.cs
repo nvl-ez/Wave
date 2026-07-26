@@ -11,6 +11,7 @@ namespace Wave.Ui.Pages.ServersContent.ViewModels;
 public partial class ServerCardViewModel : ObservableObject
 {
     //SERVICES
+    private readonly IServerManagerService serverManagerService;
     private readonly IServerExecutorService serverExecutorService;
 
     //STATES
@@ -28,9 +29,13 @@ public partial class ServerCardViewModel : ObservableObject
 
     public string? Name => Server?.Name;
 
-    public ServerCardViewModel(ServerQuery server, IServerExecutorService serverExecutorService)
+    [ObservableProperty]
+    public partial ImageSource ServerIcon { get; set; } = ImageSource.FromFile("pack.png");
+
+    public ServerCardViewModel(ServerQuery server, IServerManagerService serverManagerService, IServerExecutorService serverExecutorService)
     {
         Server = server;
+        this.serverManagerService = serverManagerService;
         this.serverExecutorService = serverExecutorService;
     }
 
@@ -38,6 +43,9 @@ public partial class ServerCardViewModel : ObservableObject
     public async Task LoadAsync()
     {
         ServerSession = serverExecutorService.TryGetSession((Guid)Server.Id!);
+        ServerIcon = serverManagerService.GetServerIconPath((Guid)Server.Id!) is string iconPath
+            ? ImageSource.FromStream(() => File.OpenRead(iconPath))
+            : ImageSource.FromFile("pack.png");
     }
 
     [RelayCommand]

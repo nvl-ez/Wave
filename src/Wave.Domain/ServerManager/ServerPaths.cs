@@ -11,7 +11,7 @@ namespace Wave.Domain.ServerManager
         public string EulaFileName { get; set; } = "eula.txt";
         public string ServerJarFilename { get; set; } = "server.jar";
         public string ModloaderJarFileName { get; set; } = "modloader.jar";
-        public string ImageFilename { get; set; } = "";
+        public string ImageFilename { get; set; } = "server-icon.png";
         public string ModDirectoryName { get; set; } = "mods";
     }
 }

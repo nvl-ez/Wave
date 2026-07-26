@@ -8,6 +8,8 @@ public interface IServerManagerService
     public Task<ServerQuery> CreateServerAsync(ServerQuery serverCreationQuery, CancellationToken ct = default);
     public Task<ServerChanges?> EditServerAsync(ServerQuery server, CancellationToken ct = default);
     public Task DeleteServerAsync(Guid id, CancellationToken ct = default);
+    public Task SetServerIconAsync(Guid id, Stream image, CancellationToken ct = default);
+    public string? GetServerIconPath(Guid id);
 
     public Task<ServerQuery> GetServerQueryAsync(Guid id, CancellationToken ct = default);
     public Task<IEnumerable<ServerQuery>> GetAllServerQueriesAsync(CancellationToken ct = default);

@@ -20,6 +20,7 @@ public class ServerManagerService : IServerManagerService
     private readonly IEulaManagerService eulaManagerService;
     private readonly IModloaderManagerService modloaderManagerService;
     private readonly IModManagerService modManagerService;
+    private readonly IImageTransformer imageTransformer;
 
     public ServerManagerService(
         IServerPathResolver serverPathResolver,
@@ -28,7 +29,8 @@ public class ServerManagerService : IServerManagerService
         IPropertiesManagerService propertiesManagerService,
         IEulaManagerService eulaManagerService,
         IModloaderManagerService modloaderManagerService,
-        IModManagerService modManagerService)
+        IModManagerService modManagerService,
+        IImageTransformer imageTransformer)
     {
         this.serverRepository = serverRepository;
         this.serverPathResolver = serverPathResolver;
@@ -37,6 +39,7 @@ public class ServerManagerService : IServerManagerService
         this.eulaManagerService = eulaManagerService;
         this.modloaderManagerService = modloaderManagerService;
         this.modManagerService = modManagerService;
+        this.imageTransformer = imageTransformer;
     }
 
     public async Task<ServerQuery> CreateServerAsync(ServerQuery query, CancellationToken ct = default)
@@ -84,6 +87,35 @@ public class ServerManagerService : IServerManagerService
         Directory.Delete(serverPath, true);
 
         await serverRepository.DeleteServerAsync(server.Id);
+    }
+
+    public async Task SetServerIconAsync(Guid id, Stream image, CancellationToken ct = default)
+    {
+        Server server = await GetServerAsync(id, ct);
+        string iconPath = serverPathResolver.GetServerIconPath(server);
+        string temporaryIconPath = $"{iconPath}.tmp";
+
+        try
+        {
+            await using (FileStream output = File.Create(temporaryIconPath))
+                await imageTransformer.TransformToPngAsync(image, output, 64, 64, ct);
+
+            File.Move(temporaryIconPath, iconPath, true);
+            server.ImageFilename = server.ServerPaths.ImageFilename;
+            await serverRepository.SaveServerAsync(server, ct);
+        }
+        finally
+        {
+            if (File.Exists(temporaryIconPath))
+                File.Delete(temporaryIconPath);
+        }
+    }
+
+    public string? GetServerIconPath(Guid id)
+    {
+        Server server = GetServer(id);
+        string iconPath = serverPathResolver.GetServerIconPath(server);
+        return File.Exists(iconPath) ? iconPath : null;
     }
 
     public async Task<ServerChanges?> EditServerAsync(ServerQuery query, CancellationToken ct = default)
