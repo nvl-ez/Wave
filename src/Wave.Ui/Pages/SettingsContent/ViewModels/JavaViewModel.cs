@@ -77,12 +77,19 @@ public partial class JavaViewModel : ObservableObject
     {
         if (SelectedJavaSupplier is null) return;
 
+        IJavaSupplier selectedJavaSupplier = SelectedJavaSupplier;
+        ResetSupplierDependentState();
+
         QuerySectionIsVisible = true;
         QuerySectionState = "Loading";
 
         DeviceInformation deviceInformation = deviceInformationService.GetDeviceInformation();
 
-        var responseVersions = await javaManagerService.GetAvailableMajorVersionsAsync(SelectedJavaSupplier!, deviceInformation.Os);
+        var responseVersions = await javaManagerService.GetAvailableMajorVersionsAsync(selectedJavaSupplier, deviceInformation.Os);
+
+        // Ignore a response that belongs to a supplier that is no longer selected.
+        if (!ReferenceEquals(SelectedJavaSupplier, selectedJavaSupplier)) return;
+
         JavaVersionNumbers = new ObservableCollection<int>(responseVersions);
         QuerySectionState = "Loaded";
     }
@@ -135,6 +142,19 @@ public partial class JavaViewModel : ObservableObject
     {
         if (SelectedJavaVersionNumber is null || SelectedJavaSupplier is null || SelectedJavaVersion is null || SelectedJavaArtifact is null) return;
 
+        bool isAlreadyInstalled = JavaInstallations.Any(javaInstallation =>
+            javaInstallation.JavaSupplierType == SelectedJavaVersion.JavaSupplierType &&
+            javaInstallation.Version == SelectedJavaVersion.Version);
+
+        if (isAlreadyInstalled)
+        {
+            await Shell.Current.DisplayAlertAsync(
+                "Java already installed",
+                $"{SelectedJavaVersion.Name} from {SelectedJavaVersion.JavaSupplierType} cannot be installed because that supplier and version are already installed.",
+                "OK");
+            return;
+        }
+
         IsInstallButtonEnabled = true;
         JavaInstallation javaInstallation = await javaManagerService.InstallJavaVersionAsync(SelectedJavaVersion!, SelectedJavaArtifact!);
         ResetPage();
@@ -144,16 +164,26 @@ public partial class JavaViewModel : ObservableObject
     private void ResetPage()
     {
         SelectedJavaSupplier = null;
+        ResetSupplierDependentState();
+
+        QuerySectionIsVisible = false;
+        IsInstallButtonEnabled = true;
+    }
+
+    private void ResetSupplierDependentState()
+    {
         SelectedJavaVersionNumber = null;
         SelectedJavaVersion = null;
         SelectedJavaArtifact = null;
 
-        QuerySectionIsVisible = false;
+        JavaVersionNumbers.Clear();
+        JavaVersions.Clear();
+        JavaArtifacts.Clear();
+
         QuerySectionState = "Loading";
         VersionsSectionIsVisible = false;
         VersionsSectionState = "Loading";
         ArtifactsSectionIsVisible = false;
         InstallSectionIsVisible = false;
-        IsInstallButtonEnabled = true;
     }
 }
