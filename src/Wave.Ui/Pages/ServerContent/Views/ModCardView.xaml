@@ -4,70 +4,67 @@
              xmlns:viewModels="clr-namespace:Wave.Ui.Pages.ServerContent.ViewModels"
              x:Class="Wave.Ui.Pages.ServerContent.Views.ModCardView"
              x:DataType="viewModels:ModCardViewModel">
-    <Border Style="{StaticResource WaveRaisedCard}">
-    <Grid ColumnSpacing="12">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="60"/>
-        </Grid.RowDefinitions>
+       <Border Style="{StaticResource WaveRaisedCard}">
+              <Grid ColumnSpacing="12">
+                     <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="60"/>
+                     </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+                     <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                     </Grid.ColumnDefinitions>
 
-        <!-- Mod Image -->
-        <Image Source="{Binding Image}"
-               SemanticProperties.Description="Mod Image"
-               Grid.Column="0"
-               Grid.Row="0"
-               Grid.RowSpan="2"
-               WidthRequest="70"
-               HeightRequest="70"
-               Aspect="AspectFill"/>
-        <!-- Mod Name -->
-        <Label Text="{Binding Name}"
-               Grid.Row="0"
-               Grid.Column="1"
-               Style="{StaticResource WaveCardTitle}"/>
-        <!-- Mod Description -->
-        <Label Text="{Binding Summary}"
-               Grid.Row="1"
-               Grid.Column="1"
-               Grid.ColumnSpan="2"
-               FontSize="13"
-               LineBreakMode="TailTruncation"
-               MaxLines="2"
-               Style="{StaticResource WaveCardSubtitle}"/>
-        <!-- Mod Version -->
-        <Label Text="{Binding Version}"
-               Grid.Row="0"
-               Grid.Column="2"
-               FontSize="12"
-               FontAttributes="Bold"
-               TextColor="{AppThemeBinding Light={StaticResource WaveAccentLight}, Dark={StaticResource WaveAccentDark}}"/>
-        <!-- Mod Supplier -->
-        <Label Text="{Binding ModSupplier}"
-               Grid.Row="0"
-               Grid.Column="3"
-               Style="{StaticResource WaveCardSubtitle}"
-               HorizontalOptions="End"/>
-        <!-- Mod Delete -->
-        <Border Grid.Row="0"
-                Grid.RowSpan="2"
-                Grid.Column="4"
-                IsVisible="{Binding CanDelete}"
-                Style="{StaticResource WaveDangerFrame}"
-                StrokeShape="RoundRectangle 0,10,0,10"
-                Margin="10,0,0,0">
-            <Button Text="Delete"
-                    Style="{StaticResource WaveDangerButton}"
-                    Command="{Binding DeleteCommand}"
-                    CommandParameter="{Binding DeleteCommandParameter}"/>
-        </Border>
-    </Grid>
-    </Border>
+                     <!-- Mod Image -->
+                     <Image Source="{Binding Image}"
+                            SemanticProperties.Description="Mod Image"
+                            Grid.Column="0"
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            WidthRequest="70"
+                            HeightRequest="70"
+                            Aspect="AspectFill"/>
+                     <!-- Mod Name -->
+                     <Label Text="{Binding Name}"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Style="{StaticResource WaveCardTitle}"/>
+                     <!-- Mod Description -->
+                     <Label Text="{Binding Summary}"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2"
+                            FontSize="13"
+                            LineBreakMode="TailTruncation"
+                            MaxLines="2"
+                            Style="{StaticResource WaveCardSubtitle}"/>
+                     <!-- Mod Version -->
+                     <Label Text="{Binding Version}"
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            FontSize="12"
+                            FontAttributes="Bold"
+                            TextColor="{AppThemeBinding Light={StaticResource WaveAccentLight}, Dark={StaticResource WaveAccentDark}}"/>
+                     <!-- Mod Supplier -->
+                     <Label Text="{Binding ModSupplier}"
+                            Grid.Row="0"
+                            Grid.Column="3"
+                            Style="{StaticResource WaveCardSubtitle}"
+                            HorizontalOptions="End"/>
+                     <!-- Mod Delete -->
+                     <Button Grid.Row="0"
+                             Grid.RowSpan="2"
+                             Grid.Column="4"
+                             Text="Remove"
+                             Margin="10,0,0,0"
+                             Style="{StaticResource WaveDangerButton}"
+                             Command="{Binding DeleteCommand}"
+                             CommandParameter="{Binding DeleteCommandParameter}"/>
+
+              </Grid>
+       </Border>
 </ContentView>
