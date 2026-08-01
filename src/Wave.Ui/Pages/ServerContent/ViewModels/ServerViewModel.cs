@@ -273,16 +273,16 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     private async Task RequestModloaderVersionsAsync()
     {
-        ModloaderInfoIsVisible = false;
-        ModloaderInfos.Clear();
-        SelectedModloaderInfo = null;
+        ResetModloaderVersions();
 
         string? minecraftVersion = Server.MinecraftVersionBase?.MinecraftVersion;
         if (minecraftVersion is null) return;
         if (ModloaderTypeQuery.ModloaderType is null) return;
 
+        ModloaderType modloaderType = (ModloaderType)ModloaderTypeQuery.ModloaderType;
+
         var modloaderInfos = await modloaderCatalogService.GetModloaderVersionsAsync(
-                (ModloaderType)ModloaderTypeQuery.ModloaderType,
+                modloaderType,
                 minecraftVersion
             );
 
@@ -291,6 +291,14 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
             ModloaderInfos.Add(modloaderInfo);
         }
         ModloaderInfoIsVisible = true;
+    }
+
+    [RelayCommand]
+    private void ResetModloaderVersions()
+    {
+        ModloaderInfoIsVisible = false;
+        ModloaderInfos.Clear();
+        SelectedModloaderInfo = null;
     }
 
     [RelayCommand]

@@ -42,7 +42,17 @@
                                              ItemsSource="{Binding ModloaderTypes}"
                                              ItemDisplayBinding="{Binding Value}"
                                              SelectedValueModelPath="ModloaderType"
-                                             SelectedValueMemberPath="Key"/>
+                                             SelectedValueMemberPath="Key">
+                                <form:FormPicker.Behaviors>
+                                    <toolkit:EventToCommandBehavior
+                                        x:DataType="viewModels:ServerViewModel"
+                                        EventName="SelectedIndexChanged"
+                                        BindingContext="{Binding BindingContext,
+                                                             Source={x:Reference Root},
+                                                             x:DataType=views:ModsView}"
+                                        Command="{Binding ResetModloaderVersionsCommand}"/>
+                                </form:FormPicker.Behaviors>
+                            </form:FormPicker>
                             <form:SubmitButton Text="Search"/>
                         </HorizontalStackLayout>
                     </form:Form>
