@@ -5,11 +5,11 @@
              xmlns:views="clr-namespace:Wave.Ui.Pages.ServerContent.Views"
              xmlns:modloader="clr-namespace:Wave.Domain.ServerManager.Modloader;assembly=Wave.Domain"
              x:Class="Wave.Ui.Pages.ServerContent.Views.ChangesPopup"
-             x:DataType="viewModels:ChangesPopupViewModel">
-    <Border Style="{StaticResource WaveSectionCard}"
-            Padding="20"
-            MaximumWidthRequest="720">
-        <Grid RowSpacing="16">
+             x:DataType="viewModels:ChangesPopupViewModel"
+             BackgroundColor="{AppThemeBinding Light={StaticResource WavePageBackgroundLight}, Dark={StaticResource WavePageBackgroundDark}}"
+             MaximumWidthRequest="720">
+        <Grid Padding="20"
+              RowSpacing="16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -126,5 +126,4 @@
                     HorizontalOptions="End"
                     WidthRequest="110"/>
         </Grid>
-    </Border>
 </ContentView>
