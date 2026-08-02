@@ -1,6 +1,7 @@
 using System;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Mods;
+using Wave.Domain.Java;
 using Wave.Domain.ServerManager.Modloader;
 
 namespace Wave.Domain.ServerManager;
@@ -13,6 +14,7 @@ public record class ServerQuery
         Id = server.Id;
         Name = server.Name;
         ExecutionFlags = server.ExecutionFlags;
+        JavaInstallation = server.JavaInstallation;
         MinecraftVersionBase = server.MinecraftVersionInstallation;
         Eula = server.Eula;
         Properties = server.Properties;
@@ -23,6 +25,7 @@ public record class ServerQuery
     public Guid? Id { get; set; }
     public string? Name { get; set; }
     public string ExecutionFlags { get; set; } = string.Empty;
+    public JavaInstallation? JavaInstallation { get; set; }
     public MinecraftVersionBase? MinecraftVersionBase { get; set; }
     public bool Eula { get; set; } = false;
     public Dictionary<string, string> Properties { get; set; } = new()

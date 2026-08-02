@@ -48,6 +48,7 @@ public class ServerManagerService : IServerManagerService
         {
             Name = query.Name,
             ExecutionFlags = query.ExecutionFlags,
+            JavaInstallation = query.JavaInstallation,
             Properties = query.Properties,
             Eula = query.Eula,
         };
@@ -128,6 +129,7 @@ public class ServerManagerService : IServerManagerService
         string originalVersion = server.MinecraftVersionInstallation!.MinecraftVersion;
         ModloaderBase? originalModloader = server.Modloader;
         server.ExecutionFlags = query.ExecutionFlags;
+        server.JavaInstallation = query.JavaInstallation;
 
         //Version
         await versionManagerService.SetVersionAsync(server, query);

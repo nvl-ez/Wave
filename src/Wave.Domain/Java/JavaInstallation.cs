@@ -11,4 +11,9 @@ public class JavaInstallation
     public required JavaSupplierType JavaSupplierType { get; set; }
     public required JavaArtifactType JavaArtifactType { get; set; }
 
+    public bool Matches(JavaInstallation? other) =>
+        other is not null &&
+        Version == other.Version &&
+        JavaSupplierType == other.JavaSupplierType &&
+        JavaArtifactType == other.JavaArtifactType;
 }

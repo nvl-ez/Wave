@@ -40,16 +40,22 @@ public class ServerExecutorService : IServerExecutorService
     {
         Server server = (await serverRepository.GetAllServersAsync()).First(s => s.Id == id);
 
-        int? serverJavaVersion = server.MinecraftVersionInstallation.JavaVersion;
+        int? serverJavaVersion = server.MinecraftVersionInstallation?.JavaVersion;
 
         if (serverJavaVersion is null) throw new JavaInstallationNotFoundException($"Server does not have a required Java version. Has a jar been downloaded?");
 
-        JavaInstallation? javaInstallation = (await javaInstallRepository.GetAllAsync())
-            .Where(j => j.Version >= serverJavaVersion)
-            .OrderBy(j => j.Version)
-            .FirstOrDefault();
+        IEnumerable<JavaInstallation> installations = await javaInstallRepository.GetAllAsync(ct);
+        JavaInstallation? javaInstallation = server.JavaInstallation is not null
+            ? installations.FirstOrDefault(j => j.Matches(server.JavaInstallation))
+            : installations.Where(j => j.Version >= serverJavaVersion).OrderBy(j => j.Version).FirstOrDefault();
 
-        if (javaInstallation is null) throw new JavaInstallationNotFoundException($"No available Java installation was found for version {serverJavaVersion}.");
+        if (javaInstallation is null)
+        {
+            string requirement = server.JavaInstallation is null
+                ? $"version {serverJavaVersion} or newer"
+                : $"the selected installation '{server.JavaInstallation.Name}'";
+            throw new JavaInstallationNotFoundException($"No available Java installation was found matching {requirement}.");
+        }
 
         lock (runningServersLock)
         {

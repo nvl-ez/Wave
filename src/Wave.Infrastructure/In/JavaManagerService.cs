@@ -1,6 +1,7 @@
 using System;
 using Wave.Application.In;
 using Wave.Application.Out.Java;
+using Wave.Application.Out.ServerManager;
 using Wave.Domain.Java;
 using Wave.Domain.System;
 using Wave.Infrastructure.Exceptions;
@@ -12,10 +13,12 @@ public class JavaManagerService : IJavaManagerService
     private IJavaInstallRepository javaInstallRepository;
     private List<IJavaSupplier> javaSuppliers;
     private List<IJavaInstaller> javaInstallers;
+    private readonly IServerRepository serverRepository;
 
-    public JavaManagerService(IJavaInstallRepository javaInstallRepository, List<IJavaSupplier> javaSuppliers, List<IJavaInstaller> javaInstallers)
+    public JavaManagerService(IJavaInstallRepository javaInstallRepository, IServerRepository serverRepository, List<IJavaSupplier> javaSuppliers, List<IJavaInstaller> javaInstallers)
     {
         this.javaInstallRepository = javaInstallRepository;
+        this.serverRepository = serverRepository;
         this.javaSuppliers = javaSuppliers;
         this.javaInstallers = javaInstallers;
     }
@@ -80,6 +83,13 @@ public class JavaManagerService : IJavaManagerService
             }
         }
 
-        await javaInstallRepository.RemoveAsync(javaInstallation);
+        await javaInstallRepository.RemoveAsync(javaInstallation, ct);
+
+        foreach (var server in await serverRepository.GetAllServersAsync(ct))
+        {
+            if (!javaInstallation.Matches(server.JavaInstallation)) continue;
+            server.JavaInstallation = null;
+            await serverRepository.SaveServerAsync(server, ct);
+        }
     }
 }

@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Wave.Application.In;
 using Wave.Domain.Minecraft;
+using Wave.Domain.Java;
 using Wave.Domain.Mods;
 using Wave.Domain.ServerManager;
 using Wave.Domain.ServerManager.Modloader;
@@ -24,6 +25,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     private readonly IServerManagerService serverHandlerService;
     private readonly IModloaderCatalogService modloaderCatalogService;
     private readonly IModCatalogService modCatalogService;
+    private readonly IJavaManagerService javaManagerService;
 
     /***************************
     * VARIABLES AND PROPERTIES *
@@ -63,6 +65,8 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     //Versions
     [ObservableProperty]
     public partial List<MinecraftVersionInfo> MinecraftVersionsInfos { get; set; } = new List<MinecraftVersionInfo>();
+    [ObservableProperty]
+    public partial ObservableCollection<KeyValuePair<JavaInstallation?, string>> JavaInstallationOptions { get; set; } = new();
     [ObservableProperty]
     public partial bool IncludeSnapshots { get; set; } = false;
 
@@ -127,12 +131,13 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     /***************
     * CONSTRUCTORS *
     ***************/
-    public ServerViewModel(IMinecraftCatalogService minecraftCatalogService, IServerManagerService serverHandlerService, IModloaderCatalogService modloaderCatalogService, IModCatalogService modCatalogService)
+    public ServerViewModel(IMinecraftCatalogService minecraftCatalogService, IServerManagerService serverHandlerService, IModloaderCatalogService modloaderCatalogService, IModCatalogService modCatalogService, IJavaManagerService javaManagerService)
     {
         this.minecraftCatalogService = minecraftCatalogService;
         this.serverHandlerService = serverHandlerService;
         this.modloaderCatalogService = modloaderCatalogService;
         this.modCatalogService = modCatalogService;
+        this.javaManagerService = javaManagerService;
 
         ServerProperties.CollectionChanged += (_, _) => OnPropertyChanged(nameof(FilteredServerProperties));
         Mods.CollectionChanged += (_, _) => OnPropertyChanged(nameof(FilteredMods));
@@ -171,6 +176,17 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         else
             server = new ServerQuery();
         IsModalOpen = false;
+
+        var javaInstallations = (await javaManagerService.GetJavaInstallationsAsync()).ToList();
+        JavaInstallationOptions = new ObservableCollection<KeyValuePair<JavaInstallation?, string>>
+        {
+            new(null, "Automatic (recommended)")
+        };
+        foreach (var installation in javaInstallations)
+            JavaInstallationOptions.Add(new(installation, $"{installation.Name} (Java {installation.Version})"));
+
+        if (server.JavaInstallation is not null)
+            server.JavaInstallation = javaInstallations.FirstOrDefault(j => j.Matches(server.JavaInstallation));
 
 
         //Obterner versiones de MC

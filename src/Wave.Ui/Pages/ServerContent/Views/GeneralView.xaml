@@ -192,5 +192,17 @@
                      </VerticalStackLayout>
               </Border>
 
+              <!-- Java installation -->
+              <Border Style="{StaticResource WaveSectionCard}">
+                     <VerticalStackLayout Spacing="10">
+                            <Label Style="{StaticResource WaveFieldLabel}"
+                                   Text="Java installation"/>
+                            <form:FormPicker ItemsSource="{Binding JavaInstallationOptions}"
+                                             ItemDisplayBinding="{Binding Value}"
+                                             SelectedValueMemberPath="Key"
+                                             SelectedValueModelPath="JavaInstallation"/>
+                     </VerticalStackLayout>
+              </Border>
+
        </VerticalStackLayout>
 </ContentView>

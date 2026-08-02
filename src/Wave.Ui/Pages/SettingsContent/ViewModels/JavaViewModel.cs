@@ -176,6 +176,13 @@ public partial class JavaViewModel : ObservableObject
     [RelayCommand]
     public async Task UninstallJavaAsync(JavaInstallation javaInstallation)
     {
+        bool confirmed = await Shell.Current.DisplayAlertAsync(
+            "Uninstall Java?",
+            $"Are you sure you want to uninstall {javaInstallation.Name}? Servers may be configured to use this Java installation. Their selection will be reset to automatic.",
+            "Uninstall",
+            "Cancel");
+        if (!confirmed) return;
+
         await javaManagerService.UninstallJavaArtifactAsync(javaInstallation);
         JavaInstallations.Remove(javaInstallation);
     }

@@ -1,6 +1,7 @@
 using System;
 using Wave.Domain.Minecraft;
 using Wave.Domain.Mods;
+using Wave.Domain.Java;
 using Wave.Domain.ServerManager.Modloader;
 
 namespace Wave.Domain.ServerManager;
@@ -10,6 +11,7 @@ public sealed class Server
     public Guid Id { get; init; } = Guid.NewGuid();
     public required string Name { get; set; }
     public string ExecutionFlags { get; set; } = string.Empty;
+    public JavaInstallation? JavaInstallation { get; set; }
     public DateTime CreationDate { get; init; } = DateTime.Now;
     public ServerPaths ServerPaths = new();
 
