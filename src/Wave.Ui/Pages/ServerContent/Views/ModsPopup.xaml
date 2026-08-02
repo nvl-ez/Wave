@@ -11,268 +11,295 @@
              x:DataType="viewModels:ModsPopupViewModel"
              x:Name="Root"
              BackgroundColor="{AppThemeBinding Light={StaticResource WavePageBackgroundLight}, Dark={StaticResource WavePageBackgroundDark}}"
-             MinimumWidthRequest="1000"
-             MinimumHeightRequest="700"
-             WidthRequest="1500">
+             MinimumWidthRequest="1100"
+             MinimumHeightRequest="720"
+             WidthRequest="1700">
 
     <ContentView.Behaviors>
-        <toolkit:EventToCommandBehavior
-            x:DataType="viewModels:ModsPopupViewModel"
-            EventName="Loaded"
-            BindingContext="{Binding BindingContext,
-                                 Source={x:Reference Root},
-                                 x:DataType=views:ModsPopup}"
-            Command="{Binding LoadCommand}"/>
+        <toolkit:EventToCommandBehavior EventName="Loaded"
+                                        BindingContext="{Binding BindingContext, Source={x:Reference Root}, x:DataType=views:ModsPopup}"
+                                        Command="{Binding LoadCommand}"/>
     </ContentView.Behaviors>
 
-    <Grid Padding="22"
-          RowSpacing="16"
-          ColumnSpacing="16">
+    <Grid Padding="26,22"
+            RowSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="1.8*"/>
+            <ColumnDefinition Width="2.2*"/>
+            <ColumnDefinition Width="1.45*"/>
         </Grid.ColumnDefinitions>
-        <!-- Header -->
-        <Grid Grid.Row="0"
-              Grid.Column="0"
-              Grid.ColumnSpan="3"
-              ColumnSpacing="12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="5*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0"
-                   Text="Mod Browser"
-                   Style="{StaticResource WavePageTitle}"/>
-            <Button Grid.Column="1"
-                    Text="X"
-                    Style="{StaticResource WaveIconButton}"
-                    Command="{Binding ClosePopupCommand}"/>
-        </Grid>
 
-        <!-- Searcher -->
+        <VerticalStackLayout Grid.Row="0"
+                Grid.ColumnSpan="3"
+                Spacing="3">
+            <Label Text="Mod Browser"
+                    Style="{StaticResource WavePageTitle}"/>
+            <Label Text="Find compatible mods, choose a version, and review your selection before saving."
+                   Style="{StaticResource WaveCardSubtitle}"
+                    FontSize="14"/>
+        </VerticalStackLayout>
+
         <Border Grid.Row="1"
-                Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Style="{StaticResource WavePanelCard}">
-        <form:Form Grid.Row="1"
-                   Grid.Column="0"
-                   Grid.ColumnSpan="3"
-                   Model="{Binding ModInfoSupplierQuery}"
-                   SubmitCommand="{Binding SearchModsCommand}">
-            <Grid ColumnSpacing="12"
-                  RowSpacing="6">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <form:Form Model="{Binding ModInfoSupplierQuery}"
+                    SubmitCommand="{Binding SearchModsCommand}">
+                <Grid ColumnSpacing="12"
+                        RowSpacing="6"
+                        ColumnDefinitions="1.2*,5*,2*,Auto"
+                        RowDefinitions="Auto,Auto">
+                    <Label Text="MOD SUPPLIER"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Style="{StaticResource WaveMetaLabel}"/>
+                    <form:FormPicker Grid.Row="1"
+                            Grid.Column="0"
+                            IsRequired="True"
+                                     ItemsSource="{Binding ModSupplierTypes}"
+                            ItemDisplayBinding="{Binding Value}"
+                                     SelectedValueMemberPath="Key"
+                            SelectedValueModelPath="ModSupplierType"/>
+                    <Label Text="SEARCH"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Style="{StaticResource WaveMetaLabel}"/>
+                    <form:FormEntry Grid.Row="1"
+                            Grid.Column="1"
+                            TextModelPath="TextQuery"/>
+                    <Label Text="AUTHOR"
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            Style="{StaticResource WaveMetaLabel}"/>
+                    <form:FormEntry Grid.Row="1"
+                            Grid.Column="2"
+                            TextModelPath="Author"/>
+                    <form:SubmitButton Text="Search mods"
+                            Grid.Row="1"
+                            Grid.Column="3"/>
+                </Grid>
+            </form:Form>
+        </Border>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="6*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+        <Border Grid.Row="2"
+                Grid.ColumnSpan="3"
+                Style="{StaticResource WavePanelCard}"
+                IsVisible="{Binding HasSearched}">
+            <Grid ColumnSpacing="16"
+                    ColumnDefinitions="1.8*,2.2*,1.45*">
+                <collectionComponents:PaginatedCollectionView Grid.Column="0"
+                        x:Name="ModsCollection"
+                                                              NavigateCommand="{Binding PaginatedSearchModsCommand}"
+                                                              PaginationState="{Binding ObservablePaginationState}"
+                                                              ItemsSource="{Binding ModInfos}"
+                        SelectionMode="Single"
+                                                              SelectionChangedCommand="{Binding GetModDetailsWithModInfoCommand}"
+                                                              SelectionChangedCommandParameter="{Binding Source={x:Reference ModsCollection}, Path=SelectedItem.ModInfo}">
+                    <collectionComponents:PaginatedCollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical"
+                                ItemSpacing="10"/>
+                    </collectionComponents:PaginatedCollectionView.ItemsLayout>
+                    <collectionComponents:PaginatedCollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:ModCardViewModel">
+                            <views:ModCardView/>
+                        </DataTemplate>
+                    </collectionComponents:PaginatedCollectionView.ItemTemplate>
+                </collectionComponents:PaginatedCollectionView>
 
-                <!-- Mod Supplier Query -->
-                <Label Text="Mod Supplier:"
-                       Grid.Row="0"
-                       Grid.Column="0"
-                       Style="{StaticResource WaveMetaLabel}"/>
+                <Grid Grid.Column="1">
+                    <VerticalStackLayout HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            Spacing="8">
+                        <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout"
+                                    Binding="{Binding HasSelectedMod}"
+                                    Value="True">
+                                <Setter Property="IsVisible"
+                                        Value="False"/>
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+                        <Label Text="Select a mod"
+                                Style="{StaticResource WaveSectionTitle}"
+                                HorizontalTextAlignment="Center"/>
+                        <Label Text="Choose a mod from the results to view its details and available versions."
+                               Style="{StaticResource WaveCardSubtitle}"
+                                FontSize="14"
+                                HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                    <Grid RowSpacing="14"
+                            IsVisible="{Binding HasSelectedMod}"
+                            RowDefinitions="Auto,*,Auto">
+                        <HorizontalStackLayout Spacing="14"
+                                VerticalOptions="Center">
+                            <Border Style="{StaticResource WaveIconWell}"
+                                    Padding="5"
+                                    WidthRequest="86"
+                                    HeightRequest="86">
+                                <Image Source="{Binding ModIconUrl}"
+                                        Aspect="AspectFill"/>
+                            </Border>
+                            <Label Text="{Binding ModName}"
+                                    FontSize="24"
+                                    Style="{StaticResource WaveCardTitle}"
+                                    VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <Border Grid.Row="1"
+                                Style="{StaticResource WaveRaisedCard}"
+                                BackgroundColor="{StaticResource WaveInputDark}"
+                                Padding="10">
+                            <Grid toolkit:StateContainer.CurrentState="{Binding ModDescriptionType}">
+                                <toolkit:StateContainer.StateViews>
+                                    <WebView toolkit:StateView.StateKey="Html"
+                                            BackgroundColor="{StaticResource WaveInputDark}">
+                                        <WebView.Source>
+                                            <HtmlWebViewSource Html="{Binding ModDescription}"/>
+                                        </WebView.Source>
+                                    </WebView>
+                                    <Editor toolkit:StateView.StateKey="Text"
+                                            IsReadOnly="True"
+                                            Text="{Binding ModDescription}"
+                                            FontSize="14"/>
+                                    <ActivityIndicator toolkit:StateView.StateKey="Loading"
+                                            IsRunning="True"/>
+                                </toolkit:StateContainer.StateViews>
+                            </Grid>
+                        </Border>
+                        <Grid Grid.Row="2"
+                                ColumnDefinitions="Auto,*,Auto"
+                                ColumnSpacing="10">
+                            <Label Text="VERSION"
+                                    Style="{StaticResource WaveMetaLabel}"
+                                    VerticalOptions="Center"/>
+                            <Picker Grid.Column="1"
+                                    Style="{StaticResource WaveInputPicker}"
+                                    ItemsSource="{Binding ModVersions}"
+                                    ItemDisplayBinding="{Binding VersionName}"
+                                    SelectedItem="{Binding CurrentModVersion}"/>
+                            <Button Grid.Column="2"
+                                    Text="Add mod"
+                                    Style="{StaticResource WavePrimaryButton}"
+                                    Command="{Binding AddModFileCommand}"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
 
-                <form:FormPicker Grid.Row="1"
-                                 Grid.Column="0"
-                                 IsRequired="True"
-                                 ItemsSource="{Binding ModSupplierTypes}"
-                                 ItemDisplayBinding="{Binding Value}"
-                                 SelectedValueMemberPath="Key"
-                                 SelectedValueModelPath="ModSupplierType"/>
-
-                <!-- Text Query -->
-                <Label Text="Text:"
-                       Grid.Row="0"
-                       Grid.Column="1"
-                       Style="{StaticResource WaveMetaLabel}"/>
-                <form:FormEntry Grid.Row="1"
-                                Grid.Column="1"
-                                TextModelPath="TextQuery"/>
-
-                <!-- Author Query -->
-                <Label Text="Author:"
-                       Grid.Row="0"
-                       Grid.Column="2"
-                       Style="{StaticResource WaveMetaLabel}"/>
-                <form:FormEntry Grid.Row="1"
-                                Grid.Column="2"
-                                TextModelPath="Author"/>
-
-                <!-- Search Button -->
-                <form:SubmitButton Text="Search"
-                                   Grid.Row="1"
-                                   Grid.Column="3"/>
+                <Grid Grid.Column="2"
+                        RowDefinitions="Auto,*,Auto"
+                        RowSpacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Selected mods"
+                                Style="{StaticResource WaveSectionTitle}"/>
+                        <Border Grid.Column="1"
+                                Style="{StaticResource WaveIconWell}"
+                                Padding="10,4">
+                            <Label Text="{Binding ModFiles.Count}"
+                                    FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource WaveAccentLight}, Dark={StaticResource WaveAccentDark}}"/>
+                        </Border>
+                    </Grid>
+                    <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding ModFiles}"
+                            SelectionMode="None">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical"
+                                    ItemSpacing="10"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="domain:ModFile">
+                                <Border Style="{StaticResource WaveRaisedCard}"
+                                        Padding="10">
+                                    <Grid ColumnDefinitions="54,*,Auto"
+                                            ColumnSpacing="10">
+                                        <Border Style="{StaticResource WaveIconWell}"
+                                                WidthRequest="54"
+                                                HeightRequest="54"
+                                                Padding="3">
+                                            <Image Source="{Binding IconUrl}"
+                                                    Aspect="AspectFill"/>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1"
+                                                Spacing="2"
+                                                VerticalOptions="Center">
+                                            <Label Text="{Binding ModName}"
+                                                    Style="{StaticResource WaveCardTitle}"
+                                                    FontSize="15"
+                                                   LineBreakMode="WordWrap"
+                                                    MaxLines="2"/>
+                                            <Label Text="{Binding VersionName}"
+                                                    Style="{StaticResource WaveCardSubtitle}"
+                                                    FontAttributes="Bold"/>
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="2"
+                                                Text="Remove"
+                                                Style="{StaticResource WaveDangerButton}"
+                                                Padding="12,8"
+                                                VerticalOptions="Center"
+                                                Command="{Binding BindingContext.RemoveModFileCommand, Source={x:Reference Root}}"
+                                                CommandParameter="{Binding ModId}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Label Grid.Row="1"
+                            Text="Mods you add will appear here."
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                           Style="{StaticResource WaveCardSubtitle}"
+                            FontSize="14"
+                            IsVisible="False">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label"
+                                    Binding="{Binding ModFiles.Count}"
+                                    Value="0">
+                                <Setter Property="IsVisible"
+                                        Value="True"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <Grid Grid.Row="2"
+                            ColumnDefinitions="*,*"
+                            ColumnSpacing="10">
+                        <Button Grid.Column="0"
+                                Text="Cancel"
+                                Style="{StaticResource WaveSecondaryButton}"
+                                Command="{Binding CancelCommand}"/>
+                        <Button Grid.Column="1"
+                                Text="Save"
+                                Style="{StaticResource WavePrimaryButton}"
+                                Command="{Binding SaveCommand}"/>
+                    </Grid>
+                </Grid>
             </Grid>
-        </form:Form>
         </Border>
 
-        <!-- Returned Mods -->
         <Border Grid.Row="2"
-                Grid.Column="0"
+                Grid.ColumnSpan="3"
                 Style="{StaticResource WavePanelCard}">
-        <collectionComponents:PaginatedCollectionView Grid.Row="2"
-                                                      Grid.Column="0"
-                                                      x:Name="ModsCollection"
-                                                      NavigateCommand="{Binding PaginatedSearchModsCommand}"
-                                                      PaginationState="{Binding ObservablePaginationState}"
-                                                      ItemsSource="{Binding ModInfos}"
-                                                      SelectionMode="Single"
-                                                      SelectionChangedCommand="{Binding GetModDetailsWithModInfoCommand}"
-                                                      SelectionChangedCommandParameter="{Binding Source={x:Reference ModsCollection}, Path=SelectedItem.ModInfo}">
-
-            <collectionComponents:PaginatedCollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical"
-                                   ItemSpacing="10"/>
-            </collectionComponents:PaginatedCollectionView.ItemsLayout>
-
-            <collectionComponents:PaginatedCollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:ModCardViewModel">
-                    <views:ModCardView/>
-                </DataTemplate>
-            </collectionComponents:PaginatedCollectionView.ItemTemplate>
-
-        </collectionComponents:PaginatedCollectionView>
+            <Border.Triggers>
+                <DataTrigger TargetType="Border"
+                        Binding="{Binding HasSearched}"
+                        Value="True">
+                    <Setter Property="IsVisible"
+                            Value="False"/>
+                </DataTrigger>
+            </Border.Triggers>
+            <VerticalStackLayout HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Spacing="8">
+                <Label Text="Select a mod supplier"
+                        Style="{StaticResource WaveSectionTitle}"
+                        HorizontalTextAlignment="Center"/>
+                <Label Text="Choose a supplier above and search to browse compatible mods."
+                       Style="{StaticResource WaveCardSubtitle}"
+                        FontSize="14"
+                        HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
         </Border>
 
-        <!-- Mod Details -->
-        <Border Grid.Row="2"
-                Grid.Column="1"
-                Style="{StaticResource WavePanelCard}">
-        <Grid Grid.Row="2"
-              Grid.Column="1"
-              RowSpacing="14">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <HorizontalStackLayout Grid.Row="0"
-                                   Spacing="14"
-                                   VerticalOptions="Center">
-                <Image Source="{Binding ModIconUrl}"
-                       SemanticProperties.Description="Mod Image"
-                       WidthRequest="120"
-                       HeightRequest="120"
-                       Aspect="AspectFill"/>
-                <Label Text="{Binding ModName}"
-                       FontSize="24"
-                       Style="{StaticResource WaveCardTitle}"
-                       VerticalOptions="Center"
-                       />
-            </HorizontalStackLayout>
-
-            <Border Grid.Row="1"
-                    Style="{StaticResource WaveRaisedCard}"
-                    Padding="8">
-            <Grid
-                  HorizontalOptions="Fill"
-                  VerticalOptions="Fill"
-                  toolkit:StateContainer.CurrentState="{Binding ModDescriptionType}">
-                <toolkit:StateContainer.StateViews>
-                    <!-- Renderizar HTML -->
-                    <WebView toolkit:StateView.StateKey="Html"
-                             HorizontalOptions="Fill"
-                             VerticalOptions="Fill">
-                        <WebView.Source>
-                            <HtmlWebViewSource Html="{Binding ModDescription}"/>
-                        </WebView.Source>
-                    </WebView>
-
-                    <!-- Mostrar Texto -->
-                    <Editor toolkit:StateView.StateKey="Text"
-                            IsReadOnly="True"
-                            Text="{Binding ModDescription}"
-                            FontSize="14"/>
-
-                    <!-- Loader -->
-                    <BoxView toolkit:StateView.StateKey="Loading"
-                             WidthRequest="200"
-                             HeightRequest="50"
-                             Color="Green"/>
-                </toolkit:StateContainer.StateViews>
-                <!-- Loader -->
-                <BoxView WidthRequest="200"
-                         HeightRequest="50"
-                         Color="Red"/>
-            </Grid>
-            </Border>
-
-
-            <HorizontalStackLayout Grid.Row="2"
-                                   Spacing="10"
-                                   VerticalOptions="Center">
-                <Label Text="Version:"
-                       Style="{StaticResource WaveMetaLabel}"
-                       VerticalOptions="Center"/>
-                <Picker ItemsSource="{Binding ModVersions}"
-                        ItemDisplayBinding="{Binding VersionName}"
-                        SelectedItem="{Binding CurrentModVersion}"/>
-                <Button Text="Add Mod"
-                        Command="{Binding AddModFileCommand}"/>
-            </HorizontalStackLayout>
-        </Grid>
-        </Border>
-
-        <!-- Added Mods -->
-        <Border Grid.Row="2"
-                Grid.Column="2"
-                Style="{StaticResource WavePanelCard}">
-        <Grid RowSpacing="12">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Label Text="Added Mods"
-                   Style="{StaticResource WaveCardTitle}"/>
-        <CollectionView Grid.Row="1"
-                        x:Name="ModFilesCollection"
-                        ItemsSource="{Binding ModFiles}"
-                        Margin="0"
-                        SelectionMode="None">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical"
-                                   ItemSpacing="10"/>
-            </CollectionView.ItemsLayout>
-
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="domain:ModFile">
-                    <Border Style="{StaticResource WaveRaisedCard}"
-                            Padding="10">
-                    <HorizontalStackLayout Spacing="8">
-                        <Label Text="{Binding VersionName}"
-                               LineBreakMode="TailTruncation"
-                               VerticalOptions="Center"
-                               Style="{StaticResource WaveCardTitle}"/>
-
-                        <Button Text="-"
-                                WidthRequest="36"
-                                HeightRequest="36"
-                                Padding="0"
-                                Style="{StaticResource WaveDangerButton}"
-                                Command="{Binding BindingContext.RemoveModFileCommand, Source={x:Reference Root}}"
-                                CommandParameter="{Binding ModId}"/>
-                    </HorizontalStackLayout>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-        </Grid>
-        </Border>
     </Grid>
 </ContentView>

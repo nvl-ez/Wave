@@ -22,17 +22,57 @@ public partial class ModsPopupViewModel : ObservableObject
     public ObservablePaginationState ObservablePaginationState { get; set; } = new ObservablePaginationState(new PaginationState() { Index = 0 });
     public ObservableCollection<ModCardViewModel> ModInfos { get; } = [];
 
+    [ObservableProperty]
+    public partial bool HasSearched { get; set; }
+
     //MOD DETAILS
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ModDescription))]
     [NotifyPropertyChangedFor(nameof(ModDescriptionType))]
     [NotifyPropertyChangedFor(nameof(ModName))]
     [NotifyPropertyChangedFor(nameof(ModIconUrl))]
+    [NotifyPropertyChangedFor(nameof(HasSelectedMod))]
     public partial ModDetails? ModDetails { get; set; } = null;
+
+    public bool HasSelectedMod => ModDetails is not null;
 
     public string? ModName => ModDetails?.ModName;
     public string? ModIconUrl => ModDetails?.IconUrl;
-    public string? ModDescription => ModDetails?.ModDescription;
+    public string? ModDescription
+    {
+        get
+        {
+            if (ModDetails?.ModDescription is not string description) return null;
+            if (ModDetails.ModDescriptionType != Domain.Mods.ModDescriptionType.Html) return description;
+
+            const string readableTheme = """
+                <style>
+                    html, body {
+                        background-color: #171B22 !important;
+                        color: #F8FAFC !important;
+                        font-family: "Open Sans", "Segoe UI", Arial, sans-serif !important;
+                    }
+
+                    body * {
+                        color: #F8FAFC !important;
+                        font-family: inherit !important;
+                    }
+
+                    a, a * {
+                        color: #7CA6FF !important;
+                    }
+
+                    img {
+                        max-width: 100% !important;
+                        height: auto !important;
+                        object-fit: contain;
+                    }
+                </style>
+                """;
+
+            return readableTheme + description;
+        }
+    }
     public string? ModDescriptionType
     {
         get
@@ -54,7 +94,8 @@ public partial class ModsPopupViewModel : ObservableObject
 
     //MOD FIES
     public ObservableCollection<ModFile> ModFiles { get; } = [];
-    public ModVersion? CurrentModVersion { get; set; } = null;
+    [ObservableProperty]
+    public partial ModVersion? CurrentModVersion { get; set; }
     public ModBase? CurrentMod { get; set; } = null;
 
 
@@ -73,6 +114,7 @@ public partial class ModsPopupViewModel : ObservableObject
             TextQuery = "",
             Author = ""
         };
+
     }
 
     [RelayCommand]
@@ -103,6 +145,9 @@ public partial class ModsPopupViewModel : ObservableObject
         {
             ModInfos.Add(new ModCardViewModel(modInfo));
         }
+
+        HasSearched = true;
+        ClearSelectedMod();
     }
 
     [RelayCommand]
@@ -125,11 +170,25 @@ public partial class ModsPopupViewModel : ObservableObject
         {
             ModInfos.Add(new ModCardViewModel(modInfo));
         }
+
+        HasSearched = true;
+        ClearSelectedMod();
     }
 
     [RelayCommand]
-    public async Task ClosePopupAsync()
+    public async Task CancelAsync()
     {
+        await Shell.Current.ClosePopupAsync();
+    }
+
+    [RelayCommand]
+    public async Task SaveAsync()
+    {
+        var selectedModIds = ModFiles.Select(mod => mod.ModId).ToHashSet();
+        Server.Mods = Server.Mods
+            .Where(mod => !selectedModIds.Contains(mod.ModId))
+            .Concat(ModFiles)
+            .ToList();
         await Shell.Current.ClosePopupAsync();
     }
 
@@ -183,6 +242,8 @@ public partial class ModsPopupViewModel : ObservableObject
         {
             ModVersions.Add(modVersion);
         }
+
+        CurrentModVersion = ModVersions.FirstOrDefault();
     }
 
     [RelayCommand]
@@ -196,16 +257,22 @@ public partial class ModsPopupViewModel : ObservableObject
         //Elimina si existe una version diferente del mod
         RemoveModFile(modFile.ModId);
 
-        Server.Mods = Server.Mods.Append(modFile);
         ModFiles.Add(modFile);
     }
 
     [RelayCommand]
     public void RemoveModFile(string modId)
     {
-        Server.Mods = Server.Mods.Where(m => m.ModId != modId);
-
         var modFile = ModFiles.FirstOrDefault(m => m.ModId == modId);
         if (modFile is not null) ModFiles.Remove(modFile);
+    }
+
+
+    private void ClearSelectedMod()
+    {
+        CurrentMod = null;
+        CurrentModVersion = null;
+        ModDetails = null;
+        ModVersions.Clear();
     }
 }
