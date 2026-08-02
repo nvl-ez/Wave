@@ -19,14 +19,16 @@
             Command="{Binding LoadCommand}"/>
     </ContentPage.Behaviors>
 
-    <VerticalStackLayout>
-        <!--Lista-->
-        <CollectionView Grid.Row="0"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="3"
+    <Grid RowDefinitions="*,Auto"
+          Padding="20"
+          RowSpacing="12">
+        <!-- The star-sized row keeps the log inside the available screen space. -->
+        <CollectionView x:Name="LogsCollectionView"
+                        Grid.Row="0"
                         ItemsSource="{Binding Logs}"
-                        Margin="20"
-                        SelectionMode="None">
+                        ItemsUpdatingScrollMode="KeepLastItemInView"
+                        SelectionMode="None"
+                        VerticalScrollBarVisibility="Always">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical"
                                    ItemSpacing="5"/>
@@ -39,39 +41,40 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <HorizontalStackLayout>
-            <!-- Command Text -->
+        <!-- Fixed command bar. -->
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,Auto,Auto"
+              ColumnSpacing="8">
             <Entry
+                Grid.Column="0"
                 Text="{Binding CommandMessage}"
-                IsEnabled="{Binding CanSendCommand}"/>
+                Placeholder="Enter a server command"
+                IsEnabled="{Binding IsServerRunning}"
+                ReturnType="Send"
+                ReturnCommand="{Binding SendCommandCommand}"/>
 
-            <!-- Server Action Buttons -->
-            <VerticalStackLayout Grid.Row="1"
-                                 toolkit:StateContainer.CurrentState="{Binding ServerState}">
+            <Button Grid.Column="1"
+                    Text="Send"
+                    IsEnabled="{Binding CanSendCommand}"
+                    Command="{Binding SendCommandCommand}"/>
+
+            <!-- Stop and Start share the final position in the command bar. -->
+            <Grid Grid.Column="2"
+                  toolkit:StateContainer.CurrentState="{Binding ServerState}">
                 <toolkit:StateContainer.StateViews>
-                    <!-- Stop / Send -->
-                    <HorizontalStackLayout toolkit:StateView.StateKey="Running">
-                        <Button Text="Send"
-                                IsEnabled="{Binding CanSendCommand}"
-                                Command="{Binding SendCommandCommand}"/>
+                    <Button toolkit:StateView.StateKey="Running"
+                            Text="Stop"
+                            BackgroundColor="Red"
+                            IsEnabled="{Binding CanStopServer}"
+                            Command="{Binding StopServerCommand}"/>
 
-                        <Button Text="Stop"
-                                BackgroundColor="Red"
-                                IsEnabled="{Binding CanStopServer}"
-                                Command="{Binding StopServerCommand}"/>
-                    </HorizontalStackLayout>
-
-                    <!-- Start -->
                     <Button
                         toolkit:StateView.StateKey="Stopped"
                         Text="Start"
                         BackgroundColor="Green"
                         Command="{Binding StartServerCommand}"/>
                 </toolkit:StateContainer.StateViews>
-                <BoxView WidthRequest="10"
-                         HeightRequest="5"/>
-            </VerticalStackLayout>
-        </HorizontalStackLayout>
-
-    </VerticalStackLayout>
+            </Grid>
+        </Grid>
+    </Grid>
 </ContentPage>

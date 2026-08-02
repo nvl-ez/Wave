@@ -27,6 +27,7 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanStopServer))]
     [NotifyPropertyChangedFor(nameof(CanSendCommand))]
+    [NotifyPropertyChangedFor(nameof(IsServerRunning))]
     [NotifyPropertyChangedFor(nameof(ServerState))]
     public partial IServerSession? ServerSession { get; set; }
 
@@ -42,8 +43,9 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
 
 
     //State
-    public bool CanStopServer => ServerSession is not null && ServerSession.IsRunning;
-    public bool CanSendCommand => !string.IsNullOrEmpty(CommandMessage) && ServerSession is not null && ServerSession.IsRunning;
+    public bool IsServerRunning => ServerSession is not null && ServerSession.IsRunning;
+    public bool CanStopServer => IsServerRunning;
+    public bool CanSendCommand => !string.IsNullOrWhiteSpace(CommandMessage) && IsServerRunning;
     public string ServerState => CanStopServer ? "Running" : "Stopped";
 
     /***************
@@ -76,8 +78,12 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     public async Task SendCommand()
     {
-        if (ServerSession is not null)
-            await ServerSession.SendCommandAsync(CommandMessage);
+        if (ServerSession is null || !ServerSession.IsRunning || string.IsNullOrWhiteSpace(CommandMessage))
+            return;
+
+        var command = CommandMessage;
+        await ServerSession.SendCommandAsync(command);
+        CommandMessage = "";
     }
 
     [RelayCommand]
