@@ -8,5 +8,7 @@ public class ServerChanges
 {
     public IEnumerable<ModFile>? DeletedMods { get; set; } = null;
 
+    public IEnumerable<ModFile>? FailedMods { get; set; } = null;
+
     public ModloaderBase? DeletedModloader { get; set; } = null;
 }

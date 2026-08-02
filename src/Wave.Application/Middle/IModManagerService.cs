@@ -6,6 +6,6 @@ namespace Wave.Application.Middle;
 
 public interface IModManagerService
 {
-    public Task SetModsAsync(Server server, ServerQuery query);
-    public Task<IEnumerable<ModFile>> MigrateModsAsync(Server server);
+    public Task<IEnumerable<ModFile>> SetModsAsync(Server server, ServerQuery query);
+    public Task<ModMigrationResult> MigrateModsAsync(Server server);
 }

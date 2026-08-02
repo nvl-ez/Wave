@@ -169,21 +169,27 @@ public class ServerManagerService : IServerManagerService
         //Manage Mods
         if (query.Modloader is not null && (originalVersion != query.MinecraftVersionBase?.MinecraftVersion || originalModloader?.ModloaderType != query.Modloader.ModloaderType))
         { //Update mods
-            await modManagerService.SetModsAsync(server, query);
-            changes.DeletedMods = await modManagerService.MigrateModsAsync(server);
+            var failedMods = await modManagerService.SetModsAsync(server, query);
+            var migrationResult = await modManagerService.MigrateModsAsync(server);
+            changes.DeletedMods = migrationResult.DeletedMods;
+            changes.FailedMods = failedMods.Concat(migrationResult.FailedMods);
         }
         else
         {
             if (query.Mods.Count() == 0)
                 server.Mods = [];
             else
-                await modManagerService.SetModsAsync(server, query);
+                changes.FailedMods = await modManagerService.SetModsAsync(server, query);
         }
 
         // Save server
         await serverRepository.SaveServerAsync(server);
 
-        return (changes.DeletedMods is not null && changes.DeletedMods.Count() > 0) || changes.DeletedModloader is not null ? changes : null;
+        return (changes.DeletedMods?.Any() == true) ||
+               (changes.FailedMods?.Any() == true) ||
+               changes.DeletedModloader is not null
+            ? changes
+            : null;
     }
 
     public Server GetServer(Guid id)

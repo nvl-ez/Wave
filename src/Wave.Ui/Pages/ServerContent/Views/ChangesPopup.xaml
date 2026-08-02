@@ -22,7 +22,7 @@
                 <Label Text="Server configuration changed"
                        FontSize="22"
                        Style="{StaticResource WaveSectionTitle}"/>
-                <Label Text="The selected server configuration required the mods and/or modloader to be migrated. The following items could not be migrated, so they were removed."
+                <Label Text="Some changes to the server configuration require your attention."
                        FontSize="14"
                        Style="{StaticResource WaveCardSubtitle}"/>
             </VerticalStackLayout>
@@ -89,35 +89,38 @@
                 </Grid>
             </Border>
 
-            <Grid Grid.Row="2"
-                  IsVisible="{Binding HasDeletedMods}"
-                  RowSpacing="10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <ScrollView Grid.Row="2" MaximumHeightRequest="480">
+                <VerticalStackLayout Spacing="16">
+                    <VerticalStackLayout IsVisible="{Binding HasDeletedMods}" Spacing="10">
+                        <Label Text="Removed Mods"
+                               Style="{StaticResource WaveSectionTitle}"
+                               FontSize="18"/>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding DeletedMods}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:ModCardViewModel">
+                                    <views:ModCardView/>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
 
-                <Label Grid.Row="0"
-                       Text="Removed Mods"
-                       Style="{StaticResource WaveSectionTitle}"
-                       FontSize="18"/>
-
-                <CollectionView Grid.Row="1"
-                                ItemsSource="{Binding DeletedMods}"
-                                SelectionMode="None"
-                                MaximumHeightRequest="360">
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Vertical"
-                                           ItemSpacing="10"/>
-                    </CollectionView.ItemsLayout>
-
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="viewModels:ModCardViewModel">
-                            <views:ModCardView/>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Grid>
+                    <VerticalStackLayout IsVisible="{Binding HasFailedMods}" Spacing="10">
+                        <Label Text="Mods that could not be installed"
+                               Style="{StaticResource WaveSectionTitle}"
+                               FontSize="18"/>
+                        <Label Text="An error occurred while downloading these mods. They were not added to the server."
+                               Style="{StaticResource WaveCardSubtitle}"
+                               FontSize="14"/>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding FailedMods}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:ModCardViewModel">
+                                    <views:ModCardView/>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
 
             <Button Grid.Row="3"
                     Text="Ok"

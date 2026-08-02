@@ -20,7 +20,7 @@ public class ModManagerService : IModManagerService
 
 
 
-    public async Task SetModsAsync(Server server, ServerQuery query)
+    public async Task<IEnumerable<ModFile>> SetModsAsync(Server server, ServerQuery query)
     {
         //Differing de mods por id de mod y version
         var added = query.Mods.ExceptBy(
@@ -33,13 +33,16 @@ public class ModManagerService : IModManagerService
                 x => (x.ModId, x.VersionId))
             .ToList();
 
-        await AddModsAsync(server, added);
+        var failedMods = await AddModsAsync(server, added);
         await RemoveModsAsync(server, removed);
+
+        return failedMods;
     }
 
-    public async Task<IEnumerable<ModFile>> MigrateModsAsync(Server server)
+    public async Task<ModMigrationResult> MigrateModsAsync(Server server)
     {
         List<ModFile> removedMods = new();
+        List<ModFile> failedMods = new();
 
         string modsDirectory = serverPathResolver.GetModsDirectory(server);
 
@@ -89,26 +92,41 @@ public class ModManagerService : IModManagerService
             //Download the latest version
             ModFile modFile = new(mod, versions.First());
 
-            await DownloadMod(modFile, modsDirectory);
+            if (!await TryDownloadMod(modFile, modsDirectory))
+            {
+                failedMods.Add(modFile);
+                continue;
+            }
 
             server.Mods = server.Mods.Append(modFile);
         }
 
-        return removedMods;
+        return new ModMigrationResult
+        {
+            DeletedMods = removedMods,
+            FailedMods = failedMods
+        };
     }
 
-    private async Task AddModsAsync(Server server, IEnumerable<ModFile> mods)
+    private async Task<IEnumerable<ModFile>> AddModsAsync(Server server, IEnumerable<ModFile> mods)
     {
         string modsDirectory = serverPathResolver.CreateModsDirectory(server);
+        List<ModFile> failedMods = new();
 
         foreach (ModFile mod in mods)
         {
             if (mod is null) continue;
 
-            await DownloadMod(mod, modsDirectory);
+            if (!await TryDownloadMod(mod, modsDirectory))
+            {
+                failedMods.Add(mod);
+                continue;
+            }
 
             server.Mods = server.Mods.Append(mod);
         }
+
+        return failedMods;
     }
 
     private async Task RemoveModsAsync(Server server, IEnumerable<ModFile> mods)
@@ -150,5 +168,42 @@ public class ModManagerService : IModManagerService
 
         //Download and store the mod
         await target.DownloadMod(mod, modsDirectory);
+    }
+
+    private async Task<bool> TryDownloadMod(ModFile mod, string modsDirectory)
+    {
+        try
+        {
+            await DownloadMod(mod, modsDirectory);
+            return true;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine($"Could not download mod {mod.ModId}: {exception.Message}");
+
+            foreach (var artifact in mod.Artifacts)
+            {
+                string artifactPath = Path.Combine(modsDirectory, artifact.FileName);
+                try
+                {
+                    if (File.Exists(artifactPath))
+                        File.Delete(artifactPath);
+                }
+                catch (IOException cleanupException)
+                {
+                    Console.Error.WriteLine($"Could not remove partial mod file {artifactPath}: {cleanupException.Message}");
+                }
+                catch (UnauthorizedAccessException cleanupException)
+                {
+                    Console.Error.WriteLine($"Could not remove partial mod file {artifactPath}: {cleanupException.Message}");
+                }
+            }
+
+            return false;
+        }
     }
 }

@@ -142,16 +142,16 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
     {
         foreach (var modArtifact in modFile.Artifacts)
         {
-            using (var response = await client.GetAsync(modArtifact.DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
+            using (var response = await client.GetAsync(modArtifact.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, ct))
             {
                 response.EnsureSuccessStatusCode();
 
                 string filePath = Path.Combine(modsPath, modArtifact.FileName);
                 using (var fileStream = File.Create(filePath))
                 {
-                    using (var httpStream = await response.Content.ReadAsStreamAsync())
+                    using (var httpStream = await response.Content.ReadAsStreamAsync(ct))
                     {
-                        await httpStream.CopyToAsync(fileStream);
+                        await httpStream.CopyToAsync(fileStream, ct);
                     }
                 }
             }
