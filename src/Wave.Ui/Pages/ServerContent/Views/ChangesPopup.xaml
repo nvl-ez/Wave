@@ -119,6 +119,38 @@
                             </BindableLayout.ItemTemplate>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
+
+                    <VerticalStackLayout IsVisible="{Binding HasIncompatibleMods}" Spacing="10">
+                        <Label Text="Mods not installed due to incompatibilities"
+                               Style="{StaticResource WaveSectionTitle}"
+                               FontSize="18"/>
+                        <Label Text="These mods, or one of their required dependencies, conflict with a mod already installed on the server."
+                               Style="{StaticResource WaveCardSubtitle}"
+                               FontSize="14"/>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding IncompatibleMods}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:ModCardViewModel">
+                                    <views:ModCardView/>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout IsVisible="{Binding HasRequiredMods}" Spacing="10">
+                        <Label Text="Automatically installed required mods"
+                               Style="{StaticResource WaveSectionTitle}"
+                               FontSize="18"/>
+                        <Label Text="These mods were added because they are required dependencies."
+                               Style="{StaticResource WaveCardSubtitle}"
+                               FontSize="14"/>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding RequiredMods}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:ModCardViewModel">
+                                    <views:ModCardView/>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
             </ScrollView>
 

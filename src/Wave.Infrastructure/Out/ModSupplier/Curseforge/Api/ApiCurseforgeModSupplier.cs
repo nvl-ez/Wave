@@ -111,6 +111,18 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
         return new(modBase, BuildHtml(dto.Data), ModDescriptionType.Html);
     }
 
+    public async Task<ModInfo> GetModInfoAsync(string modId, CancellationToken ct = default)
+    {
+        if (!HasToken)
+            throw new InvalidOperationException("A CurseForge API token is required.");
+
+        string jsonResponse = await client.GetStringAsync($"https://api.curseforge.com/v1/mods/{modId}", ct);
+        using JsonDocument document = JsonDocument.Parse(jsonResponse);
+        ModInfoDto dto = JsonSerializer.Deserialize<ModInfoDto>(document.RootElement.GetProperty("data"))
+            ?? throw new InvalidDataException($"CurseForge returned no metadata for mod {modId}.");
+        return Mapper.ToDomain(dto);
+    }
+
     public async Task<ModVersionSupplierResponse> GetModVersionsAsync(ModVersionSupplierQuery modVersionSupplierQuery, CancellationToken ct = default)
     {
         if (!HasToken)

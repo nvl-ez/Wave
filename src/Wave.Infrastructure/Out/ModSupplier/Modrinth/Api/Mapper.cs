@@ -46,7 +46,8 @@ public static class Mapper
                 dependencies.Add(new ModDependency()
                 {
                     DependencyType = ToDomainModDependencyType(dependencyDto.DependencyType),
-                    ModId = dependencyDto.ProjectId.ToString()
+                    ModId = dependencyDto.ProjectId.ToString(),
+                    VersionId = dependencyDto.VersionId
                 });
             }
         }

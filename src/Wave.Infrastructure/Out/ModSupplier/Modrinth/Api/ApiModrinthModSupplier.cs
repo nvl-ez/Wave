@@ -98,6 +98,13 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
         return new(modBase, BuildHtml(dto.Body), ModDescriptionType.Html);
     }
 
+    public async Task<ModInfo> GetModInfoAsync(string modId, CancellationToken ct = default)
+    {
+        string jsonResponse = await client.GetStringAsync($"/v2/project/{modId}", ct);
+        ProjectDetailsDto dto = JsonSerializer.Deserialize<ProjectDetailsDto>(jsonResponse) ?? new ProjectDetailsDto();
+        return new(dto.ProjectId, dto.Title, dto.Slug, ModSupplierType, dto.Description, dto.IconUrl);
+    }
+
     public async Task<ModVersionSupplierResponse> GetModVersionsAsync(ModVersionSupplierQuery modInfo, CancellationToken ct = default)
     {
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();

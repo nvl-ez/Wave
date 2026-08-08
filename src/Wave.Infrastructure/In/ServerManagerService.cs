@@ -172,17 +172,19 @@ public class ServerManagerService : IServerManagerService
         //Manage Mods
         if (query.Modloader is not null && (originalVersion != query.MinecraftVersionBase?.MinecraftVersion || originalModloader?.ModloaderType != query.Modloader.ModloaderType))
         { //Update mods
-            var failedMods = await modManagerService.SetModsAsync(server, query);
+            var setResult = await modManagerService.SetModsAsync(server, query);
             var migrationResult = await modManagerService.MigrateModsAsync(server);
             changes.DeletedMods = migrationResult.DeletedMods;
-            changes.FailedMods = failedMods.Concat(migrationResult.FailedMods);
+            changes.FailedMods = setResult.FailedMods.Concat(migrationResult.FailedMods);
+            changes.IncompatibleMods = setResult.IncompatibleMods.Concat(migrationResult.IncompatibleMods);
+            changes.RequiredMods = setResult.RequiredMods.Concat(migrationResult.RequiredMods);
         }
         else
         {
-            if (query.Mods.Count() == 0)
-                server.Mods = [];
-            else
-                changes.FailedMods = await modManagerService.SetModsAsync(server, query);
+            var setResult = await modManagerService.SetModsAsync(server, query);
+            changes.FailedMods = setResult.FailedMods;
+            changes.IncompatibleMods = setResult.IncompatibleMods;
+            changes.RequiredMods = setResult.RequiredMods;
         }
 
         // Save server
@@ -190,6 +192,8 @@ public class ServerManagerService : IServerManagerService
 
         return (changes.DeletedMods?.Any() == true) ||
                (changes.FailedMods?.Any() == true) ||
+               (changes.IncompatibleMods?.Any() == true) ||
+               (changes.RequiredMods?.Any() == true) ||
                changes.DeletedModloader is not null
             ? changes
             : null;

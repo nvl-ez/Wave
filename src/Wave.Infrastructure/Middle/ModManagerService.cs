@@ -20,7 +20,7 @@ public class ModManagerService : IModManagerService
 
 
 
-    public async Task<IEnumerable<ModFile>> SetModsAsync(Server server, ServerQuery query)
+    public async Task<ModMigrationResult> SetModsAsync(Server server, ServerQuery query)
     {
         //Differing de mods por id de mod y version
         var added = query.Mods.ExceptBy(
@@ -33,16 +33,18 @@ public class ModManagerService : IModManagerService
                 x => (x.ModId, x.VersionId))
             .ToList();
 
-        var failedMods = await AddModsAsync(server, added);
+        var result = await AddModsAsync(server, added, query.Mods);
         await RemoveModsAsync(server, removed);
 
-        return failedMods;
+        return result;
     }
 
     public async Task<ModMigrationResult> MigrateModsAsync(Server server)
     {
         List<ModFile> removedMods = new();
         List<ModFile> failedMods = new();
+        List<ModFile> incompatibleMods = new();
+        List<ModFile> requiredMods = new();
 
         string modsDirectory = serverPathResolver.GetModsDirectory(server);
 
@@ -92,32 +94,75 @@ public class ModManagerService : IModManagerService
             //Download the latest version
             ModFile modFile = new(mod, versions.First());
 
-            if (!await TryDownloadMod(modFile, modsDirectory))
-            {
-                failedMods.Add(modFile);
-                continue;
-            }
-
-            server.Mods = server.Mods.Append(modFile);
+            var addResult = await AddModsAsync(server, [modFile], [modFile]);
+            failedMods.AddRange(addResult.FailedMods);
+            incompatibleMods.AddRange(addResult.IncompatibleMods);
+            requiredMods.AddRange(addResult.RequiredMods);
         }
 
         return new ModMigrationResult
         {
             DeletedMods = removedMods,
-            FailedMods = failedMods
+            FailedMods = failedMods,
+            IncompatibleMods = incompatibleMods,
+            RequiredMods = requiredMods
         };
     }
 
-    private async Task<IEnumerable<ModFile>> AddModsAsync(Server server, IEnumerable<ModFile> mods)
+    private async Task<ModMigrationResult> AddModsAsync(
+        Server server,
+        IEnumerable<ModFile> mods,
+        IEnumerable<ModFile> knownMods)
     {
         string modsDirectory = serverPathResolver.CreateModsDirectory(server);
         List<ModFile> failedMods = new();
+        List<ModFile> incompatibleMods = new();
+        List<ModFile> requiredMods = new();
+        var knownById = knownMods.GroupBy(mod => mod.ModId).ToDictionary(group => group.Key, group => group.First());
+        var explicitlyRequestedIds = knownMods.Select(mod => mod.ModId).ToHashSet();
 
         foreach (ModFile mod in mods)
         {
             if (mod is null) continue;
+            if (server.Mods.Any(existing => existing.ModId == mod.ModId && existing.VersionId == mod.VersionId))
+                continue;
 
-            if (!await TryDownloadMod(mod, modsDirectory))
+            var dependencyMods = new List<ModFile>();
+            var resolution = await ResolveDependenciesAsync(
+                mod,
+                server,
+                knownById,
+                dependencyMods,
+                new HashSet<string>());
+
+            if (resolution == DependencyResolution.Incompatible)
+            {
+                incompatibleMods.Add(mod);
+                continue;
+            }
+            if (resolution == DependencyResolution.Failed)
+            {
+                failedMods.Add(mod);
+                continue;
+            }
+
+            bool dependencyDownloadFailed = false;
+            foreach (var dependencyMod in dependencyMods)
+            {
+                if (server.Mods.Any(existing => existing.ModId == dependencyMod.ModId)) continue;
+
+                if (!await TryDownloadMod(dependencyMod, modsDirectory))
+                {
+                    dependencyDownloadFailed = true;
+                    break;
+                }
+
+                server.Mods = server.Mods.Append(dependencyMod);
+                if (!explicitlyRequestedIds.Contains(dependencyMod.ModId))
+                    requiredMods.Add(dependencyMod);
+            }
+
+            if (dependencyDownloadFailed || !await TryDownloadMod(mod, modsDirectory))
             {
                 failedMods.Add(mod);
                 continue;
@@ -126,7 +171,131 @@ public class ModManagerService : IModManagerService
             server.Mods = server.Mods.Append(mod);
         }
 
-        return failedMods;
+        return new ModMigrationResult
+        {
+            FailedMods = failedMods,
+            IncompatibleMods = incompatibleMods,
+            RequiredMods = requiredMods
+        };
+    }
+
+    private async Task<DependencyResolution> ResolveDependenciesAsync(
+        ModFile mod,
+        Server server,
+        IReadOnlyDictionary<string, ModFile> knownMods,
+        List<ModFile> dependencyMods,
+        HashSet<string> visiting)
+    {
+        var installedAndPlanned = server.Mods.Concat(dependencyMods).ToList();
+        if (IsIncompatibleWith(mod, installedAndPlanned))
+            return DependencyResolution.Incompatible;
+
+        if (!visiting.Add(mod.ModId))
+            return DependencyResolution.Success;
+
+        try
+        {
+            foreach (var dependency in mod.Dependencies.Where(dependency => dependency.DependencyType == ModDependencyType.Required))
+            {
+                if (server.Mods.Any(existing => existing.ModId == dependency.ModId) ||
+                    dependencyMods.Any(existing => existing.ModId == dependency.ModId))
+                    continue;
+
+                ModFile? dependencyMod = await GetDependencyModAsync(mod, dependency, knownMods);
+                if (dependencyMod is null)
+                    return DependencyResolution.Failed;
+                if (IsIncompatibleWith(mod, [dependencyMod]))
+                    return DependencyResolution.Incompatible;
+
+                var result = await ResolveDependenciesAsync(
+                    dependencyMod,
+                    server,
+                    knownMods,
+                    dependencyMods,
+                    visiting);
+                if (result != DependencyResolution.Success)
+                    return result;
+
+                if (!server.Mods.Any(existing => existing.ModId == dependencyMod.ModId) &&
+                    !dependencyMods.Any(existing => existing.ModId == dependencyMod.ModId))
+                    dependencyMods.Add(dependencyMod);
+            }
+
+            return DependencyResolution.Success;
+        }
+        finally
+        {
+            visiting.Remove(mod.ModId);
+        }
+    }
+
+    private async Task<ModFile?> GetDependencyModAsync(
+        ModFile parent,
+        ModDependency dependency,
+        IReadOnlyDictionary<string, ModFile> knownMods)
+    {
+        if (knownMods.TryGetValue(dependency.ModId, out var knownMod) &&
+            (dependency.VersionId is null || knownMod.VersionId == dependency.VersionId))
+            return knownMod;
+
+        var target = modSupplierIntegrations.FirstOrDefault(supplier => supplier.CanHandle(parent.ModSupplierType));
+        if (target is null)
+            return null;
+
+        var query = new ModVersionSupplierQuery
+        {
+            MinecraftVersion = parent.MinecraftVersion,
+            ModId = dependency.ModId,
+            ModloaderType = parent.ModloaderType,
+            ModSupplierType = parent.ModSupplierType
+        };
+        var versions = (await target.GetModVersionsAsync(query)).Versions;
+        var version = dependency.VersionId is null
+            ? versions.FirstOrDefault()
+            : versions.FirstOrDefault(candidate => candidate.VersionId == dependency.VersionId);
+        if (version is null)
+            return null;
+
+        try
+        {
+            var info = await target.GetModInfoAsync(dependency.ModId);
+            if (string.IsNullOrWhiteSpace(info.ModId) || string.IsNullOrWhiteSpace(info.ModName))
+                return null;
+
+            return new ModFile(info, version);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine($"Could not retrieve metadata for required mod {dependency.ModId}: {exception.Message}");
+            return null;
+        }
+    }
+
+    private static bool IsIncompatibleWith(ModFile candidate, IEnumerable<ModFile> otherMods)
+    {
+        foreach (var other in otherMods.Where(other => other.ModId != candidate.ModId))
+        {
+            if (candidate.Dependencies.Any(dependency =>
+                    dependency.DependencyType == ModDependencyType.Incompatible &&
+                    dependency.ModId == other.ModId) ||
+                other.Dependencies.Any(dependency =>
+                    dependency.DependencyType == ModDependencyType.Incompatible &&
+                    dependency.ModId == candidate.ModId))
+                return true;
+        }
+
+        return false;
+    }
+
+    private enum DependencyResolution
+    {
+        Success,
+        Failed,
+        Incompatible
     }
 
     private async Task RemoveModsAsync(Server server, IEnumerable<ModFile> mods)

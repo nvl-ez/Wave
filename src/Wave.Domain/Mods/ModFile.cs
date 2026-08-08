@@ -12,6 +12,7 @@ public class ModFile : ModBase, IEquatable<ModFile>
         Version = string.Empty;
         MinecraftVersion = string.Empty;
         Artifacts = [];
+        Dependencies = [];
     }
     public ModFile(ModBase modBase, ModVersion modVersion) : base(modBase.ModId, modBase.ModName, modBase.Slug, modBase.ModSupplierType, modBase.ModSummary, modBase.IconUrl)
     {
@@ -25,6 +26,7 @@ public class ModFile : ModBase, IEquatable<ModFile>
         ModloaderType = modVersion.ModloaderType;
         VersionName = modVersion.VersionName;
         Artifacts = modVersion.Artifacts;
+        Dependencies = modVersion.Dependencies ?? [];
     }
 
     public string VersionName { get; set; }
@@ -32,6 +34,7 @@ public class ModFile : ModBase, IEquatable<ModFile>
     public string Version { get; set; }
     public string MinecraftVersion { get; set; }
     public IEnumerable<ModArtifact> Artifacts { get; set; }
+    public IEnumerable<ModDependency> Dependencies { get; set; }
 
     public ModVersionType ModVersionType { get; set; }
     public ModloaderType ModloaderType { get; set; }
