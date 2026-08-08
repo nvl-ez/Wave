@@ -11,174 +11,180 @@
               <!-- Icon, Name and MOTD !-->
               <Border Style="{StaticResource WaveSectionCard}"
                       Padding="18">
-              <Grid ColumnSpacing="16"
-                    RowSpacing="12">
-                     <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                     </Grid.RowDefinitions>
-                     <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                     </Grid.ColumnDefinitions>
+                     <Grid ColumnSpacing="16"
+                           RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                   <RowDefinition Height="Auto"/>
+                                   <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                   <ColumnDefinition Width="Auto"/>
+                                   <ColumnDefinition Width="120"/>
+                                   <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                     <Border Grid.Column="0"
-                             Grid.RowSpan="2"
-                             Grid.Row="0"
-                             WidthRequest="104"
-                             HeightRequest="104"
-                             Style="{StaticResource WaveIconWell}"
-                             ToolTipProperties.Text="Preferred image size: 64 x 64 pixels">
-                            <Border.GestureRecognizers>
-                                   <TapGestureRecognizer Command="{Binding SelectServerIconCommand}"/>
-                                   <PointerGestureRecognizer PointerEnteredCommand="{Binding ShowServerIconOverlayCommand}"
-                                                             PointerExitedCommand="{Binding HideServerIconOverlayCommand}"/>
-                            </Border.GestureRecognizers>
-                            <Grid>
-                                   <Image Source="{Binding ServerIcon}"
-                                          Aspect="AspectFill"/>
-                                   <Border StrokeThickness="0"
-                                           BackgroundColor="{StaticResource WaveOverlay}"
-                                           IsVisible="{Binding ServerIconIsPointerOver}">
-                                          <Label Text="+"
-                                                 FontAttributes="Bold"
-                                                 FontSize="42"
-                                                 TextColor="White"
-                                                 HorizontalOptions="Center"
-                                                 VerticalOptions="Center"/>
-                                   </Border>
-                            </Grid>
-                     </Border>
+                            <Border Grid.Column="0"
+                                    Grid.RowSpan="2"
+                                    Grid.Row="0"
+                                    WidthRequest="104"
+                                    HeightRequest="104"
+                                    Style="{StaticResource WaveIconWell}"
+                                    ToolTipProperties.Text="Preferred image size: 64 x 64 pixels">
+                                   <Border.GestureRecognizers>
+                                          <TapGestureRecognizer Command="{Binding SelectServerIconCommand}"/>
+                                          <PointerGestureRecognizer PointerEnteredCommand="{Binding ShowServerIconOverlayCommand}"
+                                                                    PointerExitedCommand="{Binding HideServerIconOverlayCommand}"/>
+                                   </Border.GestureRecognizers>
+                                   <Grid>
+                                          <Image Source="{Binding ServerIcon}"
+                                                 Aspect="AspectFill"/>
+                                          <Border StrokeThickness="0"
+                                                  BackgroundColor="{StaticResource WaveOverlay}"
+                                                  IsVisible="{Binding ServerIconIsPointerOver}">
+                                                 <Label Text="+"
+                                                        FontAttributes="Bold"
+                                                        FontSize="42"
+                                                        TextColor="White"
+                                                        HorizontalOptions="Center"
+                                                        VerticalOptions="Center"/>
+                                          </Border>
+                                   </Grid>
+                            </Border>
 
-                     <!-- Name -->
-                     <Label Grid.Column="1"
-                            Grid.Row="0"
-                            Style="{StaticResource WaveFieldLabel}"
-                            Text="Server name"/>
-                     <form:FormEntry Grid.Column="2"
-                                     Grid.Row="0"
-                                     TextModelPath="Name"
-                                     IsRequired="True"/>
+                            <!-- Name -->
+                            <Label Grid.Column="1"
+                                   Grid.Row="0"
+                                   Style="{StaticResource WaveFieldLabel}"
+                                   Text="Server name"/>
+                            <form:FormEntry Grid.Column="2"
+                                            Grid.Row="0"
+                                            TextModelPath="Name"
+                                            IsRequired="True"/>
 
-                     <!-- Motd -->
-                     <Label Grid.Column="1"
-                            Grid.Row="1"
-                            Style="{StaticResource WaveFieldLabel}"
-                            Text="Motd"/>
-                     <views:ServerPropertyInputView Grid.Column="2"
-                                                    Grid.Row="1"
-                                                    ServerPropertyKey="motd"
-                                                    PropertyDictionaryModelPath="Properties"
-                                                    ServerPropertyDefinition="{Binding MotdServerProperty}"/>
-              </Grid>
+                            <!-- Motd -->
+                            <Label Grid.Column="1"
+                                   Grid.Row="1"
+                                   Style="{StaticResource WaveFieldLabel}"
+                                   Text="Motd"/>
+                            <views:ServerPropertyInputView Grid.Column="2"
+                                                           Grid.Row="1"
+                                                           ServerPropertyKey="motd"
+                                                           PropertyDictionaryModelPath="Properties"
+                                                           ServerPropertyDefinition="{Binding MotdServerProperty}"/>
+                     </Grid>
               </Border>
 
               <!-- General Properties !-->
               <Border Style="{StaticResource WaveSectionCard}"
                       Padding="18">
-              <Grid ColumnSpacing="16"
-                    RowSpacing="14">
-                     <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                     </Grid.RowDefinitions>
-                     <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                     </Grid.ColumnDefinitions>
+                     <Grid ColumnSpacing="16"
+                           RowSpacing="14">
+                            <Grid.RowDefinitions>
+                                   <RowDefinition Height="Auto"/>
+                                   <RowDefinition Height="Auto"/>
+                                   <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                   <ColumnDefinition Width="120"/>
+                                   <ColumnDefinition Width="*"/>
+                                   <ColumnDefinition Width="120"/>
+                                   <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                     <!-- Versions -->
-                     <Label Grid.Column="0"
-                            Grid.Row="0"
-                            Style="{StaticResource WaveFieldLabel}"
-                            Text="Versions:"/>
-                     <HorizontalStackLayout Grid.Row="0"
-                                            Grid.Column="1"
-                                            Spacing="10"
-                                            VerticalOptions="Center">
-                            <VerticalStackLayout
-                                   toolkit:StateContainer.CurrentState="{Binding MinecraftVersionsStatus}">
-                                   <toolkit:StateContainer.StateViews>
-                                          <form:FormPicker toolkit:StateView.StateKey="Done"
-                                                           ItemsSource="{Binding MinecraftVersionsInfos}"
-                                                           ItemDisplayBinding="{Binding MinecraftVersion}"
-                                                           SelectedValueModelPath="MinecraftVersionBase"
+                            <!-- Versions -->
+                            <Label Grid.Column="0"
+                                   Grid.Row="0"
+                                   Style="{StaticResource WaveFieldLabel}"
+                                   Text="Versions:"/>
+                            <HorizontalStackLayout Grid.Row="0"
+                                                   Grid.Column="1"
+                                                   Spacing="10"
+                                                   VerticalOptions="Center">
+                                   <VerticalStackLayout
+                                          toolkit:StateContainer.CurrentState="{Binding MinecraftVersionsStatus}">
+                                          <toolkit:StateContainer.StateViews>
+                                                 <form:FormPicker toolkit:StateView.StateKey="Done"
+                                                                  ItemsSource="{Binding MinecraftVersionsInfos}"
+                                                                  ItemDisplayBinding="{Binding MinecraftVersion}"
+                                                                  SelectedValueModelPath="MinecraftVersionBase"
+                                                                  IsRequired="True"/>
+
+                                                 <BoxView toolkit:StateView.StateKey="Error"
+                                                          WidthRequest="200"
+                                                          HeightRequest="50"
+                                                          Color="Red"/>
+                                                 <BoxView toolkit:StateView.StateKey="Loading"
+                                                          WidthRequest="200"
+                                                          HeightRequest="50"/>
+                                          </toolkit:StateContainer.StateViews>
+
+                                          <BoxView WidthRequest="200"
+                                                   HeightRequest="50"/>
+                                   </VerticalStackLayout>
+                                   <Label Text="Include Snapshots"
+                                          Style="{StaticResource WaveFieldLabel}"/>
+                                   <form:FormCheckBox IsChecked="{Binding IncludeSnapshots}"
+                                                      Command="{Binding RequestMinecraftVersionsCommand}"/>
+                            </HorizontalStackLayout>
+
+                            <!-- Gamemode -->
+                            <Label Grid.Column="2"
+                                   Grid.Row="0"
+                                   Style="{StaticResource WaveFieldLabel}"
+                                   Text="Gamemode:"/>
+                            <views:ServerPropertyInputView Grid.Column="3"
+                                                           Grid.Row="0"
+                                                           ServerPropertyDefinition="{Binding GamemodeServerProperty}"
+                                                           PropertyDictionaryModelPath="Properties"
                                                            IsRequired="True"/>
 
-                                          <BoxView toolkit:StateView.StateKey="Error"
-                                                   WidthRequest="200"
-                                                   HeightRequest="50"
-                                                   Color="Red"/>
-                                          <BoxView toolkit:StateView.StateKey="Loading"
-                                                   WidthRequest="200"
-                                                   HeightRequest="50"/>
-                                   </toolkit:StateContainer.StateViews>
+                            <!-- Server IP -->
+                            <Label Grid.Column="0"
+                                   Grid.Row="1"
+                                   Style="{StaticResource WaveFieldLabel}"
+                                   Text="Server IP:"/>
+                            <views:ServerPropertyInputView Grid.Column="1"
+                                                           Grid.Row="1"
+                                                           ServerPropertyDefinition="{Binding ServerIpServerProperty}"
+                                                           PropertyDictionaryModelPath="Properties"
+                                                           IsRequired="False"
+                                                           Placeholder="Optional"/>
 
-                                   <BoxView WidthRequest="200"
-                                            HeightRequest="50"/>
-                            </VerticalStackLayout>
-                            <Label Text="Include Snapshots"
-                                   Style="{StaticResource WaveFieldLabel}"/>
-                            <form:FormCheckBox IsChecked="{Binding IncludeSnapshots}"
-                                               Command="{Binding RequestMinecraftVersionsCommand}"/>
-                     </HorizontalStackLayout>
+                            <!-- Max Players -->
+                            <Label Grid.Column="2"
+                                   Grid.Row="1"
+                                   Style="{StaticResource WaveFieldLabel}"
+                                   Text="Max Players:"/>
+                            <views:ServerPropertyInputView Grid.Column="3"
+                                                           Grid.Row="1"
+                                                           ServerPropertyDefinition="{Binding MaxPlayersServerProperty}"
+                                                           PropertyDictionaryModelPath="Properties"
+                                                           IsRequired="True"/>
 
-                     <!-- Gamemode -->
-                     <Label Grid.Column="2"
-                            Grid.Row="0"
-                            Style="{StaticResource WaveFieldLabel}"
-                            Text="Gamemode:"/>
-                     <views:ServerPropertyInputView Grid.Column="3"
-                                                    Grid.Row="0"
-                                                    ServerPropertyDefinition="{Binding GamemodeServerProperty}"
-                                                    PropertyDictionaryModelPath="Properties"/>
+                            <!-- Difficulty -->
+                            <Label Grid.Column="0"
+                                   Grid.Row="2"
+                                   Style="{StaticResource WaveFieldLabel}"
+                                   Text="Difficulty:"/>
+                            <views:ServerPropertyInputView Grid.Column="1"
+                                                           Grid.Row="2"
+                                                           ServerPropertyDefinition="{Binding DifficultyServerProperty}"
+                                                           PropertyDictionaryModelPath="Properties"
+                                                           IsRequired="True"/>
 
-                     <!-- Server IP -->
-                     <Label Grid.Column="0"
-                            Grid.Row="1"
-                            Style="{StaticResource WaveFieldLabel}"
-                            Text="Server IP:"/>
-                     <views:ServerPropertyInputView Grid.Column="1"
-                                                    Grid.Row="1"
-                                                    ServerPropertyDefinition="{Binding ServerIpServerProperty}"
-                                                    PropertyDictionaryModelPath="Properties"/>
-
-                     <!-- Max Players -->
-                     <Label Grid.Column="2"
-                            Grid.Row="1"
-                            Style="{StaticResource WaveFieldLabel}"
-                            Text="Max Players:"/>
-                     <views:ServerPropertyInputView Grid.Column="3"
-                                                    Grid.Row="1"
-                                                    ServerPropertyDefinition="{Binding MaxPlayersServerProperty}"
-                                                    PropertyDictionaryModelPath="Properties"/>
-
-                     <!-- Difficulty -->
-                     <Label Grid.Column="0"
-                            Grid.Row="2"
-                            Style="{StaticResource WaveFieldLabel}"
-                            Text="Difficulty:"/>
-                     <views:ServerPropertyInputView Grid.Column="1"
-                                                    Grid.Row="2"
-                                                    ServerPropertyDefinition="{Binding DifficultyServerProperty}"
-                                                    PropertyDictionaryModelPath="Properties"/>
-
-                     <!-- Eula -->
-                     <Label Grid.Column="2"
-                            Grid.Row="2"
-                            Style="{StaticResource WaveFieldLabel}"
-                            Text="Eula:"/>
-                     <form:FormPicker Grid.Column="3"
-                                      Grid.Row="2"
-                                      ItemsSource="{Binding EulaOptions}"
-                                      ItemDisplayBinding="{Binding Value}"
-                                      SelectedValueMemberPath="Key"
-                                      SelectedValueModelPath="Eula"/>
-              </Grid>
+                            <!-- Eula -->
+                            <Label Grid.Column="2"
+                                   Grid.Row="2"
+                                   Style="{StaticResource WaveFieldLabel}"
+                                   Text="Eula:"/>
+                            <form:FormPicker Grid.Column="3"
+                                             Grid.Row="2"
+                                             ItemsSource="{Binding EulaOptions}"
+                                             ItemDisplayBinding="{Binding Value}"
+                                             SelectedValueMemberPath="Key"
+                                             SelectedValueModelPath="Eula"
+                                             IsRequired="True"/>
+                     </Grid>
               </Border>
 
               <!-- Execution flags -->
@@ -205,7 +211,8 @@
                                           <DataTrigger TargetType="form:FormPicker"
                                                        Binding="{Binding Server.IsJavaInstallationLocked}"
                                                        Value="True">
-                                                 <Setter Property="IsEnabled" Value="False"/>
+                                                 <Setter Property="IsEnabled"
+                                                         Value="False"/>
                                           </DataTrigger>
                                    </form:FormPicker.Triggers>
                             </form:FormPicker>

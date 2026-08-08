@@ -45,6 +45,12 @@ public partial class ServerPropertyInputView : ContentView, IFormElement
 			typeof(ServerPropertyInputView),
 			false);
 
+	public static readonly BindableProperty PlaceholderProperty =
+		BindableProperty.Create(
+			nameof(Placeholder),
+			typeof(string),
+			typeof(ServerPropertyInputView));
+
 	public static readonly BindableProperty ModelProperty =
 		BindableProperty.Create(
 			nameof(Model),
@@ -89,6 +95,12 @@ public partial class ServerPropertyInputView : ContentView, IFormElement
 	{
 		get => (bool)GetValue(IsRequiredProperty);
 		set => SetValue(IsRequiredProperty, value);
+	}
+
+	public string? Placeholder
+	{
+		get => (string?)GetValue(PlaceholderProperty);
+		set => SetValue(PlaceholderProperty, value);
 	}
 
 	public object? Model

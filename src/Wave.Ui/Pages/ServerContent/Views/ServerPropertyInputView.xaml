@@ -27,17 +27,20 @@
             <form:FormEntry
                 toolkit:StateView.StateKey="Integer"
                 Text="{Binding Source={x:Reference Root}, Path=StringValue, Mode=TwoWay}"
+                Placeholder="{Binding Source={x:Reference Root}, Path=Placeholder}"
                 IsRequired="False"/>
 
             <form:FormEntry
                 toolkit:StateView.StateKey="String"
                 Text="{Binding Source={x:Reference Root}, Path=StringValue, Mode=TwoWay}"
+                Placeholder="{Binding Source={x:Reference Root}, Path=Placeholder}"
                 IsRequired="False"/>
 
         </toolkit:StateContainer.StateViews>
 
         <form:FormEntry
             Text="{Binding Source={x:Reference Root}, Path=StringValue, Mode=TwoWay}"
+            Placeholder="{Binding Source={x:Reference Root}, Path=Placeholder}"
             IsRequired="False"/>
 
     </VerticalStackLayout>
