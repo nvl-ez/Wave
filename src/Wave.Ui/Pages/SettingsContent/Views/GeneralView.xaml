@@ -15,6 +15,19 @@
                                           Style="{StaticResource WavePageTitle}"/>
 
                                    <Border Style="{StaticResource WaveSectionCard}">
+                                          <VerticalStackLayout Spacing="10">
+                                                 <Label Text="Default Java installation"
+                                                        Style="{StaticResource WaveSectionTitle}"/>
+                                                 <Label Text="Automatic selects the required Java version, or the lowest newer installed version."
+                                                        Style="{StaticResource WaveCardSubtitle}"/>
+                                                 <form:FormPicker ItemsSource="{Binding JavaInstallationOptions}"
+                                                                  ItemDisplayBinding="{Binding Value}"
+                                                                  SelectedValueMemberPath="Key"
+                                                                  SelectedValueModelPath="JavaInstallation"/>
+                                          </VerticalStackLayout>
+                                   </Border>
+
+                                   <Border Style="{StaticResource WaveSectionCard}">
                                           <VerticalStackLayout Spacing="12">
                                                  <Label Text="Mod suppliers"
                                                         Style="{StaticResource WaveSectionTitle}"/>

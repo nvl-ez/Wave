@@ -26,6 +26,7 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     private readonly IModloaderCatalogService modloaderCatalogService;
     private readonly IModCatalogService modCatalogService;
     private readonly IJavaManagerService javaManagerService;
+    private readonly IApplicationConfigurationService configurationService;
 
     /***************************
     * VARIABLES AND PROPERTIES *
@@ -131,13 +132,14 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     /***************
     * CONSTRUCTORS *
     ***************/
-    public ServerViewModel(IMinecraftCatalogService minecraftCatalogService, IServerManagerService serverHandlerService, IModloaderCatalogService modloaderCatalogService, IModCatalogService modCatalogService, IJavaManagerService javaManagerService)
+    public ServerViewModel(IMinecraftCatalogService minecraftCatalogService, IServerManagerService serverHandlerService, IModloaderCatalogService modloaderCatalogService, IModCatalogService modCatalogService, IJavaManagerService javaManagerService, IApplicationConfigurationService configurationService)
     {
         this.minecraftCatalogService = minecraftCatalogService;
         this.serverHandlerService = serverHandlerService;
         this.modloaderCatalogService = modloaderCatalogService;
         this.modCatalogService = modCatalogService;
         this.javaManagerService = javaManagerService;
+        this.configurationService = configurationService;
 
         ServerProperties.CollectionChanged += (_, _) => OnPropertyChanged(nameof(FilteredServerProperties));
         Mods.CollectionChanged += (_, _) => OnPropertyChanged(nameof(FilteredMods));
@@ -180,13 +182,18 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         var javaInstallations = (await javaManagerService.GetJavaInstallationsAsync()).ToList();
         JavaInstallationOptions = new ObservableCollection<KeyValuePair<JavaInstallation?, string>>
         {
-            new(null, "Automatic (recommended)")
+            new(null, "Default")
         };
         foreach (var installation in javaInstallations)
             JavaInstallationOptions.Add(new(installation, $"{installation.Name} (Java {installation.Version})"));
 
         if (server.JavaInstallation is not null)
             server.JavaInstallation = javaInstallations.FirstOrDefault(j => j.Matches(server.JavaInstallation));
+
+        var applicationConfiguration = await configurationService.GetAsync();
+        server.IsJavaInstallationLocked = applicationConfiguration.JavaInstallation is not null;
+        if (server.IsJavaInstallationLocked)
+            server.JavaInstallation = javaInstallations.FirstOrDefault(j => j.Matches(applicationConfiguration.JavaInstallation));
 
 
         //Obterner versiones de MC

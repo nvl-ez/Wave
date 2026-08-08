@@ -15,16 +15,18 @@ public class ServerExecutorService : IServerExecutorService
     private readonly IServerExecutor serverExecutor;
     private readonly IJavaInstallRepository javaInstallRepository;
     private readonly IServerRepository serverRepository;
+    private readonly IApplicationConfigurationService configurationService;
 
     private readonly Dictionary<Guid, IServerSession> runningServers = new(); //TODO abstract dictionary in an out port
     private readonly Lock runningServersLock = new();
 
-    public ServerExecutorService(IServerPathResolver serverPathResolver, IServerExecutor serverExecutor, IServerRepository serverRepository, IJavaInstallRepository javaInstallRepository)
+    public ServerExecutorService(IServerPathResolver serverPathResolver, IServerExecutor serverExecutor, IServerRepository serverRepository, IJavaInstallRepository javaInstallRepository, IApplicationConfigurationService configurationService)
     {
         this.serverPathResolver = serverPathResolver;
         this.serverExecutor = serverExecutor;
         this.serverRepository = serverRepository;
         this.javaInstallRepository = javaInstallRepository;
+        this.configurationService = configurationService;
     }
 
     public IServerSession? TryGetSession(Guid id)
@@ -36,7 +38,7 @@ public class ServerExecutorService : IServerExecutorService
         }
     }
 
-    public async Task<IServerSession> Start(Guid id, CancellationToken ct = default)
+    public async Task<ServerStartResult> Start(Guid id, CancellationToken ct = default)
     {
         Server server = (await serverRepository.GetAllServersAsync()).First(s => s.Id == id);
 
@@ -45,16 +47,16 @@ public class ServerExecutorService : IServerExecutorService
         if (serverJavaVersion is null) throw new JavaInstallationNotFoundException($"Server does not have a required Java version. Has a jar been downloaded?");
 
         IEnumerable<JavaInstallation> installations = await javaInstallRepository.GetAllAsync(ct);
-        JavaInstallation? javaInstallation = server.JavaInstallation is not null
-            ? installations.FirstOrDefault(j => j.Matches(server.JavaInstallation))
-            : installations.Where(j => j.Version >= serverJavaVersion).OrderBy(j => j.Version).FirstOrDefault();
+        JavaInstallation? configuredInstallation = server.JavaInstallation
+            ?? (await configurationService.GetAsync(ct)).JavaInstallation;
+        JavaInstallation? javaInstallation = configuredInstallation is not null
+            ? installations.FirstOrDefault(j => j.Matches(configuredInstallation))
+            : installations.FirstOrDefault(j => j.Version == serverJavaVersion)
+                ?? installations.Where(j => j.Version > serverJavaVersion).OrderBy(j => j.Version).FirstOrDefault();
 
         if (javaInstallation is null)
         {
-            string requirement = server.JavaInstallation is null
-                ? $"version {serverJavaVersion} or newer"
-                : $"the selected installation '{server.JavaInstallation.Name}'";
-            throw new JavaInstallationNotFoundException($"No available Java installation was found matching {requirement}.");
+            return ServerStartResult.JavaNotFound(serverJavaVersion.Value);
         }
 
         lock (runningServersLock)
@@ -73,7 +75,7 @@ public class ServerExecutorService : IServerExecutorService
             runningServers.Add(server.Id, serverSession);
             serverSession.ServerDisposed += ServerDisposed;
 
-            return serverSession;
+            return ServerStartResult.Success(serverSession);
         }
     }
 

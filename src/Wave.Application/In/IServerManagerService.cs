@@ -1,5 +1,6 @@
 using System;
 using Wave.Domain.ServerManager;
+using Wave.Domain.Java;
 
 namespace Wave.Application.In;
 
@@ -16,6 +17,7 @@ public interface IServerManagerService
 
     public Task<Server> GetServerAsync(Guid id, CancellationToken ct = default);
     public Task<IEnumerable<Server>> GetAllServersAsync(CancellationToken ct = default);
+    public Task SetJavaInstallationForAllAsync(JavaInstallation? installation, CancellationToken ct = default);
     public Server GetServer(Guid id);
     public IEnumerable<Server> GetAllServers();
 }

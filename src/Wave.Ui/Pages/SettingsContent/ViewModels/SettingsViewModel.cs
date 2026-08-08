@@ -3,12 +3,17 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Wave.Application.In;
 using Wave.Domain.Configuration;
+using Wave.Domain.Java;
+using Wave.Domain.ServerManager;
+using System.Collections.ObjectModel;
 
 namespace Wave.Ui.Pages.SettingsContent.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject, IQueryAttributable
 {
     private readonly IApplicationConfigurationService configurationService;
+    private readonly IJavaManagerService javaManagerService;
+    private readonly IServerManagerService serverManagerService;
     /***************************
     * VARIABLES AND PROPERTIES *
     ****************************/
@@ -18,9 +23,14 @@ public partial class SettingsViewModel : ObservableObject, IQueryAttributable
 
     [ObservableProperty]
     public partial ApplicationConfiguration Configuration { get; set; } = new();
-    public SettingsViewModel(IApplicationConfigurationService configurationService)
+    [ObservableProperty]
+    public partial ObservableCollection<KeyValuePair<JavaInstallation?, string>> JavaInstallationOptions { get; set; } = [];
+
+    public SettingsViewModel(IApplicationConfigurationService configurationService, IJavaManagerService javaManagerService, IServerManagerService serverManagerService)
     {
         this.configurationService = configurationService;
+        this.javaManagerService = javaManagerService;
+        this.serverManagerService = serverManagerService;
     }
     /***************
     * CONSTRUCTORS *
@@ -38,12 +48,24 @@ public partial class SettingsViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     private async Task LoadAsync()
     {
-        Configuration = await configurationService.GetAsync();
+        ApplicationConfiguration configuration = await configurationService.GetAsync();
+        var installations = (await javaManagerService.GetJavaInstallationsAsync()).ToList();
+        JavaInstallationOptions = [new(null, "Automatic")];
+        foreach (JavaInstallation installation in installations)
+            JavaInstallationOptions.Add(new(installation, $"{installation.Name} (Java {installation.Version})"));
+
+        if (configuration.JavaInstallation is not null)
+            configuration.JavaInstallation = installations.FirstOrDefault(i => i.Matches(configuration.JavaInstallation));
+
+        Configuration = configuration;
     }
 
     [RelayCommand]
-    private Task SaveConfigurationAsync(ApplicationConfiguration configuration) =>
-        configurationService.SaveAsync(configuration);
+    private async Task SaveConfigurationAsync(ApplicationConfiguration configuration)
+    {
+        await configurationService.SaveAsync(configuration);
+        await serverManagerService.SetJavaInstallationForAllAsync(configuration.JavaInstallation);
+    }
 
     [RelayCommand]
     private void ShowGeneralView() => CurrentTab = "General";

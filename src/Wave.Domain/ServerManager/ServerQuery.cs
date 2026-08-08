@@ -3,6 +3,7 @@ using Wave.Domain.Minecraft;
 using Wave.Domain.Mods;
 using Wave.Domain.Java;
 using Wave.Domain.ServerManager.Modloader;
+using System.Text.Json.Serialization;
 
 namespace Wave.Domain.ServerManager;
 
@@ -26,6 +27,7 @@ public record class ServerQuery
     public string? Name { get; set; }
     public string ExecutionFlags { get; set; } = string.Empty;
     public JavaInstallation? JavaInstallation { get; set; }
+    public bool IsJavaInstallationLocked { get; set; }
     public MinecraftVersionBase? MinecraftVersionBase { get; set; }
     public bool Eula { get; set; } = false;
     public Dictionary<string, string> Properties { get; set; } = new()

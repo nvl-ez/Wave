@@ -14,13 +14,15 @@ public class JavaManagerService : IJavaManagerService
     private List<IJavaSupplier> javaSuppliers;
     private List<IJavaInstaller> javaInstallers;
     private readonly IServerRepository serverRepository;
+    private readonly IApplicationConfigurationService configurationService;
 
-    public JavaManagerService(IJavaInstallRepository javaInstallRepository, IServerRepository serverRepository, List<IJavaSupplier> javaSuppliers, List<IJavaInstaller> javaInstallers)
+    public JavaManagerService(IJavaInstallRepository javaInstallRepository, IServerRepository serverRepository, List<IJavaSupplier> javaSuppliers, List<IJavaInstaller> javaInstallers, IApplicationConfigurationService configurationService)
     {
         this.javaInstallRepository = javaInstallRepository;
         this.serverRepository = serverRepository;
         this.javaSuppliers = javaSuppliers;
         this.javaInstallers = javaInstallers;
+        this.configurationService = configurationService;
     }
 
     public async Task<IEnumerable<int>> GetAvailableMajorVersionsAsync(IJavaSupplier javaSupplier, OsType? os = null, CancellationToken ct = default)
@@ -84,6 +86,13 @@ public class JavaManagerService : IJavaManagerService
         }
 
         await javaInstallRepository.RemoveAsync(javaInstallation, ct);
+
+        var configuration = await configurationService.GetAsync(ct);
+        if (javaInstallation.Matches(configuration.JavaInstallation))
+        {
+            configuration.JavaInstallation = null;
+            await configurationService.SaveAsync(configuration, ct);
+        }
 
         foreach (var server in await serverRepository.GetAllServersAsync(ct))
         {

@@ -124,18 +124,18 @@ public static class AppComposition
 
         minecraftCatalogService = new MinecraftCatalogService(minecraftVersionRepository, serverPropertyDefinitionRepository);
         serverHandlerService = new ServerManagerService(serverPathResolver, serverRepository, versionManagerService, propertiesManagerService, eulaManagerService, modloaderManagerService, modManagerService, imageTransformer);
-        serverExecutorService = new ServerExecutorService(serverPathResolver, serverExecutor, serverRepository, javaInstallRepository);
-        javaManagerService = new JavaManagerService(javaInstallRepository, serverRepository, [adoptiumJavaSupplier, mojangJavaSupplier], [compressedJavaInstaller, manifestJavaInstaller]);
+        serverExecutorService = new ServerExecutorService(serverPathResolver, serverExecutor, serverRepository, javaInstallRepository, applicationConfigurationService);
+        javaManagerService = new JavaManagerService(javaInstallRepository, serverRepository, [adoptiumJavaSupplier, mojangJavaSupplier], [compressedJavaInstaller, manifestJavaInstaller], applicationConfigurationService);
         deviceInformationService = new DeviceInformationService(windowsDeviceInformationRepository);
     }
 
     // VIEW MODELS
     public static ServersViewModel CreateServersViewModel() =>
         new ServersViewModel(serverHandlerService, serverExecutorService, javaInstallRepository);
-    public static ServerViewModel CreateServerViewModel() => new ServerViewModel(minecraftCatalogService, serverHandlerService, modloaderCatalogService, modCatalogService, javaManagerService);
+    public static ServerViewModel CreateServerViewModel() => new ServerViewModel(minecraftCatalogService, serverHandlerService, modloaderCatalogService, modCatalogService, javaManagerService, applicationConfigurationService);
     public static ExecutionViewModel CreateExecutionViewModel() => new ExecutionViewModel(serverExecutorService);
     public static JavaViewModel CreateJavaViewModel() => new JavaViewModel(deviceInformationService, javaManagerService);
-    public static SettingsViewModel CreateSettingsViewModel() => new SettingsViewModel(applicationConfigurationService);
+    public static SettingsViewModel CreateSettingsViewModel() => new SettingsViewModel(applicationConfigurationService, javaManagerService, serverHandlerService);
 
     public static IServerExecutorService GetServerExecutorService() => serverExecutorService;
 }

@@ -73,15 +73,21 @@ public partial class ServerCardViewModel : ObservableObject
     [RelayCommand]
     public async Task StartServerAsync()
     {
-        if (!await JavaInstallationGuard.CanContinueAsync(javaInstallRepository))
-        {
-            return;
-        }
-
         if (!IsRunning)
         {
-            ServerSession = await serverExecutorService.Start((Guid)Server.Id!);
-            ServerSession.ServerDisposed += StopServerAsync;
+            ServerStartResult result = await serverExecutorService.Start((Guid)Server.Id!);
+            if (!result.Started)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Compatible Java version required",
+                    $"The server requires Java {result.RequiredJavaVersion}, but no compatible installed version was found.",
+                    "OK");
+                return;
+            }
+
+            IServerSession session = result.Session!;
+            session.ServerDisposed += StopServerAsync;
+            ServerSession = session;
         }
 
         var parameters = new ShellNavigationQueryParameters

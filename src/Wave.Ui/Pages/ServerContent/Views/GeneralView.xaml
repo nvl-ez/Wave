@@ -200,7 +200,15 @@
                             <form:FormPicker ItemsSource="{Binding JavaInstallationOptions}"
                                              ItemDisplayBinding="{Binding Value}"
                                              SelectedValueMemberPath="Key"
-                                             SelectedValueModelPath="JavaInstallation"/>
+                                             SelectedValueModelPath="JavaInstallation">
+                                   <form:FormPicker.Triggers>
+                                          <DataTrigger TargetType="form:FormPicker"
+                                                       Binding="{Binding Server.IsJavaInstallationLocked}"
+                                                       Value="True">
+                                                 <Setter Property="IsEnabled" Value="False"/>
+                                          </DataTrigger>
+                                   </form:FormPicker.Triggers>
+                            </form:FormPicker>
                      </VerticalStackLayout>
               </Border>
 

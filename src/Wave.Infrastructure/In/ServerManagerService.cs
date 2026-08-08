@@ -8,6 +8,7 @@ using Wave.Domain.Mods;
 using Wave.Domain.ServerManager;
 using Wave.Domain.ServerManager.Modloader;
 using Wave.Infrastructure.Middle;
+using Wave.Domain.Java;
 
 namespace Wave.Infrastructure.In;
 
@@ -208,6 +209,15 @@ public class ServerManagerService : IServerManagerService
     public async Task<IEnumerable<Server>> GetAllServersAsync(CancellationToken ct = default)
     {
         return (await serverRepository.GetAllServersAsync()).ToList();
+    }
+
+    public async Task SetJavaInstallationForAllAsync(JavaInstallation? installation, CancellationToken ct = default)
+    {
+        foreach (Server server in await serverRepository.GetAllServersAsync(ct))
+        {
+            server.JavaInstallation = installation;
+            await serverRepository.SaveServerAsync(server, ct);
+        }
     }
 
     public async Task<Server> GetServerAsync(Guid id, CancellationToken ct = default)

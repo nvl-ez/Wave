@@ -102,7 +102,17 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
         try
         {
             // Start the new server/session first
-            var newSession = await serverExecutorService.Start((Guid)Server.Id!);
+            ServerStartResult result = await serverExecutorService.Start((Guid)Server.Id!);
+            if (!result.Started)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Compatible Java version required",
+                    $"The server requires Java {result.RequiredJavaVersion}, but no compatible installed version was found.",
+                    "OK");
+                return;
+            }
+
+            var newSession = result.Session!;
             newSession.ServerDisposed += StopServer;
 
             // Stop only the old reader loop, not the old server process
