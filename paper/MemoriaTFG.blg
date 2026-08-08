@@ -1,0 +1,68 @@
+This is BibTeX, Version 0.99e (TeX Live 2026)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: MemoriaTFG.aux
+A level-1 auxiliary file: Acronims.aux
+A level-1 auxiliary file: Resum.aux
+A level-1 auxiliary file: Introduccio.aux
+A level-1 auxiliary file: Instruccions.aux
+A level-1 auxiliary file: Memoria.aux
+A level-1 auxiliary file: Presentacio.aux
+A level-1 auxiliary file: Conclusions.aux
+A level-1 auxiliary file: Annexos.aux
+The style file: IEEEtran.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: Bibliografia.bib
+-- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+Warning--empty journal in Wil10
+Warning--empty journal in Fea05
+Warning--empty journal in Wri12
+
+Done.
+You've used 15 entries,
+            4087 wiz_defined-function locations,
+            929 strings with 9276 characters,
+and the built_in function-call counts, 10178 in all, are:
+= -- 831
+> -- 173
+< -- 96
++ -- 80
+- -- 22
+* -- 461
+:= -- 1567
+add.period$ -- 30
+call.type$ -- 15
+change.case$ -- 13
+chr.to.int$ -- 240
+cite$ -- 18
+duplicate$ -- 726
+empty$ -- 837
+format.name$ -- 27
+if$ -- 2384
+int.to.chr$ -- 0
+int.to.str$ -- 15
+missing$ -- 101
+newline$ -- 74
+num.names$ -- 15
+pop$ -- 259
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 2
+skip$ -- 783
+stack$ -- 0
+substring$ -- 568
+swap$ -- 588
+text.length$ -- 16
+text.prefix$ -- 0
+top$ -- 5
+type$ -- 15
+warning$ -- 3
+while$ -- 36
+width$ -- 17
+write$ -- 160
+(There were 3 warnings)
