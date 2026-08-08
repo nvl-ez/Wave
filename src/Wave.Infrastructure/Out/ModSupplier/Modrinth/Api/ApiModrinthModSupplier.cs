@@ -14,6 +14,10 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
     private readonly HttpClient client;
 
     public ModSupplierType ModSupplierType { get => ModSupplierType.Modrinth; }
+    public bool RequiresToken => false;
+    public bool HasToken => true;
+
+    public void SetToken(string? token) { }
 
     public ApiModrinthModSupplier()
     {

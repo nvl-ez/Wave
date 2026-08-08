@@ -25,6 +25,8 @@ using Wave.Infrastructure.Out.Modloader.Fabric.Api;
 using Wave.Application.Out.ModSupplier;
 using Wave.Infrastructure.Out.ModSupplier.Curseforge.Api;
 using Wave.Infrastructure.Out.ModSupplier.Modrinth.Api;
+using Wave.Application.Out.Configuration;
+using Wave.Infrastructure.Out.Configuration;
 
 namespace Wave.Ui;
 
@@ -54,6 +56,7 @@ public static class AppComposition
     private static readonly IModSupplierIntegration curseforgeModSupplier;
     private static readonly IModSupplierIntegration modrinthModSupplier;
     private static readonly IImageTransformer imageTransformer;
+    private static readonly IApplicationConfigurationRepository applicationConfigurationRepository;
 
     //SERVICES
     private static readonly IMinecraftCatalogService minecraftCatalogService;
@@ -69,6 +72,7 @@ public static class AppComposition
     private static readonly IModloaderCatalogService modloaderCatalogService;
     private static readonly IModCatalogService modCatalogService;
     private static readonly IModManagerService modManagerService;
+    private static readonly IApplicationConfigurationService applicationConfigurationService;
 
     static AppComposition()
     {
@@ -97,8 +101,12 @@ public static class AppComposition
         serverEulaRepository = new ServerEulaRepository();
         forgeVersionCatalog = new ApiForgeVersionCatalog();
         fabricVersionCatalog = new ApiFabricVersionCatalog();
+        applicationConfigurationRepository = new JsonApplicationConfigurationRepository(appDirectory);
         curseforgeModSupplier = new ApiCurseforgeModSupplier();
         modrinthModSupplier = new ApiModrinthModSupplier();
+        applicationConfigurationService = new ApplicationConfigurationService(
+            applicationConfigurationRepository,
+            [curseforgeModSupplier, modrinthModSupplier]);
         imageTransformer = new ImageSharpImageTransformer();
 
 
@@ -110,7 +118,7 @@ public static class AppComposition
         versionManagerService = new VersionManagerService(serverPathResolver, minecraftVersionRepository);
         modloaderManagerService = new ModloaderManagerService(serverPathResolver, [forgeVersionCatalog, fabricVersionCatalog], javaInstallRepository);
         modloaderCatalogService = new ModloaderCatalogService([forgeVersionCatalog, fabricVersionCatalog]);
-        modCatalogService = new ModCatalogService([curseforgeModSupplier, modrinthModSupplier]);
+        modCatalogService = new ModCatalogService([curseforgeModSupplier, modrinthModSupplier], applicationConfigurationService);
         modManagerService = new ModManagerService(serverPathResolver, [curseforgeModSupplier, modrinthModSupplier]);
 
 
@@ -127,7 +135,7 @@ public static class AppComposition
     public static ServerViewModel CreateServerViewModel() => new ServerViewModel(minecraftCatalogService, serverHandlerService, modloaderCatalogService, modCatalogService, javaManagerService);
     public static ExecutionViewModel CreateExecutionViewModel() => new ExecutionViewModel(serverExecutorService);
     public static JavaViewModel CreateJavaViewModel() => new JavaViewModel(deviceInformationService, javaManagerService);
-    public static SettingsViewModel CreateSettingsViewModel() => new SettingsViewModel();
+    public static SettingsViewModel CreateSettingsViewModel() => new SettingsViewModel(applicationConfigurationService);
 
     public static IServerExecutorService GetServerExecutorService() => serverExecutorService;
 }

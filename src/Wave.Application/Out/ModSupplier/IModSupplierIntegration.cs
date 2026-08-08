@@ -6,6 +6,9 @@ namespace Wave.Application.Out.ModSupplier;
 public interface IModSupplierIntegration
 {
     public ModSupplierType ModSupplierType { get; }
+    public bool RequiresToken { get; }
+    public bool HasToken { get; }
+    public void SetToken(string? token);
     public bool CanHandle(ModSupplierType modSupplierType);
     public Task<ModInfoSupplierResponse> SearchModsAsync(ModInfoSupplierQuery modInfoSupplierQuery, CancellationToken ct = default);
     public Task<ModDetails> GetModDetailsAsync(ModBase modBase, CancellationToken ct = default);

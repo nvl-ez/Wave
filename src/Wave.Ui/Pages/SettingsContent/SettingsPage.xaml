@@ -7,7 +7,14 @@
              xmlns:navigation="clr-namespace:Wave.Ui.Views.Navigation"
              x:Class="Wave.Ui.Pages.SettingsContent.SettingsPage"
              x:DataType="viewModels:SettingsViewModel"
+             x:Name="Root"
              Title="Settings">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing"
+                                        BindingContext="{Binding BindingContext, Source={x:Reference Root}, x:DataType=ContentPage}"
+                                        Command="{Binding LoadCommand}"/>
+    </ContentPage.Behaviors>
 
     <Grid Style="{StaticResource WavePageGrid}">
         <Grid.RowDefinitions>
@@ -17,15 +24,16 @@
         </Grid.RowDefinitions>
 
         <navigation:TabContainerView Grid.Row="0">
-            <navigation:TabView Text="Java"/>
+            <navigation:TabView Text="General"
+                                Command="{Binding ShowGeneralViewCommand}"/>
+            <navigation:TabView Text="Java"
+                                Command="{Binding ShowJavaViewCommand}"/>
         </navigation:TabContainerView>
 
-        <VerticalStackLayout Grid.Row="1"
-                             toolkit:StateContainer.CurrentState="{Binding CurrentTab}">
-            <toolkit:StateContainer.StateViews>
-                <views:JavaView toolkit:StateView.StateKey="Java"/>
-            </toolkit:StateContainer.StateViews>
-            <views:JavaView/>
-        </VerticalStackLayout>
+        <navigation:KeepAliveTabHost Grid.Row="1"
+                                     CurrentTab="{Binding CurrentTab}">
+            <views:GeneralView navigation:KeepAliveTabHost.TabKey="General"/>
+            <views:JavaView navigation:KeepAliveTabHost.TabKey="Java"/>
+        </navigation:KeepAliveTabHost>
     </Grid>
 </ContentPage>

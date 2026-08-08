@@ -16,11 +16,19 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
     private const int ModClassId = 6;
 
     public ModSupplierType ModSupplierType { get => ModSupplierType.Curseforge; }
+    public bool RequiresToken => true;
+    public bool HasToken => client.DefaultRequestHeaders.Contains("x-api-key");
 
     public ApiCurseforgeModSupplier()
     {
         client = new HttpClient();
-        client.DefaultRequestHeaders.Add("x-api-key", "$2a$10$BGG5jB6kIf.QgqGtFOKEWuscWzRGs.YsZ3YXp1YJ7.0PW9i4CzmAe");
+    }
+
+    public void SetToken(string? token)
+    {
+        client.DefaultRequestHeaders.Remove("x-api-key");
+        if (!string.IsNullOrWhiteSpace(token))
+            client.DefaultRequestHeaders.Add("x-api-key", token);
     }
     public bool CanHandle(ModSupplierType modSupplierType)
     {
@@ -29,6 +37,9 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
 
     public async Task<ModInfoSupplierResponse> SearchModsAsync(ModInfoSupplierQuery modInfoSupplierQuery, CancellationToken ct = default)
     {
+        if (!HasToken)
+            throw new InvalidOperationException("A CurseForge API token is required.");
+
         //Build Query Arguments
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
 
@@ -88,7 +99,8 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
 
     public async Task<ModDetails> GetModDetailsAsync(ModBase modBase, CancellationToken ct = default)
     {
-
+        if (!HasToken)
+            throw new InvalidOperationException("A CurseForge API token is required.");
 
         string jsonResponse = await client.GetStringAsync($"https://api.curseforge.com/v1/mods/{modBase.ModId}/description", ct);
         JsonDocument doc = JsonDocument.Parse(jsonResponse);
@@ -101,6 +113,9 @@ public class ApiCurseforgeModSupplier : IModSupplierIntegration
 
     public async Task<ModVersionSupplierResponse> GetModVersionsAsync(ModVersionSupplierQuery modVersionSupplierQuery, CancellationToken ct = default)
     {
+        if (!HasToken)
+            throw new InvalidOperationException("A CurseForge API token is required.");
+
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
         queryParameters.Add("gameVersion", modVersionSupplierQuery.MinecraftVersion);
         ModloaderType loader = modVersionSupplierQuery.ModloaderType;

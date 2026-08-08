@@ -9,24 +9,41 @@ namespace Wave.Infrastructure.In;
 public class ModCatalogService : IModCatalogService
 {
     private readonly IEnumerable<IModSupplierIntegration> modSuppliers;
-    public ModCatalogService(IEnumerable<IModSupplierIntegration> modSuppliers)
+    private readonly IApplicationConfigurationService configurationService;
+    public ModCatalogService(IEnumerable<IModSupplierIntegration> modSuppliers, IApplicationConfigurationService configurationService)
     {
         this.modSuppliers = modSuppliers;
+        this.configurationService = configurationService;
     }
 
     public async Task<IEnumerable<KeyValuePair<ModSupplierType, string>>> GetModSupplierTypesAsync(CancellationToken ct = default)
     {
         TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
-        return modSuppliers.Select(
-            m => new KeyValuePair<ModSupplierType, string>(m.ModSupplierType, ti.ToTitleCase(m.ModSupplierType.ToString()))
-        );
+        await configurationService.GetAsync(ct);
+        List<KeyValuePair<ModSupplierType, string>> modSupplierTypes = [];
+
+        foreach (var modSupplier in modSuppliers)
+        {
+            if (modSupplier.RequiresToken && !modSupplier.HasToken)
+                continue;
+
+            modSupplierTypes.Add(new KeyValuePair<ModSupplierType, string>(
+                modSupplier.ModSupplierType,
+                ti.ToTitleCase(modSupplier.ModSupplierType.ToString())));
+        }
+
+        return modSupplierTypes;
     }
 
     public async Task<ModInfoSupplierResponse> SearchModsAsync(ModInfoSupplierQuery modInfoSupplierQuery, CancellationToken ct = default)
     {
+        await configurationService.GetAsync(ct);
         IModSupplierIntegration? target = null;
         foreach (var modSupplier in modSuppliers)
         {
+            if (modSupplier.RequiresToken && !modSupplier.HasToken)
+                continue;
+
             if (modSupplier.CanHandle(modInfoSupplierQuery.ModSupplierType))
             {
                 target = modSupplier;
@@ -41,9 +58,13 @@ public class ModCatalogService : IModCatalogService
 
     public async Task<ModDetails> GetModDetailsAsync(ModBase modBase, ModSupplierType modSupplierType, CancellationToken ct = default)
     {
+        await configurationService.GetAsync(ct);
         IModSupplierIntegration? target = null;
         foreach (var modSupplier in modSuppliers)
         {
+            if (modSupplier.RequiresToken && !modSupplier.HasToken)
+                continue;
+
             if (modSupplier.CanHandle(modSupplierType))
             {
                 target = modSupplier;
@@ -58,9 +79,13 @@ public class ModCatalogService : IModCatalogService
 
     public async Task<ModVersionSupplierResponse> GetModVersionsAsync(ModVersionSupplierQuery modVersionSupplierQuery, CancellationToken ct = default)
     {
+        await configurationService.GetAsync(ct);
         IModSupplierIntegration? target = null;
         foreach (var modSupplier in modSuppliers)
         {
+            if (modSupplier.RequiresToken && !modSupplier.HasToken)
+                continue;
+
             if (modSupplier.CanHandle(modVersionSupplierQuery.ModSupplierType))
             {
                 target = modSupplier;
@@ -72,6 +97,4 @@ public class ModCatalogService : IModCatalogService
 
         return await target.GetModVersionsAsync(modVersionSupplierQuery);
     }
-
-
 }
