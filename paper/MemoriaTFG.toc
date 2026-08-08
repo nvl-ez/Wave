@@ -2,8 +2,11 @@
 \babel@toc {catalan}{}\relax 
 \contentsline {chapter}{Sumari}{iii}{chapter*.1}%
 \contentsline {chapter}{Acrònims}{v}{chapter*.3}%
-\contentsline {chapter}{Resum}{vii}{chapter*.5}%
-\contentsline {chapter}{\chapternumberline {1}Introducció}{1}{chapter.1}%
+\contentsline {chapter}{Summary}{vii}{chapter*.5}%
+\contentsline {chapter}{\chapternumberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Contextualization}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Motivation}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Objective}{2}{section.1.3}%
 \contentsline {chapter}{\chapternumberline {2}Instruccions generals i itinerari del Treball Final de Grau }{3}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Matrícula del Treball Final de Grau}{3}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Selecció del tema de Treball Final de Grau}{3}{section.2.2}%
@@ -50,4 +53,4 @@
 \contentsline {subsection}{\numberline {A.2.3}Taules}{25}{subsection.A.2.3}%
 \contentsline {section}{\numberline {A.3}Bibliografia}{26}{appendix.A.3}%
 \contentsline {section}{\numberline {A.4}Acrònims}{26}{appendix.A.4}%
-\contentsline {chapter}{Bibliografia}{27}{chapter*.15}%
+\contentsline {chapter}{Bibliografia}{27}{chapter*.14}%
