@@ -63,16 +63,6 @@ public class ApiAdoptiumJavaSupplier : IJavaSupplier
                 };
             case JavaArtifactType.Manifest:
                 throw new NotSupportedException("Adoptium does not support Manifest packages.");
-            case JavaArtifactType.Msi:
-                return new MsiJavaPackage()
-                {
-                    Filename = fileName,
-                    PackageDirectory = javaTmpDirectory,
-                    JavaSupplierType = JavaSupplierType.Adoptium,
-                    JavaName = javaVersion.Name,
-                    Version = javaVersion.Version,
-                    JavaArtifactType = JavaArtifactType.Msi
-                };
             default:
                 throw new NotImplementedException($"The type {javaArtifact.Type} doesn't have package implementation.");
         }
@@ -109,7 +99,7 @@ public class ApiAdoptiumJavaSupplier : IJavaSupplier
         foreach (BuildsDto build in dto)
         {
             BinaryDto binary = build.Binaries.First();
-            if (binary.Installer is not null || binary.Package is not null)
+            if (binary.Package is not null)
                 retrievedVersions.Add(Mapper.ToDomain(build, binary));
         }
 

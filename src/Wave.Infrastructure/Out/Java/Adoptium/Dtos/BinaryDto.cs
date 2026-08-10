@@ -17,7 +17,4 @@ public record class BinaryDto
     public required string JvmImplementation { get; set; }
     [JsonPropertyName("package")]
     public PackageDto? Package { get; set; }
-    [JsonPropertyName("installer")]
-    public InstallerDto? Installer { get; set; }
-
 }

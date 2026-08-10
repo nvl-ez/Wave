@@ -4,5 +4,4 @@ public enum JavaArtifactType
 {
     Manifest,
     Compressed,
-    Msi,
 }

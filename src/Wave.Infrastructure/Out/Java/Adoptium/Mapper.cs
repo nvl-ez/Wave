@@ -9,28 +9,16 @@ public static class Mapper
 {
     public static JavaVersion ToDomain(BuildsDto build, BinaryDto binary)
     {
-        if (binary.Installer is null && binary.Package is null)
-            throw new NullReferenceException("Installer and Package cannot be null at the same time.");
+        if (binary.Package is null)
+            throw new NullReferenceException("Package cannot be null.");
 
         List<JavaArtifact> artifacts = new List<JavaArtifact>();
 
-        if (binary.Installer is not null)
+        artifacts.Add(new()
         {
-            artifacts.Add(new()
-            {
-                Type = JavaArtifactType.Msi,
-                DownloadUrl = binary.Installer.DownloadUrl
-            });
-        }
-
-        if (binary.Package is not null)
-        {
-            artifacts.Add(new()
-            {
-                Type = JavaArtifactType.Compressed,
-                DownloadUrl = binary.Package.DownloadUrl
-            });
-        }
+            Type = JavaArtifactType.Compressed,
+            DownloadUrl = binary.Package.DownloadUrl
+        });
 
 
         return new JavaVersion()
