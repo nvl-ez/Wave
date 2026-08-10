@@ -41,6 +41,12 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
     [NotifyPropertyChangedFor(nameof(CanSendCommand))]
     public partial string CommandMessage { get; set; } = "";
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasStartError))]
+    public partial string? StartErrorMessage { get; set; }
+
+    public bool HasStartError => !string.IsNullOrEmpty(StartErrorMessage);
+
 
     //State
     public bool IsServerRunning => ServerSession is not null && ServerSession.IsRunning;
@@ -69,6 +75,7 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
             ServerSession = serverExecutorService.TryGetSession((Guid)Server.Id!);
             if (ServerSession is not null)
             {
+                StartErrorMessage = null;
                 StartReadLoop(ServerSession);
                 ServerSession.ServerDisposed += StopServer;
             }
@@ -105,10 +112,17 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
             ServerStartResult result = await serverExecutorService.Start((Guid)Server.Id!);
             if (!result.Started)
             {
-                await Shell.Current.DisplayAlertAsync(
-                    "Compatible Java version required",
-                    $"The server requires Java {result.RequiredJavaVersion}, but no compatible installed version was found.",
-                    "OK");
+                if (result.Failure == ServerStartFailure.JavaNotFound)
+                {
+                    await Shell.Current.DisplayAlertAsync(
+                        "Compatible Java version required",
+                        $"The server requires Java {result.RequiredJavaVersion}, but no compatible installed version was found.",
+                        "OK");
+                }
+                else
+                {
+                    StartErrorMessage = GetStartErrorMessage(result);
+                }
                 return;
             }
 
@@ -120,6 +134,7 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
 
             // Switch the current session reference
             ServerSession = newSession;
+            StartErrorMessage = null;
 
             // Start reading from the new session
             StartReadLoop(newSession);
@@ -133,12 +148,24 @@ public partial class ExecutionViewModel : ObservableObject, IQueryAttributable
     //Navigation
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-
+        StartErrorMessage = null;
         if (query.ContainsKey("server"))
         {
             Server = (ServerQuery)query["server"];
         }
+
+        if (query.TryGetValue("startResult", out object? value) && value is ServerStartResult result)
+        {
+            StartErrorMessage = GetStartErrorMessage(result);
+        }
     }
+
+    private static string? GetStartErrorMessage(ServerStartResult result) => result.Failure switch
+    {
+        ServerStartFailure.PortInUse => $"Execution was stopped because port {result.Port} is already used by another running server.",
+        ServerStartFailure.PortMappingFailed => $"The server could not start because port {result.Port} could not be opened on the router.",
+        _ => null
+    };
 
     //MISC
     private async Task StopReadLoopAsync()

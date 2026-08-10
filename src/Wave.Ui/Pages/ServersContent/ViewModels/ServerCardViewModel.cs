@@ -78,10 +78,21 @@ public partial class ServerCardViewModel : ObservableObject
             ServerStartResult result = await serverExecutorService.Start((Guid)Server.Id!);
             if (!result.Started)
             {
-                await Shell.Current.DisplayAlertAsync(
-                    "Compatible Java version required",
-                    $"The server requires Java {result.RequiredJavaVersion}, but no compatible installed version was found.",
-                    "OK");
+                if (result.Failure == ServerStartFailure.JavaNotFound)
+                {
+                    await Shell.Current.DisplayAlertAsync(
+                        "Compatible Java version required",
+                        $"The server requires Java {result.RequiredJavaVersion}, but no compatible installed version was found.",
+                        "OK");
+                    return;
+                }
+
+                var failedStartParameters = new ShellNavigationQueryParameters
+                {
+                    { "server", Server },
+                    { "startResult", result }
+                };
+                await Shell.Current.GoToAsync(nameof(ExecutionPage), failedStartParameters);
                 return;
             }
 

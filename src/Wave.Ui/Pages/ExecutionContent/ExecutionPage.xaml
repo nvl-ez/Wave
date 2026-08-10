@@ -19,12 +19,23 @@
             Command="{Binding LoadCommand}"/>
     </ContentPage.Behaviors>
 
-    <Grid RowDefinitions="*,Auto"
+    <Grid RowDefinitions="Auto,*,Auto"
           Padding="20"
           RowSpacing="12">
+        <Border Grid.Row="0"
+                IsVisible="{Binding HasStartError}"
+                BackgroundColor="#7F1D1D"
+                Stroke="#EF4444"
+                StrokeThickness="1"
+                Padding="12">
+            <Label Text="{Binding StartErrorMessage}"
+                   TextColor="White"
+                   FontAttributes="Bold"/>
+        </Border>
+
         <!-- The star-sized row keeps the log inside the available screen space. -->
         <CollectionView x:Name="LogsCollectionView"
-                        Grid.Row="0"
+                        Grid.Row="1"
                         ItemsSource="{Binding Logs}"
                         ItemsUpdatingScrollMode="KeepLastItemInView"
                         SelectionMode="None"
@@ -42,7 +53,7 @@
         </CollectionView>
 
         <!-- Fixed command bar. -->
-        <Grid Grid.Row="1"
+        <Grid Grid.Row="2"
               ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="8">
             <Entry

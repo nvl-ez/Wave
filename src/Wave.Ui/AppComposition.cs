@@ -45,6 +45,7 @@ public static class AppComposition
     private static readonly IServerPropertiesRepository serverPropertiesRepository;
     private static readonly IServerEulaRepository serverEulaRepository;
     private static readonly IServerExecutor serverExecutor;
+    private static readonly IPortMapper portMapper;
     private static readonly IJavaInstallRepository javaInstallRepository;
     private static readonly IJavaSupplier adoptiumJavaSupplier;
     private static readonly IJavaSupplier mojangJavaSupplier;
@@ -92,6 +93,7 @@ public static class AppComposition
         serverPropertyDefinitionRepository = new InMemoryServerPropertyDefinitionRepository();
         serverPropertiesRepository = new ServerPropertiesRepository();
         serverExecutor = new WindowsServerExecutor(); //TODO: Add OSs
+        portMapper = new SharpOpenNatPortMapper();
         javaInstallRepository = new JsonJavaRepository(javaDirectory);
         adoptiumJavaSupplier = new ApiAdoptiumJavaSupplier(tmpDirectory);
         mojangJavaSupplier = new ApiMojangJavaSupplier(tmpDirectory);
@@ -124,7 +126,7 @@ public static class AppComposition
 
         minecraftCatalogService = new MinecraftCatalogService(minecraftVersionRepository, serverPropertyDefinitionRepository);
         serverHandlerService = new ServerManagerService(serverPathResolver, serverRepository, versionManagerService, propertiesManagerService, eulaManagerService, modloaderManagerService, modManagerService, imageTransformer);
-        serverExecutorService = new ServerExecutorService(serverPathResolver, serverExecutor, serverRepository, javaInstallRepository, applicationConfigurationService);
+        serverExecutorService = new ServerExecutorService(serverPathResolver, serverExecutor, serverRepository, javaInstallRepository, applicationConfigurationService, portMapper);
         javaManagerService = new JavaManagerService(javaInstallRepository, serverRepository, [adoptiumJavaSupplier, mojangJavaSupplier], [compressedJavaInstaller, manifestJavaInstaller], applicationConfigurationService);
         deviceInformationService = new DeviceInformationService(windowsDeviceInformationRepository);
     }
