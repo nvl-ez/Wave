@@ -38,17 +38,22 @@ public class ApiModrinthModSupplier : IModSupplierIntegration
         //Build Query Arguments
         Dictionary<string, string> queryParameters = new Dictionary<string, string>();
 
-        if (modSupplierQuery.TextQuery is not null)
-            queryParameters.Add("query", modSupplierQuery.TextQuery);
-        if (modSupplierQuery.Author is not null)
+        if (!string.IsNullOrWhiteSpace(modSupplierQuery.TextQuery))
         {
-            if (queryParameters.ContainsKey("query"))
+            queryParameters.Add("query", modSupplierQuery.TextQuery.Trim());
+        }
+
+        if (!string.IsNullOrWhiteSpace(modSupplierQuery.Author))
+        {
+            string author = modSupplierQuery.Author.Trim();
+
+            if (queryParameters.TryGetValue("query", out string? textQuery))
             {
-                queryParameters["query"] = $"{queryParameters["query"]} {modSupplierQuery.Author}";
+                queryParameters["query"] = $"{textQuery} {author}";
             }
             else
             {
-                queryParameters.Add("query", modSupplierQuery.Author);
+                queryParameters.Add("query", author);
             }
         }
         queryParameters.Add("offset", modSupplierQuery.PaginationState.Index.ToString());

@@ -43,6 +43,10 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [ObservableProperty]
     public partial string ModloaderInfoStatus { get; set; } = "Loading"; // Loading, Done, Error
     [ObservableProperty]
+    public partial bool IsLoading { get; set; } = true;
+    [ObservableProperty]
+    public partial bool IsSaving { get; set; } = false;
+    [ObservableProperty]
     public partial bool ModsSectionIsVisible { get; set; } = false;
     [ObservableProperty]
     public partial bool ModloaderInfoIsVisible { get; set; } = false;
@@ -170,6 +174,10 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     {
         if (IsModalOpen) return;
 
+        IsLoading = true;
+        try
+        {
+
         CurrentTab = "General";
         ServerQuery server;
 
@@ -225,6 +233,11 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
         ServerIcon = server.Id is Guid serverId && serverHandlerService.GetServerIconPath(serverId) is string iconPath
             ? ImageSource.FromStream(() => File.OpenRead(iconPath))
             : ImageSource.FromFile("pack.png");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     partial void OnSelectedModloaderInfoChanged(ModloaderInfo? value)
@@ -346,6 +359,11 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     public async Task SaveAsync()
     {
+        if (IsSaving) return;
+
+        IsSaving = true;
+        try
+        {
         Guid serverId;
         bool changesPopupWasShown = false;
         if (Server.Id is not null)
@@ -383,6 +401,11 @@ public partial class ServerViewModel : ObservableObject, IQueryAttributable
 
         if (changesPopupWasShown) return;
         await Shell.Current.GoToAsync("..");
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
 
     [RelayCommand]
