@@ -9,22 +9,22 @@
 \contentsline {section}{\numberline {1.3}Objective}{2}{section.1.3}%
 \contentsline {section}{\numberline {1.4}Scope}{2}{section.1.4}%
 \contentsline {subsection}{\numberline {1.4.1}Server instance management}{3}{subsection.1.4.1}%
-\contentsline {paragraph}{FR-01: View server instances.}{3}{section*.6}%
-\contentsline {paragraph}{FR-02: Create server instances.}{3}{section*.7}%
-\contentsline {paragraph}{FR-03: Delete server instances.}{3}{section*.8}%
-\contentsline {paragraph}{FR-04: Execute server instances.}{3}{section*.9}%
-\contentsline {paragraph}{FR-05: Send server commands.}{3}{section*.10}%
-\contentsline {paragraph}{FR-06: Stop server instances.}{3}{section*.11}%
+\contentsline {paragraph}{FR-01: View server instances.}{3}{section*.7}%
+\contentsline {paragraph}{FR-02: Create server instances.}{3}{section*.9}%
+\contentsline {paragraph}{FR-03: Delete server instances.}{3}{section*.11}%
+\contentsline {paragraph}{FR-04: Execute server instances.}{3}{section*.12}%
+\contentsline {paragraph}{FR-05: Send server commands.}{3}{section*.13}%
+\contentsline {paragraph}{FR-06: Stop server instances.}{3}{section*.14}%
 \contentsline {subsection}{\numberline {1.4.2}Mod-loader and mod management}{3}{subsection.1.4.2}%
-\contentsline {paragraph}{FR-07: Add a mod loader.}{3}{section*.12}%
-\contentsline {paragraph}{FR-08: Change a mod-loader version.}{3}{section*.13}%
-\contentsline {paragraph}{FR-09: Remove a mod loader.}{3}{section*.14}%
-\contentsline {paragraph}{FR-10: Add mods.}{3}{section*.15}%
-\contentsline {paragraph}{FR-11: Remove mods.}{4}{section*.16}%
-\contentsline {paragraph}{FR-12: Change the Minecraft version.}{4}{section*.17}%
+\contentsline {paragraph}{FR-07: Add a mod loader.}{3}{section*.15}%
+\contentsline {paragraph}{FR-08: Change a mod-loader version.}{3}{section*.16}%
+\contentsline {paragraph}{FR-09: Remove a mod loader.}{3}{section*.17}%
+\contentsline {paragraph}{FR-10: Add mods.}{3}{section*.18}%
+\contentsline {paragraph}{FR-11: Remove mods.}{4}{section*.19}%
+\contentsline {paragraph}{FR-12: Change the Minecraft version.}{4}{section*.20}%
 \contentsline {subsection}{\numberline {1.4.3}Runtime and network management}{4}{subsection.1.4.3}%
-\contentsline {paragraph}{FR-13: Manage Java runtimes.}{4}{section*.18}%
-\contentsline {paragraph}{FR-14: Configure network ports.}{4}{section*.19}%
+\contentsline {paragraph}{FR-13: Manage Java runtimes.}{4}{section*.21}%
+\contentsline {paragraph}{FR-14: Configure network ports.}{4}{section*.22}%
 \contentsline {chapter}{\chapternumberline {2}Alternatives}{5}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Free server managers}{5}{section.2.1}%
 \contentsline {section}{\numberline {2.2}AMP}{6}{section.2.2}%
@@ -41,12 +41,12 @@
 \contentsline {chapter}{\chapternumberline {4}System analysis and design}{13}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Users and operating context}{13}{section.4.1}%
 \contentsline {section}{\numberline {4.2}Quality requirements}{13}{section.4.2}%
-\contentsline {paragraph}{Usability.}{13}{section*.20}%
-\contentsline {paragraph}{Compatibility.}{14}{section*.21}%
-\contentsline {paragraph}{Maintainability.}{14}{section*.22}%
-\contentsline {paragraph}{Recoverability.}{14}{section*.23}%
-\contentsline {paragraph}{Responsiveness.}{14}{section*.24}%
-\contentsline {paragraph}{Security and privacy.}{14}{section*.25}%
+\contentsline {paragraph}{Usability.}{13}{section*.25}%
+\contentsline {paragraph}{Compatibility.}{14}{section*.26}%
+\contentsline {paragraph}{Maintainability.}{14}{section*.27}%
+\contentsline {paragraph}{Recoverability.}{14}{section*.28}%
+\contentsline {paragraph}{Responsiveness.}{14}{section*.29}%
+\contentsline {paragraph}{Security and privacy.}{14}{section*.31}%
 \contentsline {section}{\numberline {4.3}Architectural design}{15}{section.4.3}%
 \contentsline {subsection}{\numberline {4.3.1}Choice of architectural style}{15}{subsection.4.3.1}%
 \contentsline {subsection}{\numberline {4.3.2}Solution projects}{15}{subsection.4.3.2}%
@@ -111,10 +111,11 @@
 \contentsline {section}{\numberline {7.2}Future work}{52}{section.7.2}%
 \contentsline {subsection}{\numberline {7.2.1}Extend the empirical evaluation}{52}{subsection.7.2.1}%
 \contentsline {subsection}{\numberline {7.2.2}Additional platforms}{52}{subsection.7.2.2}%
-\contentsline {subsection}{\numberline {7.2.3}Transactional updates and backups}{52}{subsection.7.2.3}%
-\contentsline {subsection}{\numberline {7.2.4}Provider resilience}{53}{subsection.7.2.4}%
-\contentsline {subsection}{\numberline {7.2.5}Network diagnostics}{53}{subsection.7.2.5}%
-\contentsline {subsection}{\numberline {7.2.6}Distribution and community development}{53}{subsection.7.2.6}%
+\contentsline {subsection}{\numberline {7.2.3}Modpack support}{52}{subsection.7.2.3}%
+\contentsline {subsection}{\numberline {7.2.4}World migration with MCA Selector}{53}{subsection.7.2.4}%
+\contentsline {subsection}{\numberline {7.2.5}Whitelist management}{53}{subsection.7.2.5}%
+\contentsline {subsection}{\numberline {7.2.6}Network diagnostics}{53}{subsection.7.2.6}%
+\contentsline {subsection}{\numberline {7.2.7}Distribution and community development}{53}{subsection.7.2.7}%
 \contentsline {appendix}{\chapternumberline {A}User guide}{55}{appendix.A}%
 \contentsline {section}{\numberline {A.1}Initial configuration}{55}{appendix.A.1}%
 \contentsline {section}{\numberline {A.2}Creating a server}{55}{appendix.A.2}%
@@ -122,4 +123,4 @@
 \contentsline {section}{\numberline {A.4}Starting and stopping}{59}{appendix.A.4}%
 \contentsline {section}{\numberline {A.5}Removing content}{59}{appendix.A.5}%
 \contentsline {appendix}{\chapternumberline {B}Repository structure}{61}{appendix.B}%
-\contentsline {chapter}{Bibliografia}{63}{chapter*.27}%
+\contentsline {chapter}{Bibliografia}{63}{chapter*.40}%

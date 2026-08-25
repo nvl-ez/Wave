@@ -29,7 +29,7 @@ The functional requirements in Section~\ref{sec:scope} state what the applicatio
 
 \paragraph{Recoverability.} Persistent metadata must remain readable across normal application restarts. Failed downloads should not be recorded as successful installations. Migration must report components that cannot be retained. Since the current application modifies a real server directory rather than a transactional store, complete rollback of every file operation is not guaranteed; this constraint is relevant when interpreting the migration design.
 
-\paragraph{Responsiveness.} Network, installation and process operations use asynchronous interfaces so that the UI thread is not intentionally blocked while files are obtained or a catalogue is queried. The interface displays a busy overlay during operations that cannot complete immediately.
+\paragraph{Responsiveness.} Network, installation and process operations use asynchronous interfaces so that the \acs{UI} thread is not intentionally blocked while files are obtained or a catalogue is queried. The interface displays a busy overlay during operations that cannot complete immediately.
 
 \paragraph{Security and privacy.} Server worlds, configuration and Java runtimes remain on the local computer. CurseForge credentials are application configuration and must not be embedded in source code. Port mapping is requested only when a server is started and is released when it stops or startup fails.
 
@@ -103,7 +103,7 @@ Together, these services make it possible to treat creation and editing as coord
 
 Output ports cover persistence, providers and operating-system facilities. \texttt{IServerRepository}, \texttt{IJavaInstallRepository} and \texttt{IApplicationConfigurationRepository} store servers, Java installations and application configuration. \texttt{IMinecraftVersionRepository} and \texttt{IModloaderVersionCatalog} obtain Minecraft and loader versions. \texttt{IModSupplierIntegration} and \texttt{IJavaSupplier} represent remote mod and Java providers. \texttt{IServerExecutor} executes servers, \texttt{IImageTransformer} transforms images, \texttt{IDeviceInformationRepository} reads device information, and \texttt{IPortMapper} creates network mappings.
 
-Each adapter owns the translation between an external representation and the domain. \texttt{ApiMinecraftVersionRepository} deserializes Mojang's version manifest and maps its DTOs to version information. \texttt{ApiForgeVersionCatalog} parses Forge's Maven metadata as XML. Fabric, Modrinth, CurseForge and Adoptium responses use provider-specific DTOs within their respective adapters. \texttt{JsonServerRepository}, \texttt{JsonJavaRepository} and \texttt{JsonApplicationConfigurationRepository} serialize persistent domain state, while \texttt{WindowsServerExecutor} wraps \texttt{System.Diagnostics.Process}.
+Each adapter owns the translation between an external representation and the domain. \texttt{ApiMinecraftVersionRepository} deserializes Mojang's version manifest and maps its \acsp{DTO} to version information. \texttt{ApiForgeVersionCatalog} parses Forge's Maven metadata as \acs{XML}. Fabric, Modrinth, CurseForge and Adoptium responses use provider-specific DTOs within their respective adapters. \texttt{JsonServerRepository}, \texttt{JsonJavaRepository} and \texttt{JsonApplicationConfigurationRepository} serialize persistent domain state, while \texttt{WindowsServerExecutor} wraps \texttt{System.Diagnostics.Process}.
 
 \section{Persistence and directory design}
 
@@ -111,7 +111,7 @@ JSON persistence was chosen because the data volume and relationships are small.
 
 Repository interfaces keep that decision reversible. If later versions need concurrent access, querying over many users or stronger transactions, a database adapter can implement the same repository roles. Some contract changes might still be needed for efficient querying, but UI and provider code would not have to know the storage technology.
 
-\texttt{ServerPathResolver} centralizes the application directory, server collection, Java collection and temporary workspace. Each \texttt{Server} receives its own root directory. Files such as \texttt{server.properties}, \texttt{eula.txt}, the vanilla server JAR, the normalized loader JAR and the \texttt{mods} directory are derived from that root. Central path construction reduces the risk that different managers disagree about where an artifact belongs.
+\texttt{ServerPathResolver} centralizes the application directory, server collection, Java collection and temporary workspace. Each \texttt{Server} receives its own root directory. Files such as \texttt{server.properties}, \texttt{eula.txt}, the vanilla server \acs{JAR}, the normalized loader JAR and the \texttt{mods} directory are derived from that root. Central path construction reduces the risk that different managers disagree about where an artifact belongs.
 
 \begin{figure}[htbp]
   \centering
@@ -170,7 +170,7 @@ Migration reevaluates every mod whose Minecraft version or loader differs from t
 
 \subsection{Execution and port mapping}
 
-Starting a server is a coordinated local and network operation. \texttt{ServerExecutorService} first rejects a second start of the same instance and checks whether another Wave session uses the requested port. It then requests a temporary mapping through \texttt{IPortMapper}. \texttt{SharpOpenNatPortMapper} attempts UPnP and NAT-PMP discovery and creates a TCP mapping with the same private and public port. If discovery or mapping fails, startup returns a specific \texttt{ServerStartResult} and the Java process is not launched.
+Starting a server is a coordinated local and network operation. \texttt{ServerExecutorService} first rejects a second start of the same instance and checks whether another Wave session uses the requested port. It then requests a temporary mapping through \texttt{IPortMapper}. \texttt{SharpOpenNatPortMapper} attempts \acs{UPnP} and \acs{NAT-PMP} discovery and creates a \acs{TCP} mapping with the same private and public port. If discovery or mapping fails, startup returns a specific \texttt{ServerStartResult} and the Java process is not launched.
 
 After mapping succeeds, \texttt{ServerExecutorService} chooses the server or loader JAR, obtains the configured Java executable and asks \texttt{IServerExecutor} to start the process. Standard input, standard output and standard error are redirected through \texttt{IServerSession}. Output is exposed as an asynchronous sequence so \texttt{ExecutionViewModel} can append lines as they arrive. Commands written by the user go to standard input through \texttt{IServerSession.SendCommandAsync}.
 

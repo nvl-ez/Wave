@@ -26,13 +26,17 @@ The initial comparison involved only three participants and always presented the
 
 .NET MAUI and the internal boundaries leave room for macOS or Linux desktop support, but the present product should not be described as cross-platform until adapters and complete tests exist. New process-executor and device-information implementations are required. File permissions, executable discovery, archive formats and platform packaging must also be addressed. Android and iOS are not natural server-hosting targets even though MAUI can compile interface projects for them, so desktop platforms have higher priority.
 
-\subsection{Transactional updates and backups}
+\subsection{Modpack support}
 
-Server migration currently coordinates related changes but operates on live directories. A stronger design would stage downloads and generated configuration in a temporary tree, validate it, then replace the active files atomically where the operating system permits. Automatic backups of worlds and configuration before version changes would make rollback accessible to casual users.
+The current mod integrations manage individual projects obtained from Modrinth and CurseForge. A future version could also browse and install modpacks published by these already supported suppliers. Installing a modpack would require the application to interpret its manifest, obtain the specified loader and Minecraft version, download its mods and configuration files, and present any optional components to the user. Reusing the existing supplier adapters and compatibility model would keep modpack installation within the same server-management workflow instead of requiring users to assemble a published pack manually.
 
-\subsection{Provider resilience}
+\subsection{World migration with MCA Selector}
 
-External adapters should gain contract tests built from recorded provider responses. This would detect schema and mapping changes without downloading complete packages. Retry policies, request timeouts, caching and structured error messages would improve behavior during temporary outages. Credentials should be stored through operating-system protected storage rather than as ordinary configuration where possible.
+Updating the server software does not update terrain that has already been generated in its world. Integrating MCA Selector could make world migration more useful by identifying and deleting generated chunks that have not been modified. When those areas are explored again, Minecraft would regenerate them using the terrain and features of the newer version. The launcher should present the affected area clearly and require explicit confirmation before changing the world files, since deleting the wrong chunks could remove player changes.
+
+\subsection{Whitelist management}
+
+Wave Launcher could provide an interface for managing the server whitelist without requiring the user to edit files or enter commands in the server console. The interface should list the currently allowed players and support adding or removing entries from the launcher. This would make access control consistent with the existing graphical management of properties, mods and execution while keeping the underlying Minecraft whitelist synchronized.
 
 \subsection{Network diagnostics}
 
@@ -40,4 +44,4 @@ UPnP and NAT-PMP cover many home routers but cannot solve carrier-grade NAT, dis
 
 \subsection{Distribution and community development}
 
-Wave Launcher is intended to be published as free software under a GNU copyleft licence once its repository is made public. Packaging, release signing, licence notices for dependencies and a contributor guide are required before that release. A public issue tracker could then collect unsupported provider cases and router behavior that cannot be reproduced on the original development machine.
+Wave Launcher's source code is publicly available at \url{https://github.com/nvl-ez/Wave}. The project is intended to be distributed as free software under a GNU copyleft licence.

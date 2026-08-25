@@ -7,8 +7,7 @@
 \providecommand{\BIBentrySTDinterwordspacing}{\spaceskip=0pt\relax}
 \providecommand{\BIBentryALTinterwordstretchfactor}{4}
 \providecommand{\BIBentryALTinterwordspacing}{\spaceskip=\fontdimen2\font plus
-\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
-  \fontdimen4\font\relax}
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus \fontdimen4\font\relax}
 \providecommand{\BIBforeignlanguage}[2]{{%
 \expandafter\ifx\csname l@#1\endcsname\relax
 \typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
@@ -22,61 +21,42 @@
 \BIBdecl
 
 \bibitem{CraftyDocs}
-{Crafty Controller}, ``Crafty documentation,''
-  \url{https://docs.craftycontrol.com/}, 2026, accessed: 2026-08-09.
+{Crafty Controller}, ``Crafty documentation,'' \url{https://docs.craftycontrol.com/}, 2026, accessed: 2026-08-09.
 
 \bibitem{CraftyLicense}
-------, ``Crafty 4 license,''
-  \url{https://gitlab.com/crafty-controller/crafty-4/-/blob/master/LICENSE},
-  2022, accessed: 2026-08-09.
+------, ``Crafty 4 license,'' \url{https://gitlab.com/crafty-controller/crafty-4/-/blob/master/LICENSE}, 2022, accessed: 2026-08-09.
 
 \bibitem{CraftyJava}
-------, ``Linux installation guide,''
-  \url{https://docs.craftycontrol.com/pages/getting-started/installation/linux/},
-  2026, accessed: 2026-08-09.
+------, ``Linux installation guide,'' \url{https://docs.craftycontrol.com/pages/getting-started/installation/linux/}, 2026, accessed: 2026-08-09.
 
 \bibitem{CraftyWebsite}
-------, ``Crafty controller,'' \url{https://craftycontrol.com/\#home}, 2026,
-  accessed: 2026-08-09.
+------, ``Crafty controller,'' \url{https://craftycontrol.com/\#home}, 2026, accessed: 2026-08-09.
 
 \bibitem{MCSSFeatures}
-{MC Server Soft}, ``Mc server soft: Free minecraft server wrapper ui for
-  windows,'' \url{https://www.mcserversoft.com/}, 2026, accessed: 2026-08-09.
+{MC Server Soft}, ``Mc server soft: Free minecraft server wrapper ui for windows,'' \url{https://www.mcserversoft.com/}, 2026, accessed: 2026-08-09.
 
 \bibitem{MCSSDocs}
-------, ``Getting started with mcss,'' \url{https://docs.mcserversoft.com/},
-  2026, accessed: 2026-08-09.
+------, ``Getting started with mcss,'' \url{https://docs.mcserversoft.com/}, 2026, accessed: 2026-08-09.
 
 \bibitem{MCSSServerFiles}
-------, ``Sourcing a server file,''
-  \url{https://docs.mcserversoft.com/basic/create-server/sourcing-server-file},
-  2026, accessed: 2026-08-09.
+------, ``Sourcing a server file,'' \url{https://docs.mcserversoft.com/basic/create-server/sourcing-server-file}, 2026, accessed: 2026-08-09.
 
 \bibitem{ForkWebsite}
-{Fork}, ``Fork: Minecraft server manager,'' \url{https://www.fork.gg/}, 2026,
-  accessed: 2026-08-09.
+{Fork}, ``Fork: Minecraft server manager,'' \url{https://www.fork.gg/}, 2026, accessed: 2026-08-09.
 
 \bibitem{MCSManagerProject}
-{MCSManager}, ``Mcsmanager project repository,''
-  \url{https://github.com/MCSManager/MCSManager}, 2026, accessed: 2026-08-09.
+{MCSManager}, ``Mcsmanager project repository,'' \url{https://github.com/MCSManager/MCSManager}, 2026, accessed: 2026-08-09.
 
 \bibitem{MCSManagerJava}
-------, ``Dependencies: Install java environment,''
-  \url{https://docs.mcsmanager.com/setup_package.html}, 2026, accessed:
-  2026-08-09.
+------, ``Dependencies: Install java environment,'' \url{https://docs.mcsmanager.com/setup_package.html}, 2026, accessed: 2026-08-09.
 
 \bibitem{MCSManagerSetup}
-------, ``Setup java edition server,''
-  \url{https://docs.mcsmanager.com/setup_java_edition.html}, 2026, accessed:
-  2026-08-09.
+------, ``Setup java edition server,'' \url{https://docs.mcsmanager.com/setup_java_edition.html}, 2026, accessed: 2026-08-09.
 
 \bibitem{AMPMods}
-{CubeCoders Limited}, ``{AMP} deimos 2.7.0 release notes,''
-  \url{https://discourse.cubecoders.com/t/amp-deimos-2-7-0-release-notes/38578},
-  2026, accessed: 2026-08-09.
+{CubeCoders Limited}, ``{AMP} deimos 2.7.0 release notes,'' \url{https://discourse.cubecoders.com/t/amp-deimos-2-7-0-release-notes/38578}, 2026, accessed: 2026-08-09.
 
 \bibitem{AMPPricing}
-------, ``{AMP}: Game server control panel,''
-  \url{https://cubecoders.com/amp/install}, 2026, accessed: 2026-08-09.
+------, ``{AMP}: Game server control panel,'' \url{https://cubecoders.com/amp/install}, 2026, accessed: 2026-08-09.
 
 \end{thebibliography}
