@@ -55,7 +55,7 @@
                                      VerticalOptions="Center">
                     <Label Text="{Binding Name}"
                            Style="{StaticResource WaveCardTitle}"/>
-                    <Label Text="Minecraft server"
+                    <Label Text="{Binding Motd}"
                            Style="{StaticResource WaveCardSubtitle}"/>
                 </VerticalStackLayout>
             </Grid>
