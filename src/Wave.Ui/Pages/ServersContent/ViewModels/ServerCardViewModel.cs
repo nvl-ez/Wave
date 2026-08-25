@@ -15,6 +15,7 @@ public partial class ServerCardViewModel : ObservableObject
     private readonly IServerManagerService serverManagerService;
     private readonly IServerExecutorService serverExecutorService;
     private readonly IJavaInstallRepository javaInstallRepository;
+    private readonly Action<bool> setPageStarting;
 
     //STATES
     public string RunningState => IsRunning ? "Running" : "Stopped";
@@ -31,19 +32,28 @@ public partial class ServerCardViewModel : ObservableObject
 
     public string? Name => Server?.Name;
 
+    public string Motd => Server.Properties.TryGetValue("motd", out string? motd)
+        ? motd
+        : "A Minecraft Server";
+
     [ObservableProperty]
     public partial ImageSource ServerIcon { get; set; } = ImageSource.FromFile("pack.png");
+
+    [ObservableProperty]
+    public partial bool IsStarting { get; set; }
 
     public ServerCardViewModel(
         ServerQuery server,
         IServerManagerService serverManagerService,
         IServerExecutorService serverExecutorService,
-        IJavaInstallRepository javaInstallRepository)
+        IJavaInstallRepository javaInstallRepository,
+        Action<bool> setPageStarting)
     {
         Server = server;
         this.serverManagerService = serverManagerService;
         this.serverExecutorService = serverExecutorService;
         this.javaInstallRepository = javaInstallRepository;
+        this.setPageStarting = setPageStarting;
     }
 
     [RelayCommand]
@@ -73,39 +83,54 @@ public partial class ServerCardViewModel : ObservableObject
     [RelayCommand]
     public async Task StartServerAsync()
     {
-        if (!IsRunning)
+        if (IsStarting)
         {
-            ServerStartResult result = await serverExecutorService.Start((Guid)Server.Id!);
-            if (!result.Started)
+            return;
+        }
+
+        IsStarting = true;
+        setPageStarting(true);
+        try
+        {
+            if (!IsRunning)
             {
-                if (result.Failure == ServerStartFailure.JavaNotFound)
+                ServerStartResult result = await serverExecutorService.Start((Guid)Server.Id!);
+                if (!result.Started)
                 {
-                    await Shell.Current.DisplayAlertAsync(
-                        "Compatible Java version required",
-                        $"The server requires Java {result.RequiredJavaVersion}, but no compatible installed version was found.",
-                        "OK");
+                    if (result.Failure == ServerStartFailure.JavaNotFound)
+                    {
+                        await Shell.Current.DisplayAlertAsync(
+                            "Compatible Java version required",
+                            $"The server requires Java {result.RequiredJavaVersion}, but no compatible installed version was found.",
+                            "OK");
+                        return;
+                    }
+
+                    var failedStartParameters = new ShellNavigationQueryParameters
+                    {
+                        { "server", Server },
+                        { "startResult", result }
+                    };
+                    await Shell.Current.GoToAsync(nameof(ExecutionPage), failedStartParameters);
                     return;
                 }
 
-                var failedStartParameters = new ShellNavigationQueryParameters
-                {
-                    { "server", Server },
-                    { "startResult", result }
-                };
-                await Shell.Current.GoToAsync(nameof(ExecutionPage), failedStartParameters);
-                return;
+                IServerSession session = result.Session!;
+                session.ServerDisposed += StopServerAsync;
+                ServerSession = session;
             }
 
-            IServerSession session = result.Session!;
-            session.ServerDisposed += StopServerAsync;
-            ServerSession = session;
+            var parameters = new ShellNavigationQueryParameters
+            {
+                { "server", Server}
+            };
+            await Shell.Current.GoToAsync(nameof(ExecutionPage), parameters);
         }
-
-        var parameters = new ShellNavigationQueryParameters
+        finally
         {
-            { "server", Server}
-        };
-        await Shell.Current.GoToAsync(nameof(ExecutionPage), parameters);
+            IsStarting = false;
+            setPageStarting(false);
+        }
     }
 
     [RelayCommand]

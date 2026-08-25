@@ -22,6 +22,9 @@ public partial class ServersViewModel : ObservableObject, IQueryAttributable
     [ObservableProperty]
     public partial string ServerListStatus { get; set; } = "Loading"; //Loading, Loaded
 
+    [ObservableProperty]
+    public partial bool IsStarting { get; set; }
+
     public ServersViewModel(
         IServerManagerService serverManagerService,
         IServerExecutorService serverExecutorService,
@@ -44,7 +47,8 @@ public partial class ServersViewModel : ObservableObject, IQueryAttributable
                 s,
                 serverManagerService,
                 serverExecutorService,
-                javaInstallRepository));
+                javaInstallRepository,
+                isStarting => IsStarting = isStarting));
         foreach (var ServerCardViewModel in serverCardViewModels)
         {
             AllServers.Add(ServerCardViewModel);

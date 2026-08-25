@@ -40,7 +40,8 @@ public record class ServerQuery
         {"online-mode", "true"},
         {"server-ip", ""},
         {"spawn-protection", "16"},
-        {"view-distance", "8"}
+        {"view-distance", "8"},
+        {"server-port", "25565"}
     };
     public ModloaderBase? Modloader { get; set; }
     public DateTime? CreationDate { get; set; }

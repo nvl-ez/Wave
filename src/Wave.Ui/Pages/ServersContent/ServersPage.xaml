@@ -6,6 +6,7 @@
              xmlns:views="clr-namespace:Wave.Ui.Pages.ServersContent.Views"
              xmlns:serverManager="clr-namespace:Wave.Domain.ServerManager;assembly=Wave.Domain"
              xmlns:page="clr-namespace:Wave.Ui.Pages.ServersContent"
+             xmlns:feedback="clr-namespace:Wave.Ui.Views.Feedback"
              x:Class="Wave.Ui.Pages.ServersContent.ServersPage"
              Title="Servers Page"
              x:Name="Root"
@@ -61,5 +62,10 @@
             VerticalOptions="Center"
             HorizontalOptions="Center"
             Command="{Binding NewServerCommand}"/>
+
+        <feedback:BusyOverlay Grid.Row="0"
+                              Grid.RowSpan="2"
+                              IsBusy="{Binding IsStarting}"
+                              Message="Starting server..."/>
     </Grid>
 </ContentPage>

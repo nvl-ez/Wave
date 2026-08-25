@@ -11,7 +11,7 @@ public sealed class SharpOpenNatPortMapper : IPortMapper
 
     public SharpOpenNatPortMapper(TimeSpan? discoveryTimeout = null)
     {
-        this.discoveryTimeout = discoveryTimeout ?? TimeSpan.FromSeconds(5);
+        this.discoveryTimeout = discoveryTimeout ?? TimeSpan.FromSeconds(15);
     }
 
     public async Task<PortMappingLease> OpenAsync(int port, CancellationToken ct = default)
@@ -23,14 +23,21 @@ public sealed class SharpOpenNatPortMapper : IPortMapper
         {
             try
             {
-                using CancellationTokenSource timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
-                timeout.CancelAfter(discoveryTimeout);
-                INatDevice device = await OpenNat.Discoverer.DiscoverDeviceAsync(protocol, timeout.Token);
+                INatDevice device;
+                using (CancellationTokenSource timeout = CreateOperationTimeout(ct))
+                {
+                    device = await OpenNat.Discoverer.DiscoverDeviceAsync(protocol, timeout.Token);
+                }
+
                 Mapping requested = new(Protocol.Tcp, port, port, "Wave Minecraft server");
 
-                Mapping? existing = protocol == PortMapper.Upnp
-                    ? await device.GetSpecificMappingAsync(Protocol.Tcp, port, timeout.Token)
-                    : null;
+                Mapping? existing = null;
+                if (protocol == PortMapper.Upnp)
+                {
+                    using CancellationTokenSource timeout = CreateOperationTimeout(ct);
+                    existing = await device.GetSpecificMappingAsync(Protocol.Tcp, port, timeout.Token);
+                }
+
                 if (existing is not null
                     && existing.PrivatePort == port
                     && (existing.PrivateIP is null || existing.PrivateIP.Equals(device.LocalAddress)))
@@ -38,7 +45,11 @@ public sealed class SharpOpenNatPortMapper : IPortMapper
                     return new PortMappingLease(port, () => ValueTask.CompletedTask);
                 }
 
-                await device.CreatePortMapAsync(requested, timeout.Token);
+                using (CancellationTokenSource timeout = CreateOperationTimeout(ct))
+                {
+                    await device.CreatePortMapAsync(requested, timeout.Token);
+                }
+
                 return new PortMappingLease(
                     port,
                     async () => await device.DeletePortMapAsync(requested, CancellationToken.None));
@@ -54,5 +65,12 @@ public sealed class SharpOpenNatPortMapper : IPortMapper
         }
 
         throw new AggregateException($"Could not map TCP port {port} using UPnP IGD or NAT-PMP.", errors);
+    }
+
+    private CancellationTokenSource CreateOperationTimeout(CancellationToken ct)
+    {
+        CancellationTokenSource timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeout.CancelAfter(discoveryTimeout);
+        return timeout;
     }
 }
