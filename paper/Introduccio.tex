@@ -4,21 +4,66 @@
 
 \section{Contextualization}
 
-Minecraft can be played in either single-player or multiplayer mode. In multiplayer, the game running on the user’s machine acts as a client that connects to a server. Players seeking minigames or interaction with larger communities generally join public servers, many of which are commercially operated and generate revenue through advertising, paid ranks, or gameplay advantages. Players who want a private experience closer to the original game can instead rent a server from a hosting provider or host one on their own machine. Commercial hosting simplifies the process but usually requires a recurring subscription, whereas self-hosting provides greater privacy and control at the cost of increased technical complexity.
+Minecraft supports both single-player and multiplayer sessions. In multiplayer, the game running on each player's computer acts as a client and connects to a server that maintains the shared world and coordinates player activity. Public servers are suitable for players seeking established communities or minigames, but they do not provide an environment controlled exclusively by a particular group of friends. Players seeking a private environment must instead obtain a server from a hosting provider or run one on their own hardware.
 
-The ecosystem of Minecraft client launchers is active and mature: Mojang and the community provide solutions for different users, requirements, and levels of technical knowledge. By comparison, tools for creating and managing self-hosted servers have received less attention. This may be because users interested in self-hosting have traditionally been assumed to possess enough technical knowledge to configure a server manually. Consequently, casual players have relatively few tools that combine ease of use with the functionality required to manage a complete Minecraft server.
+The choice is therefore a trade-off between convenience, cost and control. A hosting provider takes care of the underlying infrastructure and usually includes a management interface, but it requires a recurring payment and stores the server files on a third-party system. Self-hosting avoids this cost and gives the player direct control over the server and its data. In return, the player becomes responsible for installation, configuration, networking and maintenance.
+
+Minecraft client launchers provide interfaces for a range of users and technical requirements. Equivalent tools for self-hosted servers exist, but their primary function is generally to administer and execute server software that has already been selected and configured. As examined in Chapter~\ref{chap:alternatives}, casual players have fewer options that also manage the dependencies and network configuration required throughout the complete server lifecycle.
 
 
 \section{Motivation}
-Creating a Minecraft: Java Edition server manually involves coordinating several interdependent components. Users must download the appropriate server files, ensure that a compatible Java runtime is installed, and edit text-based configuration files. Modded servers introduce further complexity: users must install a compatible mod loader, download each mod individually, and resolve conflicts between Minecraft, the mod loader, and the selected mods until the server starts correctly.
 
-Making the server accessible outside the local network introduces another significant obstacle. Minecraft: Java Edition servers listen on TCP/UDP port 25565 by default, so users commonly need to access their router's configuration and permit incoming connections. This step is unfamiliar to many casual users and frequently prevents them from completing the server setup process.
+In practice, creating a Minecraft: Java Edition server manually is not a single installation task. Several components have to be obtained and configured in the right order. The user needs the appropriate server software and a compatible Java runtime, and must also choose startup parameters and edit text-based configuration files. Since every component has its own version requirements, a configuration that works for one Minecraft release may fail with another.
 
-Server maintenance presents similar difficulties. When migrating to a newer Minecraft version, users must update not only the base server but also the mod loader and every installed mod. Existing files often need to be removed or replaced manually, after which compatibility problems must be identified and resolved again. These repetitive and error-prone tasks create an unnecessary barrier for players who want a private server but lack server-administration experience.
+Modded servers extend this dependency chain. In addition to the base server and Java runtime, the user must select a compatible mod loader and obtain suitable versions of every mod and dependency. The ability to download or execute these files does not by itself resolve whether they support the selected Minecraft and loader versions. Compatibility failures may therefore become visible only when the server is started, leaving the user to identify and replace the conflicting files manually.
+
+Local execution also does not make the server reachable from outside the user's network. The player must normally configure the household router so that incoming connections are directed to the server. This requires familiarity with ports, local addresses and router administration, and may be an entry barrier for casual players.
+
+The same coordination is required during maintenance. Updating Minecraft may require a different Java runtime, a new mod-loader release and compatible updates for the installed mods. Performing these changes directly on the server files is repetitive and creates opportunities for incompatible or obsolete components to remain in the installation.
 
 
 \section{Objective}
 
-The objective of the Wave Launcher is to enable casual players to create and manage private, self-hosted Minecraft: Java Edition servers without paying recurring hosting fees or requiring advanced technical knowledge. The application should provide a simple and intuitive interface that guides users through server creation, configuration, network setup, and maintenance.
+The objective of Wave Launcher is to enable casual players to create and manage private, self-hosted Minecraft: Java Edition servers on Windows without paying recurring hosting fees or requiring server-administration knowledge. In this context, a casual player is not expected to install Java runtimes, manipulate server files, resolve version dependencies or configure network ports manually.
 
-The Wave Launcher should internally coordinate the server software, Java runtime, mod loader, and installed mods so that users do not need to manage these components manually. It should also assist with compatibility resolution and version migrations, ensuring that the required components remain correctly configured when a server is created or updated. Ultimately, the application aims to make self-hosting accessible while preserving the privacy, control, and flexibility that motivate users to operate their own servers.
+To meet this objective, the application must provide a graphical workflow for creating, configuring, starting, stopping, updating and removing server instances. It must coordinate the server software, Java runtime, mod loader and installed mods, selecting mutually compatible versions where the available provider metadata permits this. Mod discovery, installation, removal and updating must be exposed as application operations rather than as direct file management tasks.
+
+The application must also assist with making a server reachable outside the local network and communicate any conditions that cannot be configured automatically. These capabilities are intended to reduce the user's role to selecting the desired server and gameplay options while the application manages their technical consequences. Wave Launcher is not intended to replace general-purpose administration panels or commercial hosting; it addresses the narrower use case of a casual player operating a private Minecraft server from their own computer.
+
+\section{Scope}\label{sec:scope}
+
+The scope of Wave Launcher is defined by the following functional requirements. All requirements are mandatory for the application to satisfy its objective. The identifiers assigned to them provide a stable reference for the design, implementation and validation presented in subsequent chapters.
+
+\subsection{Server instance management}
+
+\paragraph{FR-01: View server instances.} The user must be able to view all created server instances. Each item must display enough information to distinguish it from the others, including the server name, icon, execution status and message of the day (MOTD).
+
+\paragraph{FR-02: Create server instances.} The user must be able to create a server instance through a graphical interface. The interface must allow the user to specify the server name, icon and Minecraft version, including snapshot and pre-release versions; configure the server properties, such as game mode, difficulty and view distance; define launch flags; and approve the Minecraft End User Licence Agreement (EULA). After submission, the application must create the server directory hierarchy and automatically download the files required for execution.
+
+\paragraph{FR-03: Delete server instances.} The user must be able to delete an existing server instance through the graphical interface. The application must remove all files belonging to that instance.
+
+\paragraph{FR-04: Execute server instances.} The user must be able to start a server instance through the graphical interface. The application must redirect the server output to the interface so that its logs can be inspected while it is running.
+
+\paragraph{FR-05: Send server commands.} The user must be able to submit commands to a running server through the graphical interface.
+
+\paragraph{FR-06: Stop server instances.} The user must be able to stop a running server instance through the graphical interface.
+
+\subsection{Mod-loader and mod management}
+
+\paragraph{FR-07: Add a mod loader.} The user must be able to add a mod loader to an existing server instance through the graphical interface. The application must support at least Forge and Fabric and must allow the loader and its specific version to be selected. A server instance must not have more than one mod loader installed at a time.
+
+\paragraph{FR-08: Change a mod-loader version.} The user must be able to upgrade or downgrade the mod loader installed in a server instance through the graphical interface.
+
+\paragraph{FR-09: Remove a mod loader.} The user must be able to remove the mod loader installed in a server instance through the graphical interface. The application must remove the loader files and all mods installed for that loader.
+
+\paragraph{FR-10: Add mods.} The user must be able to browse and add mods to an existing server instance through the graphical interface. The application must support Modrinth and, subject to obtaining the required API credentials, CurseForge. Search results must be restricted to releases compatible with the mod loader installed in the selected server instance.
+
+\paragraph{FR-11: Remove mods.} The user must be able to remove installed mods from a server instance through the graphical interface.
+
+\paragraph{FR-12: Change the Minecraft version.} The user must be able to upgrade or downgrade the Minecraft version of a server instance through the graphical interface. The application must obtain the appropriate server files and determine the corresponding changes required for the installed mod loader and mods. If no compatible version of a required component is available, the application must notify the user and abort the migration without leaving the instance partially updated.
+
+\subsection{Runtime and network management}
+
+\paragraph{FR-13: Manage Java runtimes.} The user must be able to browse the available Java runtime versions and install or uninstall them through the graphical interface. Server instances must be configured to use an installed runtime compatible with their Minecraft version.
+
+\paragraph{FR-14: Configure network ports.} When a server is started, the application must open or forward the network ports required to make it accessible. Before doing so, it must check whether the selected port is already in use by another instance. If a conflict exists, the application must abort startup and notify the user.

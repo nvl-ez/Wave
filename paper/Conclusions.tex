@@ -1,11 +1,43 @@
 %!TeX root=MemoriaTFG.tex
 
-\chapter{Conclusions}
+\chapter{Conclusions and future work}\label{chap:conclusions}
 
-Aquest document he fet palesa la importància que tenen les habilitats de redacció i presentació oral de treballs científics i tecnològics per al desenvolupament personal i laboral de qualsevol professional de l'àmbit científic o de l'enginyeria. Per tal de millorar aquestes competències i atès que en l'àmbit universitari la normativa del \ac{TFG} obliga a la redacció d'una proposta i d'una memòria de \ac{TFG} i a la defensa oral d'aquest treball davant d'un tribunal, s'ha utilitzat el \ac{TFG} com a exemple per introduir els principis bàsics per a la redacció i presentació de treballs científico-tecnològics.
+\section{Conclusions}
 
-S'han proporcionat tot un seguit de pautes per a la realització del \ac{TFG}, fent especial esment en la transcendència que tenen les tasques de redacció dels diferents documents que en formen part. S'ha posat de manifest la importància de que sigui l'estudiant, a partir de la proposta de tema proporciona per un professor o un grup de recerca, l'encarregat d'elaborar la proposta formal del \ac{TFG}. Aquest procés d'elaboració li proporcionarà una visió clara, des de l'inici del \ac{TFG}, del problema a resoldre, del seu context i dels objectius concrets de la tasca a realitzar i, a més, li servirà per visualitzar el full de ruta del \ac{TFG} i li facilitarà el control del progrés en l'execució del \ac{TFG} i en l'assoliment dels objectius.
+Wave Launcher grew out of a simple observation: setting up a private Minecraft server still requires more technical knowledge than many players have or want to acquire. The project responds to that problem with a local Windows application that coordinates the server software, Java runtimes, Forge or Fabric, mods from Modrinth or CurseForge, configuration files, process execution and router port mappings. The result is not intended to be a general hosting panel. It is a focused desktop workflow for players who want to self-host without learning a separate administration procedure for every component.
 
-S'han remarcat, també, tot un seguit de principis bàsics en el procés d'escriptura científica, tals com la precisió, concisió, claredat, coherència i adequació a l'audiència, que fan que una memòria de \ac{TFG} sigui d'alta qualitat i s'han donat les pautes a seguir en els processos de focalització, elaboració de l'esbós i redacció de la memòria de \ac{TFG} per tal de ser fidels a aquests principis.
+The implementation demonstrates that the selected components can be represented behind a common application model despite substantial differences between their providers. Mojang and Adoptium distribute Java in different forms. Forge exposes Maven metadata while Fabric provides its own catalogue endpoints. Modrinth and CurseForge use different identifiers, authentication rules and response schemas. Mapping them into domain types makes server creation and migration an application operation rather than a sequence of unrelated downloads.
 
-Finalment, s'ha fet un descripció curosa del procés a seguir quan es vol reflectir en una presentació oral la feina realitzada en el \ac{TFG}, tenint en compte tant els aspectes formals i estructurals del document de la presentació com els aspectes de comunicació oral.
+Hexagonal architecture was valuable during this work because external integrations could be implemented and revised independently. The later development of the interface did require service changes, but those changes occurred through explicit contracts rather than direct dependencies from pages to files or HTTP endpoints. JSON persistence also proved proportionate to a single-user desktop application, while repository interfaces retain a path toward stronger storage if future scope demands it.
+
+The iterative weekly process suited a project whose uncertainty lay mainly in external interfaces and a new UI framework. The high-level schedule remained stable through functional completion. The final correction phase grew by one week due to MAUI form behavior, illustrating why short milestones and time reserved for integration were necessary.
+
+The functional validation strengthens this conclusion beyond successful implementation alone. The same end-to-end scenario completed on Windows 10 Home, Windows 11 Home and Windows 11 Pro. It covered managed Java 21 and 25 installations, automatic runtime selection, Minecraft 1.21 and 26.1 servers, Forge and Fabric, CurseForge and Modrinth, dependency resolution, loader switching, a downgrade to Minecraft 26, property persistence, execution, port-conflict detection and complete cleanup. No reproducible error was observed during that procedure.
+
+The comparison with three users also provided initial evidence for the usability objective. Manual creation took between 18:23 and 22:14, whereas the Wave Launcher workflow took between 02:08 and 05:00. Mean completion time fell from 19:45 to 03:44. During manual setup, all three users struggled with port forwarding or needed specific guidance, and interpreting successful startup and loader or mod compatibility also caused repeated uncertainty. Wave Launcher automated these responsibilities, leaving mainly local interface questions such as where to add a mod or what execution flags mean. The sample is too small to support broad statistical conclusions, but the consistent result across three different backgrounds indicates that the application reduced both completion time and the technical knowledge required in the observed task.
+
+\section{Future work}
+
+\subsection{Extend the empirical evaluation}
+
+The initial comparison involved only three participants and always presented the manual task first. A larger evaluation should balance task order, use a more detailed intervention protocol and include participants from a wider range of ages and technical backgrounds. It should record completion, time, interventions, errors and user confidence consistently. This would show whether the observed reduction is maintained beyond the small exploratory sample and would separate the effect of Wave Launcher from learning during the manual task. The functional matrix should also be extended as new Minecraft, Java, Forge and Fabric versions are published, with failures classified between application defects, provider outages and unsupported router environments.
+
+\subsection{Additional platforms}
+
+.NET MAUI and the internal boundaries leave room for macOS or Linux desktop support, but the present product should not be described as cross-platform until adapters and complete tests exist. New process-executor and device-information implementations are required. File permissions, executable discovery, archive formats and platform packaging must also be addressed. Android and iOS are not natural server-hosting targets even though MAUI can compile interface projects for them, so desktop platforms have higher priority.
+
+\subsection{Transactional updates and backups}
+
+Server migration currently coordinates related changes but operates on live directories. A stronger design would stage downloads and generated configuration in a temporary tree, validate it, then replace the active files atomically where the operating system permits. Automatic backups of worlds and configuration before version changes would make rollback accessible to casual users.
+
+\subsection{Provider resilience}
+
+External adapters should gain contract tests built from recorded provider responses. This would detect schema and mapping changes without downloading complete packages. Retry policies, request timeouts, caching and structured error messages would improve behavior during temporary outages. Credentials should be stored through operating-system protected storage rather than as ordinary configuration where possible.
+
+\subsection{Network diagnostics}
+
+UPnP and NAT-PMP cover many home routers but cannot solve carrier-grade NAT, disabled discovery or firewall rules. A diagnostic screen could explain the local address, mapping protocol, public port and failure stage. Optional firewall-rule assistance and a reachability check from outside the local network would make the result easier to verify. These features must be designed cautiously because network configuration changes have security implications.
+
+\subsection{Distribution and community development}
+
+Wave Launcher is intended to be published as free software under a GNU copyleft licence once its repository is made public. Packaging, release signing, licence notices for dependencies and a contributor guide are required before that release. A public issue tracker could then collect unsupported provider cases and router behavior that cannot be reproduced on the original development machine.

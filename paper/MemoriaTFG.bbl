@@ -7,7 +7,8 @@
 \providecommand{\BIBentrySTDinterwordspacing}{\spaceskip=0pt\relax}
 \providecommand{\BIBentryALTinterwordstretchfactor}{4}
 \providecommand{\BIBentryALTinterwordspacing}{\spaceskip=\fontdimen2\font plus
-\BIBentryALTinterwordstretchfactor\fontdimen3\font minus \fontdimen4\font\relax}
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
 \providecommand{\BIBforeignlanguage}[2]{{%
 \expandafter\ifx\csname l@#1\endcsname\relax
 \typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
@@ -20,55 +21,62 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
-\bibitem{Perelman01}
-L.~C. Perelman, E.~Barrett, and J.~Paradis, \emph{Mayfield Handbook of Technical and Scientific Writing}.\hskip 1em plus 0.5em minus 0.4em\relax McGraw-Hill, 2001.
+\bibitem{CraftyDocs}
+{Crafty Controller}, ``Crafty documentation,''
+  \url{https://docs.craftycontrol.com/}, 2026, accessed: 2026-08-09.
 
-\bibitem{Malvar08}
-H.~S. Malvar, ``Effective communication: Tips on technical writing,'' \emph{IEEE Signal Processing Magazine}, vol.~25, no.~3, pp. 129--132, 2008.
+\bibitem{CraftyLicense}
+------, ``Crafty 4 license,''
+  \url{https://gitlab.com/crafty-controller/crafty-4/-/blob/master/LICENSE},
+  2022, accessed: 2026-08-09.
 
-\bibitem{Valiente96}
-G.~Valiente-Feruglio, \emph{Composició de textos científics amb \LaTeX}.\hskip 1em plus 0.5em minus 0.4em\relax Edicions {UPC}, 1996.
+\bibitem{CraftyJava}
+------, ``Linux installation guide,''
+  \url{https://docs.craftycontrol.com/pages/getting-started/installation/linux/},
+  2026, accessed: 2026-08-09.
 
-\bibitem{Booth08}
-W.~C. Booth, G.~G. Colomb, and J.~M. Williams, \emph{The craft of research}, 3rd~ed.\hskip 1em plus 0.5em minus 0.4em\relax The University of Chicago Press, 2008.
+\bibitem{CraftyWebsite}
+------, ``Crafty controller,'' \url{https://craftycontrol.com/\#home}, 2026,
+  accessed: 2026-08-09.
 
-\bibitem{Pierson97}
-M.~M. Pierson and B.~L. Pierson, ``Beginnings and endings: keys to better engineering technical writing,'' \emph{IEEE Transactions on Professional Communication}, vol.~40, no.~4, pp. 299 --304, december 1997.
+\bibitem{MCSSFeatures}
+{MC Server Soft}, ``Mc server soft: Free minecraft server wrapper ui for
+  windows,'' \url{https://www.mcserversoft.com/}, 2026, accessed: 2026-08-09.
 
-\bibitem{Blair91}
-G.~Blair, ``Presentation skills for emergent managers,'' \emph{IEEE Engineering Management Journal}, vol.~1, no.~6, pp. 249 --255, december 1991.
+\bibitem{MCSSDocs}
+------, ``Getting started with mcss,'' \url{https://docs.mcserversoft.com/},
+  2026, accessed: 2026-08-09.
 
-\bibitem{Padgett08}
-W.~T. Padgett and M.~A. Yoder, ``Effective communication: Excellence in a technical presentation,'' \emph{IEEE Signal Processing Magazine}, vol.~25, no.~2, pp. 124--127, 2008.
+\bibitem{MCSSServerFiles}
+------, ``Sourcing a server file,''
+  \url{https://docs.mcserversoft.com/basic/create-server/sourcing-server-file},
+  2026, accessed: 2026-08-09.
 
-\bibitem{Arcy88}
-J.~D'Arcy, ``Presentation skills for the technical professional,'' \emph{Procedings of the IEEE Professional Communication Conference}, pp. 207 -- 209, october 1988.
+\bibitem{ForkWebsite}
+{Fork}, ``Fork: Minecraft server manager,'' \url{https://www.fork.gg/}, 2026,
+  accessed: 2026-08-09.
 
-\bibitem{Rice04}
-A.~B. R.~Rice and L.~Stetler, ``Assessing oral presentations and writing skills,'' \emph{Proceedings of the IEEE Professional Communication Conference}, pp. 147 -- 150, october 2004.
+\bibitem{MCSManagerProject}
+{MCSManager}, ``Mcsmanager project repository,''
+  \url{https://github.com/MCSManager/MCSManager}, 2026, accessed: 2026-08-09.
 
-\bibitem{Wil10}
-\BIBentryALTinterwordspacing
-P.~Wilson, ``The memoir class,'' 2010. [Online]. Available: \url{http://mirror.ctan.org/macros/latex/contrib/memoir/memman.pdf}
-\BIBentrySTDinterwordspacing
+\bibitem{MCSManagerJava}
+------, ``Dependencies: Install java environment,''
+  \url{https://docs.mcsmanager.com/setup_package.html}, 2026, accessed:
+  2026-08-09.
 
-\bibitem{Fea05}
-\BIBentryALTinterwordspacing
-S.~Fear, ``Publication quality tables in {\LaTeX},'' 2005. [Online]. Available: \url{http://mirror.ctan.org/macros/latex/contrib/booktabs/booktabs.pdf}
-\BIBentrySTDinterwordspacing
+\bibitem{MCSManagerSetup}
+------, ``Setup java edition server,''
+  \url{https://docs.mcsmanager.com/setup_java_edition.html}, 2026, accessed:
+  2026-08-09.
 
-\bibitem{Wri12}
-\BIBentryALTinterwordspacing
-J.~Wright, ``{\texttt{siunitx}} --- a comprehensive (si) units package,'' 2012. [Online]. Available: \url{http://mirror.ctan.org/macros/latex/contrib/siunitx/siunitx.pdf}
-\BIBentrySTDinterwordspacing
+\bibitem{AMPMods}
+{CubeCoders Limited}, ``{AMP} deimos 2.7.0 release notes,''
+  \url{https://discourse.cubecoders.com/t/amp-deimos-2-7-0-release-notes/38578},
+  2026, accessed: 2026-08-09.
 
-\bibitem{bib1}
-N.~Cognoms-autor, \emph{Títol del llibre}.\hskip 1em plus 0.5em minus 0.4em\relax Editor, Any publicació.
-
-\bibitem{bib2}
-N.~Cognoms, ``Títol de l'article,'' \emph{Nom de la revista}, vol. Volum, pp. Pàgina inicial --Pàgina final, Mes Any de publicació.
-
-\bibitem{bib3}
-{Cognoms-autor, Nom}, ``{Títol de l'article de congrés},'' in \emph{Nom del congrés}, Ciutat, País, mes any de publicació.
+\bibitem{AMPPricing}
+------, ``{AMP}: Game server control panel,''
+  \url{https://cubecoders.com/amp/install}, 2026, accessed: 2026-08-09.
 
 \end{thebibliography}

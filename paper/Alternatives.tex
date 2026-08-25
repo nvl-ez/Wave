@@ -1,0 +1,51 @@
+%!TeX root=MemoriaTFG.tex
+
+\chapter{Alternatives}\label{chap:alternatives}
+
+I assessed the alternatives from the perspective of a casual player who wants to host a private Minecraft: Java Edition server on a Windows computer. In this comparison, that player is not expected to know how to select Java runtimes, manipulate server files, resolve compatibility among Minecraft versions, mod loaders and mods, or configure port forwarding. The comparison uses the functionality described in each application's official documentation, consulted on 9 August 2026. It focuses on documented capabilities and does not attempt to rank subjective qualities such as visual design.
+
+The selected alternatives are Crafty Controller, AMP, MC Server Soft, Fork and MCSManager. All five provide a graphical interface from which servers can be created or imported, configured and executed. They also support multiple server instances and can run modded server software. However, the ability to execute a server that already contains mods must be distinguished from managing the mod lifecycle: discovering mods, selecting compatible releases, installing their dependencies and keeping them updated.
+
+\section{Free server managers}
+
+Crafty Controller is a web-based administration interface with server creation, file management, backups, metrics, scheduled tasks and multi-user roles~\cite{CraftyDocs}. It supports Windows and is distributed under the GNU GPLv3~\cite{CraftyLicense}. Its installation documentation nevertheless states that Java must be installed before a Minecraft server can be started~\cite{CraftyJava}. Although Crafty can install and execute modded server types, its documented management facilities are centred on server files rather than on browsing individual mods and resolving their dependencies. Crafty's own website states that getting started requires ``a bit of technical knowledge and a desire to learn''~\cite{CraftyWebsite}. This is a reasonable requirement for novice server administrators, but it still represents a potential barrier for the target user defined in this project, who may neither possess that knowledge nor wish to acquire it merely to host a private server.
+
+MC Server Soft is a free Windows server wrapper that provides server importing, Forge and Fabric installers, backups, scheduling, configuration editors and management of multiple servers~\cite{MCSSFeatures}. Its stated prerequisites include an installed Java release, a router capable of port forwarding and basic knowledge of Minecraft server administration~\cite{MCSSDocs}. Server software must be obtained or selected separately, and its documentation directs the user to the respective external sources~\cite{MCSSServerFiles}. Its plugin manager does not constitute equivalent lifecycle management for Forge or Fabric.
+
+Fork is a free, open-source Windows application explicitly presented as a Minecraft server manager for casual players. It creates and imports servers, edits their configuration and manages multiple instances. It also contains a plugin manager, but does not document an equivalent browser and compatibility resolver for mods. Fork detects Java installations and warns when one is not available; the user must still provide the required runtime. Its own frequently asked questions also instruct users to forward the server port when access from outside the home network is required~\cite{ForkWebsite}.
+
+MCSManager is an open-source web control panel, licensed under Apache 2.0, that runs on Windows and Linux. It provides multi-user and distributed management of Minecraft, Steam and other game servers~\cite{MCSManagerProject}. Its manual workflow requires the user to supply a server core and startup command. The documentation also assumes that an appropriate Java runtime has already been installed and provides a version table for users to select it themselves~\cite{MCSManagerJava, MCSManagerSetup}. Thus, its broad deployment and multi-machine facilities are useful to administrators, but they do not remove the mod-compatibility and networking tasks identified in this project's target scenario.
+
+\section{AMP}
+
+AMP differs from the other alternatives because its current Store can browse, install, update, disable and remove Minecraft content. It filters content by game version and mod loader, and supports individual mods and modpacks from Modrinth as well as CurseForge integration~\cite{AMPMods}. This makes AMP the closest alternative to the mod-management component proposed by Wave Launcher.
+
+AMP is proprietary and has no permanent free edition. A licence is not required to install and inspect the application, but continued use requires a one-time purchase. At the time of the comparison, the Professional licence costs USD~20 and supports 15 application instances, unlimited panel users, multi-system management and webhooks. The Advanced licence costs USD~40 and supports 50 instances, adding analytics and geographic filtering, custom branding, OpenID Connect single sign-on, deployment templates and priority support~\cite{AMPPricing}. AMP supports several games in addition to Minecraft, and its Professional edition is described as being intended for power users managing multiple systems or a larger number of game servers. These capabilities are valuable in larger installations, but add cost and scope that are not required by a casual player seeking to manage one private Minecraft server.
+
+\section{Comparative analysis}
+
+Table~\ref{tab:alternatives} summarizes the criteria that directly follow from the target user's needs. ``Manual'' indicates that the application can store or execute the corresponding files but leaves their acquisition, selection or network configuration to the user. ``Integrated'' is reserved for functionality that the application performs through its own interface.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparison of Minecraft server management alternatives.}
+\label{tab:alternatives}
+\small
+\begin{tabularx}{\textwidth}{Xccccc}
+\toprule
+ & Crafty & AMP & MCSS & Fork & MCSManager \\
+\midrule
+Windows support & Yes & Yes & Yes & Yes & Yes \\
+Multiple servers & Yes & Yes & Yes & Yes & Yes \\
+No purchase required & Yes & No & Yes & Yes & Yes \\
+Open source & Yes & No & No & Yes & Yes \\
+Modded server execution & Yes & Yes & Yes & Yes & Yes \\
+Integrated mod lifecycle & No & Yes & No & No & No \\
+Java acquisition/selection & Manual & Partial & Manual & Manual & Manual \\
+External network access & Manual & Manual & Manual & Manual & Manual \\
+Minecraft-only scope & Yes & No & Yes & Yes & No \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+This comparison does not identify one application as the best choice in every situation. AMP is the strongest existing option when integrated mod management, administration of several games and multi-user control justify the licence cost. The free alternatives are suitable when the user is willing to manage Java, mod files, compatibility and network access manually. Wave Launcher occupies the narrower space between these approaches. It is a free, open-source and Minecraft-specific desktop application that manages the required Java runtime, assists with external connectivity, and treats mod discovery, compatibility, installation and updating as central operations. Its intended advantage is not a longer list of administrative features, but a reduction in the manual tasks that commonly prevent casual players from self-hosting.

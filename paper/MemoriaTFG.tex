@@ -78,7 +78,7 @@
 % incloure molts acrònims. Per això es recomana
 % usar el següent paquet. Consultau el corresponent
 % manual per saber com s'usa.
-\usepackage[printonlyused]{acronym}
+\usepackage{acronym}
 
 % Les diferents unitats de mesura tenen un
 % format estàndard de representació que convé
@@ -174,7 +174,7 @@
 %
 \cleartorecto \thispagestyle{empty}
 \begin{agraiments}
-Gràcies a tots els professors que m'han ajudat a arribar a aquesta fita dels meus estudis.
+    Gràcies a tots els professors que m'han ajudat a arribar a aquesta fita dels meus estudis.
 \end{agraiments}
 
 % A continuació el Sumari
@@ -189,12 +189,12 @@ Gràcies a tots els professors que m'han ajudat a arribar a aquesta fita dels me
 % convindrà fer-ne una llista. Podeu veure com
 % crear-la consultant el fitxer 'Acronims.tex',
 % que és el que s'inclou aquí.
-\include{Acronims} 
+\include{Acronims}
 % Si no usau acrònims, comentau la línia anterior
 
 % En l'arxiu Resum.tex es posarà el resum
 % del treball.
-\include{Resum} 
+\include{Resum}
 
 % No toqueu la línia següent 
 \mainmatter\pagestyle{ruled}
@@ -211,6 +211,7 @@ Gràcies a tots els professors que m'han ajudat a arribar a aquesta fita dels me
 % del document que ens interessi.
 
 \include{Introduccio}
+\include{Alternatives}
 \include{Instruccions}
 %\include{Proposta}
 \include{Memoria}
@@ -221,8 +222,8 @@ Gràcies a tots els professors que m'han ajudat a arribar a aquesta fita dels me
 
 % Si el vostre document no conté apèndixs 
 % comentau les dues línies següents
-\appendix 
-\include{Annexos} 
+\appendix
+\include{Annexos}
 
 % En aquest cas sols hi ha un fitxer d'annexos,
 % però podeu afegir tants \include com calgui. 
@@ -238,6 +239,6 @@ Gràcies a tots els professors que m'han ajudat a arribar a aquesta fita dels me
 % La comanda següent defineix el fitxer que
 % conté les referències bibliogràfiques.
 % En aquest cas és el fitxer Bibliografia.bib
-\bibliography{Bibliografia} 
+\bibliography{Bibliografia}
 
 \end{document}
